@@ -210,6 +210,7 @@ def singup(request):
 					#print (user_name)
 					#print (password)
 					user = authenticate(request, username=user_name, password=password)
+
 					#print(user)
 					if user is not None:
 						if user.is_active:
@@ -219,7 +220,8 @@ def singup(request):
 							if api.login():
 								
 								login(request, user)
-								messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
+								u = Usuarios.objects.get(id=request.user.id)
+								messages.success(request, 'Bienvenido ' + u.nombre + ' '+u.apellido)
 								api.logout()
 								return redirect('admingo:index')
 						else:
@@ -299,8 +301,8 @@ def registroinsta(request):
 			user = authenticate(request, username=username, password=password)
 
 			login(request, user)
-
-			messages.success(request, 'Bienvenido ' + request.user.first_name + ' ' + request.user.first_name)
+			u = Usuarios.objects.get(id=request.user.id)
+			messages.success(request, 'Bienvenido ' + u.nombre + ' ' + u.apellido)
 			api.logout()
 			return redirect("admingo:index")
 		else:
