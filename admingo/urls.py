@@ -16,6 +16,7 @@ urlpatterns = [
 	url(r'^ventas$', views.ventas, name='ventas'),
 	url(r'^upload_img$', views.upload_img, name='upload_img'),
 	url(r'^nuevo_concurso$', views.nuevo_concurso, name='nuevo_concurso'),
+	url(r'^nuevo_concurso/(?P<nuevo>[^/]+)/', views.nuevo_concurso, name='nuevo_concurso'),
 	url(r'^publicar_concurso$', views.publicar_concurso, name='publicar_concurso'),
 	url(r'^mis_concursos$', views.mis_concursos, name='mis_concursos'),
 	url(r'^generar_ganadores$', views.generar_ganadores, name='generar_ganadores'),

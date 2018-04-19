@@ -1,3 +1,22 @@
+$('#btn-siguiente-condiciones').click(function(){
+  $('#condiciones-id').trigger('click');  
+});
+$('#btn-regresar-imagen').click(function(){
+  $('#imagen-id').trigger('click');  
+});
+$('#btn-regresar-condiciones').click(function(){
+  $('#condiciones-id').trigger('click');  
+});
+
+$('#btn-regresar-previa').click(function(){
+  $('#previa-id').trigger('click');  
+});
+
+/*$('#btn-siguiente-previa').click(function(){
+  $('#previa-id')[0].click();
+});*/
+
+
 /*** Seguirnos *****/
 	var_seguirnos="";
 	if($('#seguirnos').is(':checked')){
@@ -317,121 +336,43 @@
 		}
 	});
 /****FIN validar el numero de amigos a etiquetar****/
- 
-/* Vista Compartir */
-$("#previa-id").click(function(){
-	/* Var Seguirnos */
-  	if($('#seguirnos').is(':checked')){		
-      var_seguirnos="- Debes seguirnos\n";
-      ajax_seguirnos = 1;
-  	}else{
-  		
-     	var_seguirnos="";
-      ajax_seguirnos =0;
-  	}
-	/* Fin Var Seguirnos */
-	
-	/* Var Like */
-  	if($('#like').is(':checked')){
-      var_like= "- Debes darle like a esta foto\n";
-      ajax_like = 1;
-  	}else{
-     	var_like="";
-      ajax_like = 0;
-  	}	
-	/* Fin Var Like */
 
-	/* Var Hastag */
-  	if($("#hastag-text").val()!="" && $('#hastag').is(':checked')){
-  		harr=$("#hastag-text").val().split(" ")
-  		if (harr.length > 1 && harr[1]!=""){
-  			var_hastag="- Debes usar los hastags: "+$("#hastag-text").val()+"\n";	
-        ajax_hastag = $("#hastag-text").val();
-  		}else{
-  			var_hastag="- Debes usar el hastag: "+$("#hastag-text").val()+"\n";
-        ajax_hastag = $("#hastag-text").val();
-  		}
-   		
-   	
-   	}else if (!$('#hastag').is(':checked')){
+/* Vista Condiciones */
+$("#previa-id").click(function(){
+  /* Var Hastag */
+    if (!$('#hastag').is(':checked')){
    		var_hastag="";
       ajax_hastag = "";
    	}else if($("#hastag-text").val()=="" && $('#hastag').is(':checked')){
-      $("#condiciones").click()
+      
       demo.showNotificationError('top','center','No debes dejar el espacio del Hastag vacio');
+      $('#condiciones-id').trigger('click');
     }
 
  	/* Fin Var Hastag */
 
  	/* Var Seguir a otros usuarios */
-    if($("#segir-otro-text").val() != "" && $('#seguir-otro').is(':checked')){
-   	
-   		var_seguir_otros="- Debes seguir estas cuentas: "+$("#segir-otro-text").val()+"\n";
-      ajax_seguir_otros = $("#segir-otro-text").val();
-   	}else if (!$('#seguir-otro').is(':checked')){
+    if (!$('#seguir-otro').is(':checked')){
    		var_seguir_otros="";
       ajax_seguir_otros = "";
    	}else if($("#segir-otro-text").val() == "" && $('#seguir-otro').is(':checked')){
-      $("#condiciones").click()
       demo.showNotificationError('top','center','No debes dejar el espacio de las cuentas a seguir vacio');
+      $('#condiciones-id').trigger('click');
     }
  	/* Fin Var Seguir a otros usuarios */
 
  	/* Var Catidad de usuarios a etiquetar */
   
-   	if ($("#cantidad-etiqueta").val() > 0 && $('#etiqueta').is(':checked')){
-    	if ($("#cantidad-etiqueta").val() == 1){
-    	
-    		var_cant_etiqueta="- Etiquetar a "+$("#cantidad-etiqueta").val() + " amigo\n";
-        ajax_cant_etiqueta = $("#cantidad-etiqueta").val();
-    	}else{
-    	
-    		var_cant_etiqueta= "- Etiquetar a "+$("#cantidad-etiqueta").val() + " amigos\n";
-        ajax_cant_etiqueta = $("#cantidad-etiqueta").val();
-    	}
-    	
-    }else if(!$('#etiqueta').is(':checked')){
+   	if(!$('#etiqueta').is(':checked')){
     	var_cant_etiqueta=""
       ajax_cant_etiqueta = 0;
     }else if($("#cantidad-etiqueta").val() == "" && $('#etiqueta').is(':checked')){
       demo.showNotificationError('top','center','Debes decidir que cantidad de amigos se etiquetaran');
+      $('#condiciones-id').trigger('click');
     }
   /* Fin Var Catidad de usuarios a etiquetar */
 
-  /* Amigos Seguirme */
-    if($('#amigos-seguir').is(':checked') && $('#etiqueta').is(':checked')){
-    	
-      var_amigos_seguirme="- Tus amigos etiquetados deben seguir a nuestra cuenta\n";
-      ajax_amigos_seguirme = 1;
-    }else{
-    	var_amigos_seguirme="";
-      ajax_amigos_seguirme = 0;
-    }
-  /* Fin amigos Seguirme */
 
-  /* Amigos seguir a otros usuarios*/
-    if($('#amigos-seguir-otro').is(':checked') && $('#seguir-otro').is(':checked') && $('#etiqueta').is(':checked') ){
-  	  var_amigos_seguir_otros="- Tus amigos etiquetados deben seguir a las cuentas nombradas\n";
-      ajax_amigos_seguir_otros = 1;
-  	}else{
-  		var_amigos_seguir_otros="";
-      ajax_amigos_seguir_otros = 0;
-  	}
-	/* Fin amigos seguir otros usuarios*/
-
-
-
-  /* Amigos Like a este post*/
-    if($('#amigos-like-otro').is(':checked') && $('#etiqueta').is(':checked')){
-
-      var_amigos_like_otros="- Tus amigos etiquetados deben hacer like a esta publicación\n"; 
-      ajax_amigos_like_otros = 1; 	
-
-  	}else{
-  		var_amigos_like_otros="";
-      ajax_amigos_like_otros = 0;   
-  	}
-	/* Fin amigos seguir otros usuarios*/
   /* Ganadores */
     if($('#ganadores-text').val() > 0 ){
       if($('#ganadores-text').val() == 1 ){
@@ -442,12 +383,178 @@ $("#previa-id").click(function(){
       
       ajax_ganadores = $('#ganadores-text').val();
     }else{
-      demo.showNotificationError('top','center','Debes indicar la cantidad de Ganadores para el concurso');
+            demo.showNotificationError('top','center','Debes indicar la cantidad de Ganadores para el concurso');
+      $('#condiciones-id').trigger('click');
     }
   /* Fin Ganadores */
 	$("#comentario").val( var_seguirnos+ var_like+var_hastag+var_seguir_otros+var_cant_etiqueta+var_amigos_like_otros+var_amigos_seguirme+var_amigos_seguir_otros);
-  });
+});
 
+$("#btn-siguiente-previa").click(function(){
+  var next = true;
+ 
+    if($('#seguirnos').is(':checked')){   
+      var_seguirnos="- Debes seguirnos\n";
+      ajax_seguirnos = 1;
+    }else{
+      
+      var_seguirnos="";
+      ajax_seguirnos =0;
+    }
+  /* Fin Var Seguirnos */
+  
+  /* Var Like */
+    if($('#like').is(':checked')){
+      var_like= "- Debes darle like a esta foto\n";
+      ajax_like = 1;
+    }else{
+      var_like="";
+      ajax_like = 0;
+    } 
+  /* Fin Var Like */
+
+  /* Var Hastag */
+    if($("#hastag-text").val()!="" && $('#hastag').is(':checked')){
+      harr=$("#hastag-text").val().split(" ")
+      if (harr.length > 1 && harr[1]!=""){
+        var_hastag="- Debes usar los hastags: "+$("#hastag-text").val()+"\n"; 
+        ajax_hastag = $("#hastag-text").val();
+      }else{
+        var_hastag="- Debes usar el hastag: "+$("#hastag-text").val()+"\n";
+        ajax_hastag = $("#hastag-text").val();
+      }
+      
+    
+    }else if (!$('#hastag').is(':checked')){
+      var_hastag="";
+      ajax_hastag = "";
+
+    }else if($("#hastag-text").val()=="" && $('#hastag').is(':checked')){
+      next = false
+      demo.showNotificationError('top','center','No debes dejar el espacio del Hastag vacio');
+    }
+
+  /* Fin Var Hastag */
+
+  /* Var Seguir a otros usuarios */
+    if($("#segir-otro-text").val() != "" && $('#seguir-otro').is(':checked')){
+    
+      var_seguir_otros="- Debes seguir estas cuentas: "+$("#segir-otro-text").val()+"\n";
+      ajax_seguir_otros = $("#segir-otro-text").val();
+    }else if (!$('#seguir-otro').is(':checked')){
+      var_seguir_otros="";
+      ajax_seguir_otros = "";
+    }else if($("#segir-otro-text").val() == "" && $('#seguir-otro').is(':checked')){
+      next = false
+      demo.showNotificationError('top','center','No debes dejar el espacio de las cuentas a seguir vacio');
+      
+    }
+  /* Fin Var Seguir a otros usuarios */
+
+  /* Var Catidad de usuarios a etiquetar */
+  
+    if ($("#cantidad-etiqueta").val() > 0 && $('#etiqueta').is(':checked')){
+      if ($("#cantidad-etiqueta").val() == 1){
+      
+        var_cant_etiqueta="- Etiquetar a "+$("#cantidad-etiqueta").val() + " amigo\n";
+        ajax_cant_etiqueta = $("#cantidad-etiqueta").val();
+      }else{
+      
+        var_cant_etiqueta= "- Etiquetar a "+$("#cantidad-etiqueta").val() + " amigos\n";
+        ajax_cant_etiqueta = $("#cantidad-etiqueta").val();
+      }
+      
+    }else if(!$('#etiqueta').is(':checked')){
+      var_cant_etiqueta=""
+      ajax_cant_etiqueta = 0;
+    }else if(($("#cantidad-etiqueta").val() == "" || $("#cantidad-etiqueta").val() <= 0) && $('#etiqueta').is(':checked')){
+      next = false
+      demo.showNotificationError('top','center','Debes decidir que cantidad de amigos se etiquetaran');
+      
+    }
+  /* Fin Var Catidad de usuarios a etiquetar */
+
+  /* Amigos Seguirme */
+    if($('#amigos-seguir').is(':checked') && $('#etiqueta').is(':checked')){
+      
+      var_amigos_seguirme="- Tus amigos etiquetados deben seguir a nuestra cuenta\n";
+      ajax_amigos_seguirme = 1;
+    }else{
+      var_amigos_seguirme="";
+      ajax_amigos_seguirme = 0;
+    }
+  /* Fin amigos Seguirme */
+
+  /* Amigos seguir a otros usuarios*/
+    if($('#amigos-seguir-otro').is(':checked') && $('#seguir-otro').is(':checked') && $('#etiqueta').is(':checked') ){
+      var_amigos_seguir_otros="- Tus amigos etiquetados deben seguir a las cuentas nombradas\n";
+      ajax_amigos_seguir_otros = 1;
+    }else{
+      var_amigos_seguir_otros="";
+      ajax_amigos_seguir_otros = 0;
+    }
+  /* Fin amigos seguir otros usuarios*/
+
+
+
+  /* Amigos Like a este post*/
+    if($('#amigos-like-otro').is(':checked') && $('#etiqueta').is(':checked')){
+
+      var_amigos_like_otros="- Tus amigos etiquetados deben hacer like a esta publicación\n"; 
+      ajax_amigos_like_otros = 1;   
+
+    }else{
+      var_amigos_like_otros="";
+      ajax_amigos_like_otros = 0;   
+    }
+  /* Fin amigos seguir otros usuarios*/
+  /* Ganadores */
+    if($('#ganadores-text').val() > 0 ){
+      if($('#ganadores-text').val() == 1 ){
+        var_ganadores = "- Se elegirá un solo ganador\n";
+      }else{
+        var_ganadores = "- Se elegirán "+ $('#ganadores-text').val() +" ganadores\n";
+      }
+      
+      ajax_ganadores = $('#ganadores-text').val();
+    }else{
+      next = false
+      demo.showNotificationError('top','center','Debes indicar la cantidad de Ganadores para el concurso');
+      
+    }
+  /* Fin Ganadores */
+  $("#comentario").val( var_seguirnos+ var_like+var_hastag+var_seguir_otros+var_cant_etiqueta+var_amigos_like_otros+var_amigos_seguirme+var_amigos_seguir_otros);
+
+  if (next == true){
+    if ($('#concurso-none').val() == '1'){
+      $('#previa-id').trigger('click');
+    }else{
+      $('#share-id').trigger('click');
+    }
+  }
+
+});
+$('#btn-siguiente-share').click(function(){
+  
+
+  if ($('#concurso-none').val() == '0'){
+    if($('#ganadores-text').val() > 0 ){
+      if($('#ganadores-text').val() == 1 ){
+        var_ganadores = "- Se elegirá un solo ganador\n";
+      }else{
+        var_ganadores = "- Se elegirán "+ $('#ganadores-text').val() +" ganadores\n";
+      }
+      
+      ajax_ganadores = $('#ganadores-text').val();
+      $('#share-id').trigger('click'); 
+    }else{
+      demo.showNotificationError('top','center','Debes indicar la cantidad de Ganadores para el concurso');
+    }
+  }else{
+    $('#share-id').trigger('click');  
+  }
+});
+/* Vista Compartir*/
 $("#share-id").click(function(){
   
   /* Var Seguirnos */
@@ -487,7 +594,7 @@ $("#share-id").click(function(){
       var_hastag="";
       ajax_hastag = "";
     }else if($("#hastag-text").val()=="" && $('#hastag').is(':checked')){
-      $("#condiciones").click()
+      
       demo.showNotificationError('top','center','No debes dejar el espacio del Hastag vacio');
     }
 
@@ -502,7 +609,7 @@ $("#share-id").click(function(){
       var_seguir_otros="";
       ajax_seguir_otros = "";
     }else if($("#segir-otro-text").val() == "" && $('#seguir-otro').is(':checked')){
-      $("#condiciones").click()
+      
       demo.showNotificationError('top','center','No debes dejar el espacio de las cuentas a seguir vacio');
     }
   /* Fin Var Seguir a otros usuarios */

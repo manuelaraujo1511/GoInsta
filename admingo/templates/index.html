@@ -498,6 +498,7 @@
 				$.ajax({
 			 		url : '{% url "admingo:nuevo_concurso" %}',
 			    type : 'POST',
+			    cache: false,
 			    data : 
 			    	{	'csrfmiddlewaretoken' : csrftoken,
 			    		'media_id' : media_id

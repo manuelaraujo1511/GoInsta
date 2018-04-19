@@ -86,6 +86,7 @@ class Concursos(models.Model):
 	activo = models.IntegerField(default=0)
 	publi_ganadores = models.IntegerField(default=0)
 	view_otro = models.IntegerField(default=0)
+	fin_carga = models.IntegerField(default=0)
 	fecha_creacion = models.DateTimeField(default= datetime.now)
 
 

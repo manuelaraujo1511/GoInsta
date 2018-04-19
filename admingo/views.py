@@ -131,7 +131,15 @@ def index(request):
 
 	#api.getTotalUserFeed(api.username_id)
 	#todos_concursos = []
-	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
+
+	## Eliminar de la tabla los concursos que no terminaron de publicar
+	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
+	for con_d in concursos_delete:
+		con_d.delete()
+	## fiin de eliminar los que no terminaron de cargar
+
+	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=1)
+
 
 	if (todos_concursos.exists()):		
 
@@ -477,7 +485,7 @@ def upload_img(request):
 	return JsonResponse(context)
 
 @login_required
-def nuevo_concurso (request):
+def nuevo_concurso (request, nuevo =None):
 	if (request.is_ajax()):
 		print ('entro si request ajax')
 		user_r= Usuarios.objects.get(email=request.user.email)
@@ -495,9 +503,10 @@ def nuevo_concurso (request):
 		#print("media type:  "+str(media_info["items"][0]["media_type"]))
 		imagen = []
 		hastag= ""
+		existe_img= False
 
 		if (media_info["items"][0]["media_type"] == 1):
-			print("media_info[media_type] == 1")
+			
 			comentario=media_info["items"][0]["caption"]["text"]
 			img_url=media_info["items"][0]["image_versions2"]["candidates"][0]["url"]
 
@@ -508,17 +517,24 @@ def nuevo_concurso (request):
 				hastag+= " #"+c+" "
 
 			print(str(hastag))
-			
-			Imagenes(id_usuario = user_r,media_id=media_id, imagen=img_url).save()
+			if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id, imagen=img_url).exists()):
+				Imagenes(id_usuario = user_r,media_id=media_id, imagen=img_url).save()
 
-			Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id,hastags = hastag,  seguir_otros= "",condiciones = comentario, view_otro = 1).save()
+				Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id,hastags = hastag,  seguir_otros= "",condiciones = comentario, view_otro = 1).save()
 		else:
 			
-			print("media_info[media_type] == 8")
+			
 			arra_img=[]
+
 			for img in media_info["items"][0]["carousel_media"]:
-				#arra_img.append(img["image_versions2"]["candidates"][0]['url'])
-				Imagenes(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).save()
+			
+				if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).exists()):
+
+					Imagenes(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).save()
+
+				else:
+					existe_img = True
+					break
 
 
 			comentario=media_info["items"][0]["caption"]["text"]
@@ -527,8 +543,8 @@ def nuevo_concurso (request):
 			lista_hastag = tag_re.findall(comentario)
 			for c in lista_hastag:
 				hastag+= " #"+c+" "
-
-			Concursos(id_usuario = user_r,img_url="",media_id=media_id,hastags = hastag, seguir_otros= "",condiciones = comentario, view_otro = 1).save()
+			if (not existe_img):
+				Concursos(id_usuario = user_r,img_url="",media_id=media_id,hastags = hastag, seguir_otros= "",condiciones = comentario, view_otro = 1).save()
 
 		#print("imagen : "+str(imagen))
 
@@ -546,21 +562,6 @@ def nuevo_concurso (request):
 
 		return JsonResponse(context)
 	else:
-		concursos = None
-		imagenes_count = "0"
-		imagenes=None
-		if Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1).exists():
-			concursos = Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1)
-			for c in concursos:
-				imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id, media_id = c.media_id)
-			
-			imagenes_count = imagenes.count()
-
-			print("imagenes_count: "+ str(imagenes_count))
-			## Esto esta por hacer ###
-			##usuario = Info.objects.get(id_usuario_id=request.user.id)
-			###
-
 		user_r= Usuarios.objects.get(email=request.user.email)
 		username_insta = ""+user_r.user_insta+""
 
@@ -574,15 +575,40 @@ def nuevo_concurso (request):
 		tags = api.LastJson['user']['usertags_count']
 		usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags , 'username' : username_insta}
 			
-		context = {
+		
+		if(nuevo == None):
+
+			print("entro si nuevo_concurso request no ajax y nuevo = None")
+			concursos = None
+			imagenes_count = "0"
+			imagenes=None
+			if Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1).exists():
+				concursos = Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1)
+				for c in concursos:
+					imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id, media_id = c.media_id)
+				
+				imagenes_count = imagenes.count()
+
+				print("imagenes_count: "+ str(imagenes_count))
+				## Esto esta por hacer ###
+				##usuario = Info.objects.get(id_usuario_id=request.user.id)
+				###
+			print("concursos: "+str(concursos))
+			context = {
+					'usuario' : usuario,
+					'concursos': concursos,
+					'imagenes' : imagenes 	,
+					'imagenes_count': str(imagenes_count),
+					'monto_total' : get_precio(request)
+				}
+
+		else:
+			context = {
 				'usuario' : usuario,
-				'concursos': concursos,
-				'imagenes' : imagenes 	,
-				'imagenes_count': str(imagenes_count),
 				'monto_total' : get_precio(request)
 			}
 		api.logout()
-		print("concursos: "+str(concursos))
+		
 		return render (request,'nuevo_concurso.html', context)
 
 @login_required
@@ -628,6 +654,7 @@ def publicar_concurso(request):
 					con.seguir_amigos_otras=amigos_seguir_otros
 					con.ganadores=ganadores
 					con.activo = 1
+					con.fin_carga = 1
 					con.save()
 				context = {'estado': 1}
 			else:			

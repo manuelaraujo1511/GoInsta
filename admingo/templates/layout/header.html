@@ -36,7 +36,7 @@
 
 <body>
 	<div class="load">
-		<img src="static/img/apple-icon.png">
+		<img src="/static/img/apple-icon.png">
 	</div>
 	<div class="wrapper">
 
@@ -79,7 +79,7 @@
               </a>
           </li>
           <li id="nuevo-concurso-li">
-              <a href="{% url 'admingo:nuevo_concurso' %}">
+              <a href="{% url 'admingo:nuevo_concurso' nuevo='nuevo' %}">
                   <i class="material-icons">card_giftcard</i>
                   <p>Iniciar Concurso</p>
               </a>
