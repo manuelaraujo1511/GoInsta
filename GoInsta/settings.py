@@ -101,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = '/'
+LOGIN_URL = '/singup'
 
 LOGIN_EXEMPT_URLS = (
  r'^$',

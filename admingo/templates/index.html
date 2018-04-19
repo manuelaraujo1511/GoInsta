@@ -8,6 +8,7 @@
 </dir-->
 <script type="text/javascript">
 	window.onload = function() {
+		$(".load").fadeOut();
   	demo.showNotificationSucces('top','center', "{{message}}")
 	};
 	
@@ -386,7 +387,7 @@
 	     
 	      	{% csrf_token %}
 	      	Al momento de cancelar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
-	      	<div class="form-group label-floating has-error">
+	      	<div class="form-group label-floating ">
 	    			<label class="control-label">Titulo</label>
 	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
 	    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
@@ -519,6 +520,7 @@
 						$(".load").fadeOut();
 						demo.showNotificationSucces('top','center','Hemos agregado el concurso')
 						window.location.replace("{% url 'admingo:nuevo_concurso' %}");
+						$(".load").fadeIn();
 						
 			        
 			    },
@@ -646,6 +648,7 @@
 						//console.log(data);
 						$('#MyPausar').modal('hide');
 							demo.showNotificationSucces('top','center','Venta Pausada satisfactoriamente');
+							$(".load").fadeIn();
 							setTimeout(function(){// wait for 5 secs(2)
            			location.reload(); // then reload the page.(3)
       				}, 2000); 

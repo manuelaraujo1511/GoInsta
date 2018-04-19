@@ -6,8 +6,8 @@ from . import views
 app_name = 'admingo'
 
 urlpatterns = [
-	url(r'^$', views.singup, name='singup'),
-	url(r'^index$', views.index, name='index'),
+	url(r'^$', views.index, name='index'),
+	url(r'^singup$', views.singup, name='singup'),
 	url(r'^registroinsta$', views.registroinsta, name='registroinsta'),
 	url(r'^registro$', views.registro, name='registro'),
 	url(r'^cerrar_sesion$', views.cerrar_sesion, name='cerrar_sesion'),

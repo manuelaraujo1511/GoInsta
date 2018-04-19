@@ -11,6 +11,7 @@
 <script type="text/javascript">
 	window.onload = function() {
   	demo.showNotificationSucces('top','center', "{{message}}")
+  	$(".load").fadeOut();
 	};
 	
 </script>
@@ -710,6 +711,7 @@ $('#btn-publicar').click(function(){
 						$(".load").fadeOut();
 						demo.showNotificationSucces('top','center','Publicación hecha satisfactoriamente')
 						window.location.href= '{% url "admingo:mis_concursos" %}';
+						$(".load").fadeIn();
 					}else{
 						demo.showNotificationError('top','center','La imagen debe ser JPG')
 					}
@@ -784,6 +786,7 @@ $('#btn-monitorear').click(function(){
 					$(".load").fadeOut();
 					demo.showNotificationSucces('top','center','Ahora podemos monitorear tu concurso')
 					window.location.href= '{% url "admingo:mis_concursos" %}';
+					$(".load").fadeIn();
 				}else{
 					demo.showNotificationError('top','center','La imagen debe ser JPG')
 				}
