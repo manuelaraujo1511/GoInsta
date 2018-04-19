@@ -197,11 +197,13 @@ def singup(request):
 	#	return redirect("admingo:index")
 	#global api
 	print (str(request))
+	
 	if request.method == "POST":
 		email = request.POST['email']
 		password = request.POST['password']
 
 		try:
+
 			user_u = Usuarios.objects.get(email=email)
 			user_name=user_u.username
 
@@ -220,8 +222,7 @@ def singup(request):
 							if api.login():
 								
 								login(request, user)
-								u = Usuarios.objects.get(id=request.user.id)
-								messages.success(request, 'Bienvenido ' + u.nombre + ' '+u.apellido)
+								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
 								api.logout()
 								return redirect('admingo:index')
 						else:
@@ -290,7 +291,7 @@ def registroinsta(request):
 		# ---------------
 		username = request.POST['username']
 		password = request.POST['password']
-
+		user_u = Usuarios.objects.get(username=username)
 		
 
 		api = InstagramAPI(cuenta, password_i)
@@ -301,8 +302,8 @@ def registroinsta(request):
 			user = authenticate(request, username=username, password=password)
 
 			login(request, user)
-			u = Usuarios.objects.get(id=request.user.id)
-			messages.success(request, 'Bienvenido ' + u.nombre + ' ' + u.apellido)
+
+			messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
 			api.logout()
 			return redirect("admingo:index")
 		else:
