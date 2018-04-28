@@ -662,7 +662,7 @@ $('#btn-publicar').click(function(){
 
 	}else{
 		if ($("#img-text ").val() == "" ){
-	  		demo.showNotificationError('top','center', "No hay imagen cargada");
+	  	demo.showNotificationError('top','center', "No hay imagen cargada");
 		}else{
 			var csrftoken = getCookie('csrftoken');
 			var img = $("#img-text").val();

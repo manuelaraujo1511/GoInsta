@@ -139,6 +139,7 @@ def index(request):
 	## fiin de eliminar los que no terminaron de cargar
 
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=1)
+	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
 
 
 	if (todos_concursos.exists()):		
@@ -149,10 +150,18 @@ def index(request):
 		  temp = api.LastJson
 
 		  for item in temp["items"]:
+		  	for p in pausas:
+		  		if(str(item['caption']['media_id']) == str(p.media_id)):
+		  			item['caption']['pausado'] = True
+		  		else:
+		  			item['caption']['pausado'] = False
+
 		  	for con in todos_concursos:
 		  		if(str(item['caption']['media_id']) == str(con.media_id)):
 		  			guardo = False
 		  			break
+
+
 		  	if (guardo):
 		  		feed.append(item)
 		  	guardo = True
@@ -171,6 +180,11 @@ def index(request):
 		  temp = api.LastJson
 
 		  for item in temp["items"]:
+		  	for p in pausas:
+		  		if(str(item['caption']['media_id']) == str(p.media_id)):
+		  			item['caption']['pausado'] = True
+		  		else:
+		  			item['caption']['pausado'] = False
 		  	feed.append(item)
 
 		  if temp["more_available"] is False:
@@ -181,10 +195,10 @@ def index(request):
 		  
 		  else:
 		  	next_max_id = temp["next_max_id"]
-
 	context = {
 		'usuario' : usuario_info,
 		'feed' : feed,
+		'pausas': pausas,
 		'monto_total' : get_precio(request)
 
 	}
@@ -387,13 +401,65 @@ def pausar_venta(request):
 		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 		api.login()
 
+		estado =0
+
 		if request.is_ajax():
+			desde_pro =request.POST.get('desde_pro')
+			if desde_pro == 0:
+				texto = request.POST.get('texto')
+				media_id = request.POST.get('media_id')
+				if(Productos.objects.filter(media_id=media_id).exists()):
+					pro=Productos.objects.get(media_id=media_id)
+					pro.texto=texto
+					pro.save()
+
+				if(api.editMedia(media_id, ""+texto+"")):
+					estado = 1
+				
+				api.logout()
+				
+				Pausas(id_usuario=user_r, media_id=media_id).save()
+			else:
+				texto = request.POST.get('texto')
+				media_id = request.POST.get('media_id')
+				pro = Productos.objects.get(media_id=media_id)
+				pro.texto = texto
+				pro.save();
+				
+				if(api.editMedia(media_id, ""+texto+"")):
+					estado = 1
+				
+				api.logout()
+				
+				Pausas(id_usuario=user_r, media_id=media_id).save()
+			
+			context = {'estado': estado}
+	return JsonResponse(context)
+
+@login_required
+def play_venta(request):
+
+	if request.method == "POST":
+		
+		print ("entre a pausar Venta POST")
+		user_r= Usuarios.objects.get(email=request.user.email)
+		username_insta = ""+user_r.user_insta+""
+
+		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
+		api.login()
+
+		if request.is_ajax():
+			estado= 0
 			texto = request.POST.get('texto')
 			media_id = request.POST.get('media_id')
-			api.editMedia(media_id, ""+texto+"")
-
+			if (api.editMedia(media_id, ""+texto+"")):
+				estado =1
 			api.logout()
-			context = {'estado': 1}
+
+			pausa = Pausas.objects.get(media_id=media_id)
+			pausa.delete()
+			
+			context = {'estado': estado}
 	return JsonResponse(context)
 
 @login_required
@@ -419,6 +485,7 @@ def ventas (request):
 
 	arr_img = []
 	arr_ventas = []
+	
 	for v in todas_ventas:
 		for img in imagenes:
 			if (img.media_id == v.media_id):
@@ -427,6 +494,7 @@ def ventas (request):
 		arr_ventas.append({'media_id': v.media_id, 'nombre_cliente': v.nombre_cliente, 'telefono_cliente': v.telefono_cliente,'precio': v.precio, 'precio_total':(int(v.cantidad)*v.precio),'descripcion_venta':v.descripcion_venta, 'cantidad': v.cantidad, 'imagen': arr_img, 'cant_img': len(arr_img)})
 
 		arr_img = []
+		
 
 	context = {
 		'usuario' : usuario,
@@ -582,6 +650,7 @@ def nuevo_concurso (request, nuevo =None):
 		if(nuevo == None):
 
 			print("entro si nuevo_concurso request no ajax y nuevo = None")
+			print("User ID: " + str(request.user.id))	
 			concursos = None
 			imagenes_count = "0"
 			imagenes=None
@@ -864,6 +933,7 @@ def mis_concursos(request):
 	api.login()
 	
 	comentarios=[]
+	tiene = 0
 	i =0 
 	#print(str(api.username_id))
 	#api.getSelfUserFollowers()
@@ -928,6 +998,22 @@ def mis_concursos(request):
 	api.logout()
 	return render (request,'mis_concursos.html', context)
 
+
+@login_required
+def delete_concurso(request):
+	estado = 0
+	if request.method == "POST":
+		if request.is_ajax():
+			media_id= request.POST.get('media_id')
+			concurso = Concursos.objects.get(media_id=media_id)
+			if (concurso.delete()):
+				estado = 1
+
+			context ={
+				'estado':estado
+			}
+			return JsonResponse(context)
+	
 
 @login_required
 def generar_ganadores(request):
@@ -1132,6 +1218,19 @@ def editar_producto(request):
 		context= {'estado':estado}
 		return JsonResponse(context)
 
+def delete_producto(request):
+
+	if request.is_ajax():
+		estado =0
+		media_id = request.POST.get('media_id')		
+		pro = Productos.objects.get(media_id= media_id)
+
+		if (pro.delete()):
+			estado = 1
+
+		context= {'estado':estado}
+		return JsonResponse(context)
+
 @login_required
 def productos(request):
 	product = Productos.objects.filter(id_usuario_id= request.user.id)
@@ -1155,14 +1254,19 @@ def productos(request):
 	
 	arr_img = []
 	products = []
-
+	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
+	play =False
 	for pro in product:
+		for p in pausas:
+			if (p.media_id == pro.media_id):
+				play = True
 		for img in imagenes:
 			if (img.media_id == pro.media_id):
 				arr_img.append(img.imagen)
 
-		products.append({'media_id':pro.media_id,'texto':pro.texto,'descripcion':pro.descripcion_producto, 'talla': pro.talla, 'modelo': pro.modelo, 'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
+		products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto, 'talla': pro.talla, 'modelo': pro.modelo, 'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
 		arr_img = []
+	
 
 	context = {
 		'usuario' : usuario,

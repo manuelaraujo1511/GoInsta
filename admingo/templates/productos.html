@@ -15,6 +15,7 @@
 </dir-->
 <script type="text/javascript">
 	window.onload = function() {
+		$(".load").fadeOut();
   	demo.showNotificationSucces('top','center', "{{message}}")
 	};
 	
@@ -22,44 +23,32 @@
 {% endfor %}
 		<div class="content">
 			<div class="container-fluid">
-
+			
 				<div class="row">
 					<div class="col-md-12">
             <div class="card card-plain">
               <div class="card-header" data-background-color="purple">
                 <h4 class="title">Mis Productos</h4>
-                <p class="category"> ###### tengo que escribir algo en esta sección  ####</p>
+                <p class="category"> Todos estos productos son los que has vendido o has editado desde la sección de publicaciones</p>
               </div>
+            	{% if products%}  
               <div class="card-content table-responsive">
                 <table id="tabla" class="table table-hover ">
                   <thead class="text-succes" style="font-weight: bold">
                   	<tr>
-                  		<center>
-                  			<th style="width: 160px;">Imagen</th>
-                  		</center>
-                  		<center>
-                  			<th>Descripción</th>	
-                  		</center>
-                  		<center>
-                  			<th>Detalles</th>	
-                  		</center>
-                  		<center>
-                  			<th>Talla</th>	
-                  		</center>
-                  		<center>
-                  			<th>Modelo</th>	
-                  		</center>
-                  		<center>
-                  			<th>Cantidad</th>	
-                  		</center>
                   		
-                  		<center>
-                  			<th style="width: 149px;"> Acciones</th>
-                  		</center>
+                			<th style="width: 160px;">Imagen</th>
+                			<th>Descripción</th>	
+                			<th>Detalles</th>	
+                			<th>Talla</th>	
+                			<th>Modelo</th>	
+                			<th>Cantidad</th>	
+                			
+                			<th style="width: 149px;"> Acciones</th>
                   	</tr>
                   </thead>
                   <tbody>
-                 
+                 	
                   {% for pro in products %}
                   <tr>
                   	<td>
@@ -127,13 +116,21 @@
                   	<!--td class="td-actions text-right"-->
                   	<td>
 											 <!--div class="clearfix"></div-->
-											 <div class="row">
+											<div class="row">
 											 	<div class="col-sm-4">
-													<button type="button" class="btn btn-simple Modalcancelar" data-media="{{pro.media_id}}" data-texto="{{pro.texto}}" title="Pausar Venta" style="padding: 0px 0px !important">
-													
-														<i class="material-icons text-warning" style="font-size: 30px">pause</i>
+											 		{% if pro.play %}
+														<button type="button" class="btn btn-simple ModalPlay" data-media="{{pro.media_id}}" data-texto="{{pro.texto}}" title="Play a Venta" style="padding: 0px 0px !important">
+														
+															<i class="material-icons text-warning" style="font-size: 30px">play_arrow</i>
 
-													</button> 		
+														</button>
+													{%else%}	
+														<button type="button" class="btn btn-simple Modalcancelar" data-media="{{pro.media_id}}" data-texto="{{pro.texto}}" title="Pausar Venta" style="padding: 0px 0px !important">
+														
+															<i class="material-icons text-warning" style="font-size: 30px">pause</i>
+
+														</button>
+													{%endif%}
 											 	</div>
 											 	<div class="col-sm-4">
 													<button type="button" class="btn btn-simple Modalvender"  data-media="{{pro.media_id}}"  data-comentario="{{pro.texto}}" title="Vender" style="padding: 0px 0px !important">
@@ -149,10 +146,14 @@
 
 										 			</button>
 											 	</div>
-											 </div>
-											 
-											
-											
+											 	<div class="col-sm-4">						 	
+											 		<button type="button" id="btn-eliminar-pro" class="btn btn-simple ModalEliminarProducto"  data-mediaid="{{pro.media_id}}" title="Eliminar Producto" style="padding: 0px 0px !important">
+
+										 			<i class="material-icons text-default" style="font-size: 30px">delete_sweep</i>
+
+										 			</button>
+											 	</div>
+											</div>								
 											
 											 <!--div class="clearfix"></div-->
 										</td>
@@ -162,6 +163,12 @@
 
                 </table>
               </div>
+            	{% else%}
+								<center>
+									<h3> Aun no vendes o no editas tus productos</h3>
+									<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
+								</center>
+							{%endif%}
             </div>
           </div>
 				</div>
@@ -318,7 +325,7 @@
 	  </div>
   </div>
 </div>
-<!-- Modal Cancelar Venta-->
+<!-- Modal Pausar Venta-->
 <div class="modal fade" id="MyPausar" tabindex="-1" role="dialog" aria-labelledby="MyPausarLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -330,7 +337,7 @@
       	<div class="modal-body">
 	     
 	      	{% csrf_token %}
-	      	Al momento de cancelar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
+	      	Al momento de pausar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
 	      	<div class="form-group label-floating has-error">
 	    			<label class="control-label">Titulo</label>
 	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
@@ -349,6 +356,64 @@
       </form>
     </div>
   </div>
+</div>
+
+<!-- Modal Play Venta-->
+<div class="modal fade" id="MyPlay" tabindex="-1" role="dialog" aria-labelledby="MyPlayLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="MyPlayLabel">Play Venta</h4>
+      </div>
+      <form class="form form-play-venta" method="post">
+      	<div class="modal-body">
+	     
+	      	{% csrf_token %}
+	      	Al momento de republicar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
+	      	<div class="form-group label-floating ">
+	    			<label class="control-label">Titulo</label>
+	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
+	    			<textarea id="text-publi-play" name="text-publi-play" class="form-control" rows="5" required=""></textarea>
+	    		</div>
+	    		<input  name="media_id" id="media_id" value="" style="display: none" >
+	      
+      
+	      	
+	      </div>
+	        	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+	        <button type="submit" class="btn btn-success btn-simple">Play</button>
+	      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Producto-->
+<div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEliminarProductoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body" id="texto-ganadores">
+	      <center>
+	      	<h3> Seguro que quieres eliminar el producto.?</h3>
+	      	<p> Al eliminarlo, no eliminas la publicacion de Instagram</p>
+	      </center>
+      	<center>
+        	<button type="button" class="btn btn-success" id="btn-si-eliminar-pro" data-mediaid="">SI</button>	
+      		<button type="button" class="btn btn-default" id="btn-no-eliminar-pro">NO</button>
+      	</center>
+      	
+    	</div>
+    	<div class="modal-footer">
+        
+      </div>
+	  </div>
+	</div>
 </div>
 
 
@@ -398,11 +463,7 @@
 		    $('#myModal').modal('show');
 
 			});
-
 		
-
-
-			
 			$('.Modalcancelar').on('click',function(){
 				media_id =$(this).attr('data-media');
 				text_publi =$(this).attr('data-texto');
@@ -413,6 +474,109 @@
 		    $('#MyPausar').modal('show');
 
 			});
+			$("#MyPausar").on("submit", ".form-pausar-venta", function (e) {
+				e.preventDefault();
+				var texto = $('#text-publi').val();
+				var media_id = $('#media_id').val();
+				var csrftoken = getCookie('csrftoken');
+				//var array_img = $('#array_img').serializeArray()
+				$.ajax({
+			    url : "{% url 'admingo:pausar_venta'%}",
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'texto': texto,		    		
+			    		'media_id' : media_id,
+			    		'desde_pro': 1
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+		        $('#MyPausar').modal('hide');
+		        //console.log("Before Send");
+	  				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){
+						//console.log(data);
+						
+						if (data.estado == 1){
+							demo.showNotificationSucces('top','center','Venta Pausada satisfactoriamente');
+							location.reload();	
+						}else{
+							demo.showNotificationError('top','center','No pudimos Pausada la publicación. Intentalo nuevamente.');
+							location.reload();
+						}
+							
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+					 }              
+			
+				});
+					
+
+	  	});
+
+	  	$('.ModalPlay').on('click',function(){
+				media_id =$(this).attr('data-media');
+				text_publi =$(this).attr('data-texto');
+
+				
+				$('#text-publi-play').val(text_publi);				
+				$('#media_id').val(media_id);
+		    $('#MyPlay').modal('show');
+
+			});
+
+			$("#MyPlay").on("submit", ".form-play-venta", function (e) {
+				e.preventDefault();
+				var texto = $('#text-publi-play').val();
+				var media_id = $('#media_id').val();
+				var csrftoken = getCookie('csrftoken');
+				//var array_img = $('#array_img').serializeArray()
+				$.ajax({
+			    url : '{% url "admingo:play_venta" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'texto': texto,		    		
+			    		'media_id' : media_id,
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+		        $('#MyPlay').modal('hide');
+		        //console.log("Before Send");
+	  				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){
+						//console.log(data);
+						if(data.estado == 1){
+							demo.showNotificationSucces('top','center','Venta Republicada satisfactoriamente');
+							$(".load").fadeIn();
+							location.reload();
+
+						}else{
+							demo.showNotificationError('top','center', "No pudimos republicar. Intentalo de nuvo");
+							$(".load").fadeIn();
+							location.reload();
+						}
+							
+							/*setTimeout(function(){// wait for 5 secs(2)
+           			location.reload(); // then reload the page.(3)
+      				}, 2000); **/
+					//$(".load").fadeOut();
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+					 }              
+			
+				});
+					
+
+	  	});
 
 			$("#myModal").on("submit", ".form-vender", function (e) {
 				e.preventDefault();
@@ -494,44 +658,8 @@
 					
 			});
 
-			$("#MyPausar").on("submit", ".form-pausar-venta", function (e) {
-				e.preventDefault();
-				var texto = $('#text-publi').val();
-				var media_id = $('#media_id').val();
-				var csrftoken = getCookie('csrftoken');
-				//var array_img = $('#array_img').serializeArray()
-				$.ajax({
-			    url : '{% url "admingo:pausar_venta" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'texto': texto,		    		
-			    		'media_id' : media_id,
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        //$(".load").fadeIn();
-		        //console.log("Before Send");
-	  				//$.ajaxSettings.beforeSend(xhr, settings);
-		    	},
-			    success : function(data){
-						//console.log(data);
-						$('#MyPausar').modal('hide');
-							demo.showNotificationSucces('top','center','Venta Pausada satisfactoriamente');
-							setTimeout(function(){// wait for 5 secs(2)
-           			location.reload(); // then reload the page.(3)
-      				}, 2000); 
-					//$(".load").fadeOut();
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-					 }              
 			
-				});
-					
-
-	  	});
+	  	
 
 			if($('#btn-editar').attr('data-resautomatica') == 1){
 				$("#res-automatica-si").css("color", "black");
@@ -559,7 +687,7 @@
 		    	$("#res-automatica-check").val("no")
 		    	
 		    }
-		   });
+		  });
 
 			$('.ModalEditarProducto').on('click',function(){
 				media_id =$(this).attr('data-media');
@@ -659,6 +787,58 @@
 					
 
 	  	});
+
+	  	$("#btn-eliminar-pro").on('click',function(){
+					media_id = $(this).attr('data-mediaid');
+					$("#btn-si-eliminar-pro").attr('data-mediaid',media_id);
+					$('#ModalEliminarProducto').modal('show');
+
+
+			});
+			$("#btn-no-eliminar-pro").on('click',function(){
+					
+				$('#ModalEliminarProducto').modal('hide');
+
+			});
+
+			$("#btn-si-eliminar-pro").on('click',function(){
+				
+				media_id = $(this).attr('data-mediaid');
+				var csrftoken = getCookie('csrftoken');
+				$.ajax({
+			    url : '{% url "admingo:delete_producto" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id': media_id,
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $('#ModalEliminarProducto').modal('hide');
+		        $(".load").fadeIn();
+		        //console.log("Before Send");
+    				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){						
+						
+						if (data.estado == 1){
+							demo.showNotificationSucces('top','center','El prducto fue Eliminado con Exito!');
+							location.reload();
+						}else{
+							demo.showNotificationError('top','center','Hubo un problema al eliminar el producto. Intentalo nuevamente.');
+							location.reload();	
+						}
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+						$(".load").fadeOut();
+					}              
+			
+				});
+				
+			});
+
 
 	
 	}); // end document Ready

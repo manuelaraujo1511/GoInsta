@@ -13,17 +13,21 @@ urlpatterns = [
 	url(r'^cerrar_sesion$', views.cerrar_sesion, name='cerrar_sesion'),
 	url(r'^vender$', views.vender, name='vender'),
 	url(r'^pausar_venta$', views.pausar_venta, name='pausar_venta'),
+	url(r'^play_venta$', views.play_venta, name='play_venta'),
 	url(r'^ventas$', views.ventas, name='ventas'),
 	url(r'^upload_img$', views.upload_img, name='upload_img'),
 	url(r'^nuevo_concurso$', views.nuevo_concurso, name='nuevo_concurso'),
 	url(r'^nuevo_concurso/(?P<nuevo>[^/]+)/', views.nuevo_concurso, name='nuevo_concurso'),
 	url(r'^publicar_concurso$', views.publicar_concurso, name='publicar_concurso'),
 	url(r'^mis_concursos$', views.mis_concursos, name='mis_concursos'),
+	url(r'^delete_concurso$', views.delete_concurso, name='delete_concurso'),
 	url(r'^generar_ganadores$', views.generar_ganadores, name='generar_ganadores'),
 	url(r'^guardar_ganadores$', views.guardar_ganadores, name='guardar_ganadores'),
 	url(r'^publicar_ganadores$', views.publicar_ganadores, name='publicar_ganadores'),
 	url(r'^productos$', views.productos, name='productos'),
 	url(r'^editar_producto$', views.editar_producto, name='editar_producto'),
+	url(r'^delete_producto$', views.delete_producto, name='delete_producto'),
+
 
 	
 ]

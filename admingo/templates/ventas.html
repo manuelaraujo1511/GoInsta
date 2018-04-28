@@ -96,8 +96,9 @@
             <div class="card card-plain">
               <div class="card-header" data-background-color="purple">
                 <h4 class="title">Mis Ventas</h4>
-                <p class="category">información basada en las ventas registradas en la aplicación</p>
+                <p class="category">Todas las ventas que has realizado desde la herramienta</p>
               </div>
+              {% if todas_ventas%}
               <div class="card-content table-responsive">
                 <table id="tabla" class="table table-hover ">
                   <thead class="text-succes" style="font-weight: bold">
@@ -186,6 +187,14 @@
 
                 </table>
               </div>
+              {%else%}
+              
+								<center>
+									<h3> Aun no vendes tus productos</h3>
+									<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
+								</center>
+					
+              {%endif%}
             </div>
           </div>
 				</div>

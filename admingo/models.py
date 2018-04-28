@@ -97,3 +97,7 @@ class Ganadores(models.Model):
 	username = models.CharField( max_length = 1000 )
 	fecha_creacion = models.DateTimeField(default= datetime.now)
 
+class Pausas(models.Model):
+	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
+	media_id = models.CharField( max_length = 1000, null=True )
+	fecha_creacion = models.DateTimeField(default= datetime.now)
