@@ -19,6 +19,8 @@ import json
 import re
 import os, sys
 import random
+import locale
+locale.setlocale( locale.LC_ALL, '' )
 
 
 # Create your views here.
@@ -42,13 +44,13 @@ def getTotalCommentsMedia(api, mediaId):
 
 def get_precio(request):
 	precio = 0
-	if Ventas.objects.filter(id_usuario_id=request.user.id).exists():
-		ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
+	if Finanzas.objects.filter(id_usuario_id=request.user.id).exists():
+		ventas = Finanzas.objects.filter(id_usuario_id=request.user.id)
 		for v in ventas:
 			precio +=  (int(v.precio)*int(v.cantidad))
 
-	
-	return precio
+
+	return locale.currency(precio, grouping=True )
 
 def resize_image(input_image_path,output_image_path,size):
 	
@@ -68,13 +70,26 @@ def resize_image(input_image_path,output_image_path,size):
 	
 	resized_image.save(output_image_path)
 
-
+def get_save_info(api,user_id, user_insta, pass_insta):
+	if (api != None):
+		api.searchUsername(str(user_insta))
+		img_profile = api.LastJson['user']['profile_pic_url']
+		follower = api.LastJson['user']['follower_count']
+		following = api.LastJson['user']['following_count']
+		info_user = Info.objects.get(id_usuario_id=user_id)
+		info_user.seguidores = follower
+		info_user.seguidos = following
+		info_user.foto_perfil= img_profile
+		info_user.save()
+	else:
+		info_user = Info.objects.get(id_usuario_id=user_id)
+	return info_user
 
 @login_required
 def index(request):
 	# IMPORTANTE: comprobar conexion a internet
 	user_r= Usuarios.objects.get(email=request.user.email)
-	username_insta = ""+user_r.user_insta+""
+	#username_insta = ""+user_r.user_insta+""
 
 	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 	api.login()
@@ -87,53 +102,17 @@ def index(request):
 	minTimestamp=None
 	guardo=True
 
-	######  CAMBIAR ESTO  ######
-	'''
-	if not Info.objects.filter(id_usuario_id=request.user.id).exists():
-		print("entre si no existe el perfil de usuario")
-		api.searchUsername(str(username_insta))
-		img_profile = api.LastJson['user']['profile_pic_url']
-		media_count = api.LastJson['user']['media_count']
-		follower = api.LastJson['user']['follower_count']
-		following = api.LastJson['user']['following_count']
-		tags = api.LastJson['user']['usertags_count']
-		
-		Info(id_usuario_id=request.user.id, username=username_insta, seguidores=follower, seguidos=following, fotos=media_count, foto_perfil= img_profile , hastags=tags).save()
-
-		usuario_info = Info.objects.get(id_usuario_id=request.user.id)
-	else:
-	'''
-	api.searchUsername(str(username_insta))
-	img_profile = api.LastJson['user']['profile_pic_url']
-	media_count = api.LastJson['user']['media_count']
-	follower = api.LastJson['user']['follower_count']
-	following = api.LastJson['user']['following_count']
-	tags = api.LastJson['user']['usertags_count']
-
-	#usuario_info = Info.objects.get(id_usuario_id=request.user.id)
-	#for u in usuario_info:
-	usuario_info = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags , 'username': username_insta}
-	'''
-	usuario_info['foto_perfil']= img_profile
-	usuario_info['fotos']=media_count
-	usuario_info['seguidos']= following
-	usuario_info['seguidores']= follower
-	usuario_info['hastags'] = tags
-	'''
-	#usuario_info.save()
-
-
-		#usuario = Info.objects.filter(id_usuario_id=request.user.id)
-		
-
-		
-	
-
-	#api.getTotalUserFeed(api.username_id)
-	#todos_concursos = []
-
 	## Eliminar de la tabla los concursos que no terminaron de publicar
 	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
+	### cargar informacion actualizada de usuario
+	info_user=get_save_info(api,request.user.id,user_r.user_insta, user_r.pass_insta)
+	
+	concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
+	concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
+
+	usuario_info = {'foto_perfil': info_user.foto_perfil,'concursos_abiertos': concursos_abiertos, 'concursos_cerrados':concursos_cerrados ,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
+	
+	
 	for con_d in concursos_delete:
 		con_d.delete()
 	## fiin de eliminar los que no terminaron de cargar
@@ -236,6 +215,11 @@ def singup(request):
 							if api.login():
 								
 								login(request, user)
+								# Guardo en info
+								api.searchUsername(str(user_u.user_insta))
+								img_profile = api.LastJson['user']['profile_pic_url']
+								Info(id_usuario_id=request.user.id, username=user_u.user, foto_perfil= img_profile).save()
+
 								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
 								api.logout()
 								return redirect('admingo:index')
@@ -312,10 +296,19 @@ def registroinsta(request):
 
 
 		if api.login():
+			
+
+
 			Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i)
 			user = authenticate(request, username=username, password=password)
 
+
 			login(request, user)
+			# Guardo en info
+			api.searchUsername(str(cuenta))
+			img_profile = api.LastJson['user']['profile_pic_url']
+
+			Info(id_usuario_id=request.user.id, username=username, foto_perfil= img_profile).save()
 
 			messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
 			api.logout()
@@ -366,6 +359,9 @@ def vender(request):
 				producto.save()
 					
 				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+
+				Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
+
 				print("producto.id: "+ str(producto.id))
 			else:
 				print("sino")
@@ -375,6 +371,8 @@ def vender(request):
 				producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
 
 				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+
+				Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
 			#for para el array de rult_img#
 			'''
 			ventas = Ventas.objects.all()
@@ -395,8 +393,8 @@ def vender(request):
 def pausar_venta(request):
 	if request.method == "POST":
 		print ("entre a pausar Venta POST")
+		
 		user_r= Usuarios.objects.get(email=request.user.email)
-		username_insta = ""+user_r.user_insta+""
 
 		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 		api.login()
@@ -455,6 +453,11 @@ def play_venta(request):
 			if (api.editMedia(media_id, ""+texto+"")):
 				estado =1
 			api.logout()
+			# buscar en productos si esta pausada la venta
+			product=Productos.objects.get(media_id=media_id)
+			if (product):
+				product.texto = texto
+				product.save()
 
 			pausa = Pausas.objects.get(media_id=media_id)
 			pausa.delete()
@@ -467,52 +470,84 @@ def ventas (request):
 
 	todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
-	## Esto esta por Hacer ##
-	##usuario = Info.objects.get(id_usuario_id=request.user.id)
-	###
+	
 	user_r= Usuarios.objects.get(email=request.user.email)
-	username_insta = ""+user_r.user_insta+""
 
-	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
-	api.login()
-	api.searchUsername(str(username_insta))
-	img_profile = api.LastJson['user']['profile_pic_url']
-	media_count = api.LastJson['user']['media_count']
-	follower = api.LastJson['user']['follower_count']
-	following = api.LastJson['user']['following_count']
-	tags = api.LastJson['user']['usertags_count']
-	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username': username_insta }
+	
+	### cargar informacion actualizada de usuario
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)
+
+	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
+
 
 	arr_img = []
 	arr_ventas = []
-	
+	into = False
 	for v in todas_ventas:
-		for img in imagenes:
-			if (img.media_id == v.media_id):
-				arr_img.append(img.imagen)
-
-		arr_ventas.append({'media_id': v.media_id, 'nombre_cliente': v.nombre_cliente, 'telefono_cliente': v.telefono_cliente,'precio': v.precio, 'precio_total':(int(v.cantidad)*v.precio),'descripcion_venta':v.descripcion_venta, 'cantidad': v.cantidad, 'imagen': arr_img, 'cant_img': len(arr_img)})
+		for av in arr_ventas:
+			if v.media_id == v.media_id:
+				into = True		
+		if (not into):
+			for img in imagenes:
+				if (img.media_id == v.media_id):
+					arr_img.append(img.imagen)
+			
+			arr_ventas.append({'media_id': v.media_id, 'imagen': arr_img, 'cant_img': len(arr_img)})
 
 		arr_img = []
 		
 
 	context = {
-		'usuario' : usuario,
+		'usuario' : usuario_info,
 		'todas_ventas': arr_ventas,
 		'monto_total' : get_precio(request)
 	}
-	api.logout()
 
 	return render (request,'ventas.html', context)
 
+
+def detalles_venta (request):
+	if request.method == "POST":
+		media_id = request.POST.get('media_id')
+		ventas=Ventas.objects.filter(media_id=media_id)
+		arr_ventas = []
+		cont=0
+		for v in ventas:
+			#date=split(v.fecha_venta,'T')
+			#date_bien = date[2]+"/"date[1]+"/"+date[0]
+			print(str(v.fecha_venta.strftime("%d-%m-%Y")))
+			monto_v = (v.precio*v.cantidad)
+			monto_venta = locale.currency(monto_v, grouping=True )
+			precio=locale.currency( v.precio, grouping=True )
+			arr_ventas.append({'cantidad':v.cantidad,'precio': precio,'monto_venta': monto_venta, 'nombre_cliente': v.nombre_cliente, 'telefono_cliente': v.telefono_cliente,'descripcion_venta': v.descripcion_venta, 'fecha_venta': v.fecha_venta.strftime("%d-%m-%Y")})
+			cont+=1
+		context = {
+			'ventas': arr_ventas,
+			'cont' : cont
+		}
+		return JsonResponse(context)
+
+def eliminar_venta (request):
+	if request.method == "POST":
+		media_id = request.POST.get('media_id')
+		ventas=Ventas.objects.filter(media_id=media_id)
+		
+		estado = 0
+		for v in ventas:
+			if (v.delete()):
+				estado = 1
+			else:
+				estado = 0
+
+		
+		context ={
+			'estado': estado
+		}
+		return JsonResponse(context)
+
 def upload_img(request):
 	ruta_original=os.getcwd()
-	#print ("ruta actual "+ str(os.getcwd()))
-	#os.chdir(os.getcwd()+"/admingo/static/img")
-	#print ("ruta cambio "+ str(os.getcwd()))
 	
-	# Creo carpeta
-	#os.mkdir(os.getcwd()+"/admingo/static/img/usuario-"+str(request.user.id)+"/")
 
 	if request.method == 'POST' and request.FILES['img-ig']:
 		# Creo carpeta de Usuario
@@ -617,15 +652,9 @@ def nuevo_concurso (request, nuevo =None):
 			if (not existe_img):
 				Concursos(id_usuario = user_r,img_url="",media_id=media_id,hastags = hastag, seguir_otros= "",condiciones = comentario, view_otro = 1).save()
 
-		#print("imagen : "+str(imagen))
-
-		#print("si es ajax nuevo concurso")
-		#usuario = Info.objects.get(id_usuario_id=request.user.id)
-		#print ("Usuario INFO: "+str(usuario))
 
 		context = {
-			#'usuario' : usuario,		
-			#'monto_total' : get_precio(request),
+		
 			'estado' : request.user.id
 		}
 		api.logout()
@@ -634,17 +663,16 @@ def nuevo_concurso (request, nuevo =None):
 		return JsonResponse(context)
 	else:
 		user_r= Usuarios.objects.get(email=request.user.email)
-		username_insta = ""+user_r.user_insta+""
 
-		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
-		api.login()
-		api.searchUsername(str(username_insta))
-		img_profile = api.LastJson['user']['profile_pic_url']
-		media_count = api.LastJson['user']['media_count']
-		follower = api.LastJson['user']['follower_count']
-		following = api.LastJson['user']['following_count']
-		tags = api.LastJson['user']['usertags_count']
-		usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags , 'username' : username_insta}
+
+		### cargar informacion actualizada de usuario
+		info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)
+		
+		concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
+		concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
+
+		usuario_info = {'foto_perfil': info_user.foto_perfil,'concursos_abiertos': concursos_abiertos, 'concursos_cerrados':concursos_cerrados ,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
+
 			
 		
 		if(nuevo == None):
@@ -661,13 +689,13 @@ def nuevo_concurso (request, nuevo =None):
 				
 				imagenes_count = imagenes.count()
 
-				print("imagenes_count: "+ str(imagenes_count))
+				#print("imagenes_count: "+ str(imagenes_count))
 				## Esto esta por hacer ###
 				##usuario = Info.objects.get(id_usuario_id=request.user.id)
 				###
-			print("concursos: "+str(concursos))
+			#print("concursos: "+str(concursos))
 			context = {
-					'usuario' : usuario,
+					'usuario' : usuario_info,
 					'concursos': concursos,
 					'imagenes' : imagenes 	,
 					'imagenes_count': str(imagenes_count),
@@ -676,10 +704,9 @@ def nuevo_concurso (request, nuevo =None):
 
 		else:
 			context = {
-				'usuario' : usuario,
+				'usuario' : usuario_info,
 				'monto_total' : get_precio(request)
 			}
-		api.logout()
 		
 		return render (request,'nuevo_concurso.html', context)
 
@@ -980,17 +1007,13 @@ def mis_concursos(request):
 	## Esto esta por hacer ##
 	#usuario = Info.objects.get(id_usuario_id=request.user.id)
 	####
-	api.searchUsername(str(username_insta))
-	img_profile = api.LastJson['user']['profile_pic_url']
-	media_count = api.LastJson['user']['media_count']
-	follower = api.LastJson['user']['follower_count']
-	following = api.LastJson['user']['following_count']
-	tags = api.LastJson['user']['usertags_count']
-	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username' : username_insta }
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)	
+
+	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
 	#todos_comments=getTotalCommentsMedia(api,str(1660217691590099505))
 	#print(str(todos_comments[0]['text']))
 	context = {
-		'usuario' : usuario,
+		'usuario' : usuario_info,
 		'comentarios': comentarios,
 		'imagenes_count' : imagenes_count,
 		'monto_total' : get_precio(request)
@@ -1241,16 +1264,9 @@ def productos(request):
 	user_r= Usuarios.objects.get(email=request.user.email)
 	username_insta = ""+user_r.user_insta+""
 	
-	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
-	api.login()
-	api.searchUsername(str(username_insta))
-	img_profile = api.LastJson['user']['profile_pic_url']
-	media_count = api.LastJson['user']['media_count']
-	follower = api.LastJson['user']['follower_count']
-	following = api.LastJson['user']['following_count']
-	tags = api.LastJson['user']['usertags_count']
-	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username' : username_insta }
-	
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)	
+
+	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
 	
 	arr_img = []
 	products = []
@@ -1269,9 +1285,8 @@ def productos(request):
 	
 
 	context = {
-		'usuario' : usuario,
+		'usuario' : usuario_info,
 		'products':products,
 		'monto_total' : get_precio(request)
 	}
-	api.logout()
 	return render (request,'productos.html', context)

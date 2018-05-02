@@ -19,13 +19,14 @@
 				<div class="row">
 					<div class="col-lg-3 col-md-6 col-sm-6">
 						<div class="card card-stats">
-							<div class="card-header" data-background-color="orange">
-								<i class="fa fa-hashtag" ></i>
+							<div class="card-header" data-background-color="green">
+								 <i class="material-icons">card_giftcard</i>
 
 							</div>
 							<div class="card-content">
-								<p class="category">Hastags</p>
-								<h3 class="title">{{usuario.hastags}}</h3>
+
+								<p class="category">Concursos Abierto</p>
+								<h3 class="title">{{usuario.concursos_abiertos}}</h3>
 							</div>
 							<!--div class="card-footer">
 								<div class="stats">
@@ -36,12 +37,12 @@
 					</div>
 					<div class="col-lg-3 col-md-6 col-sm-6">
 						<div class="card card-stats">
-							<div class="card-header" data-background-color="green">
-								<i class="material-icons">insert_photo</i>
+							<div class="card-header" data-background-color="orange">
+								 <i class="material-icons">card_travel</i>
 							</div>
 							<div class="card-content">
-								<p class="category">Cantidad de Fotos</p>
-								<h3 class="title">{{usuario.fotos}}</h3>
+								<p class="category">Concursos Cerrados</p>
+								<h3 class="title">{{usuario.concursos_cerrados}}</h3>
 							</div>
 							<!--div class="card-footer">
 								<div class="stats">
@@ -237,7 +238,7 @@
 		{% include 'layout/footer.html'%}		
 	</div>
 </div>
-<!-- Modal Vender-->
+
 
 </body>
 

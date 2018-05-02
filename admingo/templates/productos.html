@@ -133,12 +133,22 @@
 													{%endif%}
 											 	</div>
 											 	<div class="col-sm-4">
-													<button type="button" class="btn btn-simple Modalvender"  data-media="{{pro.media_id}}"  data-comentario="{{pro.texto}}" title="Vender" style="padding: 0px 0px !important">
+											 	{%if pro.cantidad > 0%}
+													<button type="button" class="btn btn-simple pull-right Modalvender"  data-media="{{pro.media_id}}"  data-comentario="{{pro.texto}}" title="Vender" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-success" style="font-size: 30px">shop</i>
 
-													</button> 		
+													</button> 
+												{%else%}
+													<button type="button" class="btn btn-simple pull-right"  title="Vender" style="padding: 0px 0px !important" disabled="True">
+													
+														<i class="material-icons text-default" style="font-size: 30px">shop</i>
+
+													</button> 
+												{%endif%}	
 											 	</div>
+											</div>
+											<div class="row">
 											 	<div class="col-sm-4">						 	
 											 		<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{pro.media_id}}" data-talla="{{pro.talla}}" data-modelo="{{pro.modelo}}" data-cantidad="{{pro.cantidad}}" data-descripcion="{{pro.descripcion}}" data-resautomatica="{{pro.res_automatica}}" data-comentario = "{{pro.texto}}"  title="Editar Producto" style="padding: 0px 0px !important">
 
@@ -147,7 +157,7 @@
 										 			</button>
 											 	</div>
 											 	<div class="col-sm-4">						 	
-											 		<button type="button" id="btn-eliminar-pro" class="btn btn-simple ModalEliminarProducto"  data-mediaid="{{pro.media_id}}" title="Eliminar Producto" style="padding: 0px 0px !important">
+											 		<button type="button" id="btn-eliminar-pro" class="btn btn-simple pull-right ModalEliminarProducto"  data-mediaid="{{pro.media_id}}" title="Eliminar Producto" style="padding: 0px 0px !important">
 
 										 			<i class="material-icons text-default" style="font-size: 30px">delete_sweep</i>
 
@@ -462,6 +472,7 @@
 				
 		    $('#myModal').modal('show');
 
+
 			});
 		
 			$('.Modalcancelar').on('click',function(){
@@ -637,8 +648,6 @@
 				    	},
 					    success : function(data){
 								//console.log(data);
-								$(".load").fadeOut();
-								$('#myModal').modal('hide');
 								demo.showNotificationSucces('top','center','Venta almacenada en el sistema');
 								setTimeout(function(){// wait for 5 secs(2)
 		           			location.reload(); // then reload the page.(3)
@@ -759,8 +768,7 @@
 			    	},
 				    success : function(data){
 							//console.log(data);
-							$(".load").fadeOut();
-							$('#ModalEditarProducto').modal('hide');
+							//$(".load").fadeOut();
 							if (data.estado == 1){
 								demo.showNotificationSucces('top','center','Producto editado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
 							}else{

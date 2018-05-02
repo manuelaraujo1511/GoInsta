@@ -20,6 +20,7 @@
 	
 </script-->
 {% endfor %}
+{% csrf_token %} 
 		<div class="content">
 			<div class="container-fluid">
 				<div class="row">
@@ -102,7 +103,7 @@
               <div class="card-content table-responsive">
                 <table id="tabla" class="table table-hover ">
                   <thead class="text-succes" style="font-weight: bold">
-                  	<tr>
+                  	<!--tr>
                   		<th style="width: 160px;">Imagen</th>
                   		<th>Cliente</th>
                   		<th>Telefono</th>
@@ -110,6 +111,11 @@
                   		<th>Cantidad</th>
                   		<th>Precio</th>
                   		<th>Total</th>
+                  	</tr-->
+                  	<tr>
+
+                  		<th style="width: 160px;"><center>Producto</center></th>
+                  		<th><center> Acciones </center></th>
                   	</tr>
                   </thead>
                   <tbody>
@@ -175,12 +181,31 @@
 
                   	{% endif %}
 
-                  	<td> {{v.nombre_cliente}} </td>
+                  	<!--td> {{v.nombre_cliente}} </td>
                   	<td> {{v.telefono_cliente}} </td>
                   	<td> {{v.descripcion_venta}} </td>
                   	<td> {{v.cantidad}} </td>
                   	<td> {{v.precio|floatformat:2 }} </td>
-                  	<td> {{v.precio_total|floatformat:2 }} </td>
+                  	<td> {{v.precio_total|floatformat:2 }} </td-->
+                  	<td> 
+                			<div class="row">
+                			 	<div class="col-sm-6">
+                			 		<button id="btn-detalles" type="button" class="btn btn-simple pull-right ModalDetalles"  data-mediaid="{{v.media_id}}" id="btn-ganadores" title="Ver Detalles de Compradores" style="padding: 0px 0px !important">
+
+										 			<i class="material-icons text-success" style="font-size: 30px">remove_red_eye</i>
+
+										 			</button>
+
+                			 	</div>
+                			 	<div class="col-sm-6">
+                			 		<button id="btn-eliminar-venta" type="button" class="btn btn-simple "  data-mediaid="{{v.media_id}}" title="Eliminar Venta" style="padding: 0px 0px !important">
+
+										 			<i class="material-icons text-default" style="font-size: 30px">delete_sweep</i>
+
+                			 	</div>
+                			</div>	
+
+                  	</td>
 									</tr>
                   {% endfor%}
               		</tbody>
@@ -190,8 +215,21 @@
               {%else%}
               
 								<center>
-									<h3> Aun no vendes tus productos</h3>
-									<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
+								<h3> Aun no vendes tus productos</h3>
+									<div class="row">
+										<div class="col-md-6">
+											<center>
+												<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
+											</center>	
+										</div>
+										<div class="col-md-6">
+											<center>
+												<a type="button" class="btn btn-primary btn-round" href="{% url 'admingo:productos' %}"> Ir a Mis Productos </a>
+											</center>	
+										</div>
+									</div>	
+									
+									
 								</center>
 					
               {%endif%}
@@ -210,6 +248,84 @@
 
 
 </body>
+
+
+<!-- Modal Detalles de la venta -->
+<div class="modal fade" id="ModalDetalles" tabindex="-1" role="dialog" aria-labelledby="ModalDetallesLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 1000px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="ModalDetallesLabel">Detalles de la Venta</h4>
+      </div>
+      <div class="modal-body">
+      	
+	      <div class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-content table-responsive">
+                    <table class="table">
+                    	<thead class="text-primary">
+                      	<th><center>Cliente</center></th>
+                        <th><center>Teléfono</center></th>
+                        <th><center>Cantidad</center></th>
+												<th><center>Precio</center></th>
+												<th><center>Monto Venta</center></th>
+												<th><center>Fecha Venta</center></th>
+                      </thead>
+                      <tbody id="id-ventas-table">
+                                    
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+              </div>
+
+               
+            </div>
+          </div>
+        </div>
+		    
+        	
+	      
+	    </div>
+	    <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cerrar</button>
+      </div>
+	  </div>
+  </div>
+</div>
+
+<!-- Modal Pregunta Eliminar -->
+<div class="modal fade" id="ModalPregutaEliminar" tabindex="-1" role="dialog" aria-labelledby="ModalPregutaEliminarLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+      {% csrf_token %}
+    
+	      <div class="modal-body" id="texto-ganadores">
+	      	<center>
+	      		<h3> Deseas eliminar la venta?</h3>
+	      	  	Al momento de eliminar la venta, el monto vendido quedara intacto<br>
+	      	
+	      		<button type="button" class="btn btn-default" data-dismiss="modal" >NO</button>
+	        	<button type="button" class="btn btn-success" id="btn-si-eliminar-venta"  data-mediaid="">SI</button>	
+	      	</center>
+	      	
+	    	</div>
+	    </div>
+	    <div class="modal-footer">
+      </div>
+	  </div>
+  </div>
+</div>
+
 
 	<script type="text/javascript">
     	$(document).ready(function(){
@@ -243,7 +359,102 @@
 			    
 				});
 
+      	$('.ModalDetalles').on('click',function(){
+					media_id =$(this).attr('data-mediaid');
+					var csrftoken = getCookie('csrftoken');
+					$.ajax({
+				    url : "{% url 'admingo:detalles_venta'%}",
+				    type : 'POST',
+				    data : 
+				    	{	'csrfmiddlewaretoken' : csrftoken,
+				    		'media_id' : media_id,
+				    	},
+						beforeSend: function() {
+			        // setting a timeout
+			        $(".load").fadeIn();
+			        //$('#MyPausar').modal('hide');
+			        //console.log("Before Send");
+		  				//$.ajaxSettings.beforeSend(xhr, settings);
+			    	},
+				    success : function(data){
+							//console.log(data);
+							$(".load").fadeOut();
+							//console.table(data.ventas)
+							mostrar =""
+							for(i =0; i<data.cont; i++){
+								mostrar +=
+								"<tr>"+
+									"<td><center>"+data.ventas[i]["nombre_cliente"]+"</center></td>"+
+									"<td><center>"+data.ventas[i]["telefono_cliente"]+"</center></td>"+
+									"<td><center>"+data.ventas[i]["cantidad"]+"</center></td>"+
+									"<td><center>"+data.ventas[i]["precio"]+"</center></td>"+
+									"<td><center>"+data.ventas[i]["monto_venta"]+"</center></td>"+
+									"<td><center>"+data.ventas[i]["fecha_venta"]+"</center></td>"+
+								"</tr>"
+							}
+							$("#id-ventas-table").html(mostrar);
+							$('#ModalDetalles').modal('show');
 
+								
+				        
+				    },
+		        error : function(xhr,errmsg,err) {
+						 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+						 $(".load").fadeOut();
+						 }              
+				
+					});
+
+
+			    
+				});
+
+				$('#btn-eliminar-venta').on('click',function(){
+					console.log("entre a eliminar");
+					media_id =$(this).attr('data-mediaid');
+					$("#btn-si-eliminar-venta").attr("data-mediaid",media_id);
+					$("#ModalPregutaEliminar").modal("show");
+
+				});
+
+				$("#btn-si-eliminar-venta").on('click',function(){
+					media_id =$(this).attr('data-mediaid');
+					var csrftoken = getCookie('csrftoken');
+					$.ajax({
+				    url : "{% url 'admingo:eliminar_venta'%}",
+				    type : 'POST',
+				    data : 
+				    	{	'csrfmiddlewaretoken' : csrftoken,
+				    		'media_id' : media_id,
+				    	},
+						beforeSend: function() {
+			        // setting a timeout
+			        $(".load").fadeIn();
+			        $('#ModalPregutaEliminar').modal('hide');
+			        //console.log("Before Send");
+		  				//$.ajaxSettings.beforeSend(xhr, settings);
+			    	},
+				    success : function(data){
+							//console.log(data);
+							//console.table(data.ventas)
+							if (data.estado == 1){
+								demo.showNotificationSucces('top','center','Hemos eliminado la venta.')
+								location.reload();
+								$(".load").fadeIn();
+							}else{
+								demo.showNotificationError('top','center','No hemos podido eliminar la venta. Intentalo nuevamente')
+								
+								$(".load").fadeOut();
+							}					
+				        
+				    },
+		        error : function(xhr,errmsg,err) {
+						 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+						 $(".load").fadeOut();
+						 }              
+				
+					});
+				});
     	});
 	</script>
 
