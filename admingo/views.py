@@ -1385,7 +1385,7 @@ def editar_producto(request):
 			else:
 				res_automatica = 0
 
-			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
+			producto = Productos.objects.filtre(id_usuario_id=request.user.id, media_id=media_id)
 
 
 			for p in producto:
