@@ -226,15 +226,16 @@ def index(request):
 		  	
 		  	item['caption']['cant_pro'] = -1
 
-		  	if productos:
-			  	for pro in productos:
+		  	if (not productos):
+		  		item['caption']['producto'] = False
+		  		
+		  	else:
+		  		for pro in productos:
 			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
 			  			item['caption']['producto'] = pro
 			  		else:
-			  				item['caption']['producto'] = False
-			  else:
-			  	item['caption']['producto'] = False
-			  
+			  			item['caption']['producto'] = False
+		  		
 
 		  	for con in todos_concursos:
 		  		if(str(item['caption']['media_id']) == str(con.media_id)):
@@ -267,14 +268,15 @@ def index(request):
 		  			item['caption']['pausado'] = False
 		  	item['caption']['cant_pro'] = -1
 		  	
-		  	if productos:
+		  	if not productos:
+		  		item['caption']['producto'] = False
+		  	else:
 			  	for pro in productos:
 			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
 			  			item['caption']['producto'] = pro
 			  		else:
 			  				item['caption']['producto'] = False
-			  else:
-			  	item['caption']['producto'] = False
+			  	
 		  	feed.append(item)
 
 		  if temp["more_available"] is False:
