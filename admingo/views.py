@@ -232,6 +232,8 @@ def index(request):
 			  			item['caption']['producto'] = pro
 			  		else:
 			  				item['caption']['producto'] = False
+			  else:
+			  	item['caption']['producto'] = False
 			  
 
 		  	for con in todos_concursos:
@@ -271,6 +273,8 @@ def index(request):
 			  			item['caption']['producto'] = pro
 			  		else:
 			  				item['caption']['producto'] = False
+			  else:
+			  	item['caption']['producto'] = False
 		  	feed.append(item)
 
 		  if temp["more_available"] is False:
