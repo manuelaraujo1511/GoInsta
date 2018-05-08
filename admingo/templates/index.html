@@ -200,6 +200,7 @@
 
 													</button> 		
 											 	</div>
+											 	
 											 </div>
 											 <div class="row">
 											 	<div class="col-sm-4">
@@ -209,13 +210,24 @@
 
 											 		</button>
 											 	</div>
-										 		<div class="col-sm-4">						 	
-											 		<button type="button" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.caption.media_id}}" data-comentario = "{{obj.caption.text}}" title="Editar Producto" style="padding: 0px 0px !important">
+											 	{% if obj.caption.producto == False %}
+											 	<div class="col-sm-4">						 	
+											 		<button type="button" class="btn btn-simple ModalAgregarProducto"  data-media="{{obj.caption.media_id}}" data-comentario = "{{obj.caption.text}}" title="Agregar Producto" style="padding: 0px 0px !important">
 
-										 			<i class="material-icons text-primary" style="font-size: 30px">edit</i>
+										 			<i class="material-icons text-primary" style="font-size: 30px">add_box</i>
 
 										 			</button>
 											 	</div>
+											 	{%else %}
+											 	<div class="col-sm-4">
+													<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.caption.producto.media_id}}" title="Editar Producto" style="padding: 0px 0px !important"> 
+													<i class="material-icons text-primary" style="font-size: 30px">edit</i>
+
+										 			</button>		
+											 	</div>
+											 	
+											 	{%endif%}
+										 		
 											</div>
 											
 											
@@ -243,49 +255,34 @@
 </body>
 
 
-<!-- Modal Editar Producto Index-->
-<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
+<!-- Modal Agregar Producto Index-->
+<div class="modal fade" id="ModalAgregarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarProductoLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
+        <h4 class="modal-title" id="ModalAgregarProductoLabel">Agregar Producto</h4>
       </div>
       <div class="modal-body">
-      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
+      	<p>Al agregar este producto podrar administrar mejor tus ventas</p>
+      	<form class="form form-add-producto" method="post" action='{% url "admingo:agregar_producto" %}'>
 				{% csrf_token %}
-		      <div class="row">
-			      
-		      	<div class="col-lg-6">
-	  		      <div class="form-group label-floating has-error">
-	  						<label class="control-label">Talla</label>
-	  						<input type="text" name="talla-edit-p" id="talla-edit-p" class="form-control" required="">
-	  					</div>	
-		      	</div>
-
-		      	<div class="col-lg-6">
-		      		<div class="form-group label-floating has-error">
-		      			<label class="control-label">Modelo</label>
-		      			<input type="text" name="modelo-edit-p" id="modelo-edit-p" class="form-control" >
-		      		</div>	
-		      	</div>	      	
-		      </div>
 		      <div class="row">
 		      	<div class="col-lg-4">
 		      		<div class="div-cantidad form-group label-floating">
 		      			<label class="control-label">Cantidad</label>
-		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
+		      			<input type="number" name="cantidad-agregar" id="cantidad-agregar" class="form-control" required="" >
 		      		</div>
 		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
 		      	</div>
 		      		<div class="col-md-8">
 			      		<div class="togglebutton">
 		            	<label>
-		            		<span id ="res-automatica-no" >No</span> 
+		            		<span id ="res-automatica-add-no" >No</span> 
 		               	
-		               	<input id="res-automatica" name="res-automatica" type="checkbox" >
+		               	<input id="res-automatica-add" name="res-automatica-add" type="checkbox" >
 
-		               	<span id ="res-automatica-si">Si</span> 
+		               	<span id ="res-automatica-add-si">Si</span> 
 		            	</label>
 		            	<span style="margin-left: 10%">Respuesta automatica?</span>
 		           		
@@ -296,14 +293,14 @@
 		      	<div class="col-lg-12">
 		      		<div class="form-group label-floating">
 		      			<label class="control-label">Descripción</label>
-		      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
+		      			<input type="text" name="descripcion-add-p" id="descripcion-add-p" class="form-control">
 
 		      		</div>
 		      	</div>
 		      	<div class="form-group label-floating" style="display: none">
-		      	<input  name="media_id_edit" id="media_id_edit" value="" style="display: none" >
+		      	<input  name="media_id_add" id="media_id_add" value="" style="display: none" >
 		      	<input  name="comentario-edit" id="comentario-edit" value="" style="display: none" >
-		      	<input  name="res-automatica-check" id="res-automatica-check" value="" style="display: none" >
+		      	<input  name="res-automatica-add-check" id="res-automatica-check-add" value="" style="display: none" >
 		      	</div>
 		      	
 		      </div>
@@ -311,7 +308,7 @@
         	
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button type="submit" class="btn btn-success btn-simple" id="btn-editar">Guardar</button>
+	        <button type="submit" class="btn btn-success btn-simple" id="btn-add">Guardar</button>
 	      </div>
 	      </form>
 	    </div>
@@ -348,18 +345,24 @@
 		      </div>
 		      <div class="row">
 		      	<div class="col-lg-4">
-		      		<div class="div-cantidad form-group label-floating">
+		      		<div class="div-cantidad-venta form-group label-floating">
 		      			<label class="control-label">Cantidad</label>
-		      			<input type="number" name="cantidad" id="cantidad" class="form-control" required="" >
+		      			
+		      			<input type="number" name="cantidad_venta" id="cantidad_venta" value="" class="form-control" required="" >
+
+		      			<input type="number" name="cantidad_pro_input" id="cantidad_pro_input" style="display: none">
+
 		      		</div>
-		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      		<p id="cant_pro_id" style="display: none; color: #6d0074; font-size: 12px;"></p>
+
+		      		<p id="erro-cantidad-venta" style="display: none; color: #e53935; font-size: 12px;"></p>
 		      	</div>
 		      	<div class="col-lg-4">
 		      		<div class="div-precio form-group label-floating">
 		      			<label class="control-label">Precio</label>
 		      			<input type="number" name="precio" id="precio" class="form-control" required="" >
 		      		</div>
-		      		<p id="erro-precio" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      		<p id="erro-precio" style="display: none; color: #e53935; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
 		      	</div>
 		      	<div class="col-lg-12">
 		      		<div class="form-group label-floating">
@@ -450,7 +453,7 @@
     </div>
   </div>
 </div>
-<!-- Modal Preguntar Para Agregar COncurso Index-->
+<!-- Modal Preguntar Para Agregar Concurso Index-->
 <div class="modal fade" id="ModalPreguntaAgregarConcurso" tabindex="-1" role="dialog" aria-labelledby="ModalPreguntaAgregarConcursoLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -473,6 +476,67 @@
       </div>
 	  </div>
 	</div>
+</div>
+
+<!-- Modal Editar Producto-->
+<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
+      </div>
+      <div class="modal-body">
+      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
+				{% csrf_token %} 
+		      
+			      
+		      <div class="row">
+		      	<div class="col-lg-4">
+		      		<div class="div-cantidad form-group label-floating">
+		      			<label class="control-label">Cantidad</label>
+		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
+		      		</div>
+		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser un valor positivo.</p>
+		      	</div>
+		      		<div class="col-md-8">
+			      		<div class="togglebutton">
+		            	<label>
+		            		<span id ="res-automatica-edit-no" >No</span> 
+		               	
+		               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" >
+
+		               	<span id ="res-automatica-edit-si">Si</span> 
+		            	</label>
+		            	<span style="margin-left: 10%">Respuesta automatica?</span>
+		           		
+		            </div>
+		            <p style="font-size: 12px">al recibir un comentario preguntando, precio o disponibilidad, responderemos de forma automatica</p>
+		          </div>
+		      	
+		      	<div class="col-lg-12">
+		      		<div class="form-group label-floating">
+		      			<label class="control-label">Descripción</label>
+		      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
+		      		</div>
+		      	</div>
+		      	<div class="form-group label-floating" style="display: none">
+		      	<input  name="media_id_edit" id="media_id_edit" value="" style="display: none" >
+		      	
+		      	<input  name="res-automatica-edit-check" id="res-automatica-edit-check" value="" style="display: none" >
+		      	</div>
+		      	
+		      </div>
+		    
+        	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+	        <button id="btn-guardar-edit-pro" type="submit" class="btn btn-success btn-simple" >Guardar</button>
+	      </div>
+	      </form>
+	    </div>
+	  </div>
+  </div>
 </div>
 
 
@@ -513,16 +577,7 @@
 		    
 			});
 
-			$('.Modalvender').on('click',function(){
-				media_id =$(this).attr('data-media');
-				comentario = $(this).attr('data-comentario');
-				
-				$('#media_id').val(media_id);
-				$('#comentario-vender').val(comentario);
-				
-		    $('#myModal').modal('show');
-
-			});
+			
 
 			$(".ModalAgregarConcurso").on('click',function(){
 				media_id =$(this).attr('data-media');			
@@ -586,6 +641,7 @@
 		    $('#MyPlay').modal('show');
 
 			});
+
 			$("#MyPlay").on("submit", ".form-play-venta", function (e) {
 				e.preventDefault();
 				var texto = $('#text-publi-play').val();
@@ -687,12 +743,138 @@
 
 	  	});
 
+	  	$('.Modalvender').on('click',function(){
+				media_id =$(this).attr('data-media');
+				comentario = $(this).attr('data-comentario');
+				var csrftoken = getCookie('csrftoken');
+				
+				$('#media_id').val(media_id);
+				$('#comentario-vender').val(comentario);
+
+				$.ajax({
+			    url : '{% url "admingo:get_producto" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id,
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+		        //$('#myModal').modal('hide');
+		        //console.log("Before Send");
+    				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){
+						//console.table(data.producto);
+						if (data.producto.encontre == true){
+							if (data.producto.disponible == 0){
+								$(".load").fadeOut();
+								demo.showNotificationError('top','center','Producto no disponible. Puede estar pausada la venta, o no tienes disponiblidad');	
+							}else{
+								if (data.producto.cantidad > 0){
+									$('#cant_pro_id').css("display", "block");
+									$('#cant_pro_id').html("- Disponible: "+data.producto.cantidad);
+									$('#cantidad_pro_input').val(data.producto.cantidad);	
+								}else{
+
+									$('#cant_pro_id').css("display", "block");
+									$('#cant_pro_id').html("- Disponible: "+data.producto.cantidad);
+									$('#cantidad_pro_input').val(data.producto.cantidad);	
+								}
+								$(".load").fadeOut();
+								$('#myModal').modal('show');
+							}
+							
+						}else{
+							$(".load").fadeOut();
+							$('#cant_pro_id').css("display", "none");
+							$('#cantidad_pro_input').val("");	
+							$('#myModal').modal('show');
+						}			
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+
+
+			});
+
+	  	$("#cantidad_venta").change(function() {
+
+
+				cantidad = $('#cantidad_venta').val();
+				//console.log("cambie cantidad: "+ cantidad);
+
+				cant_pro = $("#cantidad_pro_input").val();
+				//console.log("cambie cant_pro: "+ cant_pro);
+				if (cantidad <= 0){
+					$("#div-cantidad-venta").addClass("has-error");
+					$("#erro-cantidad-venta").html("- Debe ser mayor a cero(0).");
+					$("#erro-cantidad-venta").css("display", "block");
+					if (cant_pro > 0){
+						
+						//console.log("----- resta: "+ resta)
+						if (cantidad <=-1){
+								$("#cant_pro_id").html("- Disponible: 0");
+						}else{
+							resta = cant_pro-cantidad;
+							if (resta >= 0){
+								$("#cant_pro_id").html("- Disponible: "+(resta));
+
+							}
+						}
+						
+						
+					}
+					
+				}else{
+					$("#div-cantidad-venta").removeClass("has-error");
+					$("#erro-cantidad-venta").css("display", "none");
+					if (cant_pro > 0){
+						resta = cant_pro-cantidad;
+						//console.log("----- resta: "+ resta)
+						if (resta >= 0){
+							$("#cant_pro_id").html("- Disponible: "+(resta));
+
+						}else{
+							$("#div-cantidad-venta").addClass("has-error");
+							$("#erro-cantidad-venta").html("- No dispones suficientes.");
+							$("#erro-cantidad-venta").css("display", "block");
+							$("#cant_pro_id").html("- Disponible: 0 ");	
+							
+						}
+						
+					}
+					
+				}
+				
+			});
+
+			$("#precio").change(function() {
+
+				precio = $('#precio').val();
+				if (precio <= 0){
+					$("#div-precio").addClass("has-error");
+					$("#erro-precio").css("display", "block");
+				}else{
+					$("#div-precio").removeClass("has-error");
+					$("#erro-precio").css("display", "none");
+				}
+				
+			});
+
 			$("#myModal").on("submit", ".form-vender", function (e) {
 				e.preventDefault();
 				var array_img = [];
 				var nombre = $('#nombre').val();
 				var telefono = $('#telefono').val();
-				var cantidad = $('#cantidad').val();
+				var cantidad = $('#cantidad_venta').val();
+				var cant_pro = $('#cantidad_pro_input').val();// cantidad guardada
 				var precio = $('#precio').val();
 				var descripcion = $('#descripcion').val();
 				var media_id = $('#media_id').val();
@@ -712,17 +894,21 @@
 				});
 				//console.table(array_img);
 				//console.log(result_img);
-
-
+				if (cant_pro > 0){
+					if( cant_pro-cantidad < 0){
+						demo.showNotificationError('top','center','No dispones sufiencientes Productos');
+						return false;
+					
+					}	
+					
+				}
 				if (cantidad <= 0){
-					$("#div-cantidad").addClass("has-error");
-					$("#erro-cantidad").css("display", "block");
+					demo.showNotificationError('top','center','La cantidad debe ser positiva');
 					
 					return false;
 				}else{
 					if (precio <= 0){
-						$("#div-precio").addClass("has-error");
-						$("#erro-precio").css("display", "block");
+						demo.showNotificationError('top','center','El precio debe ser positivo');
 						
 						return false;
 					}else{
@@ -749,9 +935,15 @@
 				    	},
 					    success : function(data){
 								//console.log(data);
-								$(".load").fadeOut();
-								$('#myModal').modal('hide');
-								demo.showNotificationSucces('top','center','Venta almacenada en el sistema')
+								if (data.estado == 0){
+									$(".load").fadeOut();
+									demo.showNotificationError('top','center','No tienes sufientes de este producto');
+								}else{
+									$(".load").fadeOut();
+									$('#myModal').modal('hide');
+									demo.showNotificationSucces('top','center','Venta almacenada en el sistema')	
+								}
+								
 							
 					        
 					    },
@@ -769,56 +961,51 @@
 
 			
 
-			if($('#res-automatica').is(':checked')){
-				$("#res-automatica-si").css("color", "black");
-		    $("#res-automatica-no").css("color", "rgba(0,0,0, 0.26)");
-		    $("#res-automatica-td").css("display", "block");
-		    $("#res-automatica-check").val("si")
+			if($('#res-automatica-add').is(':checked')){
+				$("#res-automatica-add-si").css("color", "black");
+		    $("#res-automatica-add-no").css("color", "rgba(0,0,0, 0.26)");
+		    $("#res-automatica-add-check").val("si")
 
 			}else{
-				$("#res-automatica-no").css("color", "black");
-		   	$("#res-automatica-si").css("color", "rgba(0,0,0, 0.26)");
-		   	$("#res-automatica-td").css("display", "none");
-		   	$("#res-automatica-check").val("no")
+				$("#res-automatica-add-no").css("color", "black");
+		   	$("#res-automatica-add-si").css("color", "rgba(0,0,0, 0.26)");
+		   	$("#res-automatica-add-check").val("no")
 			}
 
-			$("#res-automatica").change(function() {
+			$("#res-automatica-add").change(function() {
 		    if(this.checked) {
-		      $("#res-automatica-si").css("color", "black");
-		      $("#res-automatica-no").css("color", "rgba(0,0,0, 0.26)");
-		      $("#res-automatica-td").css("display", "block");
-		      $("#res-automatica-check").val("si")
+		      $("#res-automatica-add-si").css("color", "black");
+		      $("#res-automatica-add-no").css("color", "rgba(0,0,0, 0.26)");
+		      $("#res-automatica-add-check").val("si")
 		    }else{
-		    	$("#res-automatica-no").css("color", "black");
-		    	$("#res-automatica-si").css("color", "rgba(0,0,0, 0.26)");
-		    	$("#res-automatica-td").css("display", "none");
-		    	$("#res-automatica-check").val("no")
+		    	$("#res-automatica-add-no").css("color", "black");
+		    	$("#res-automatica-add-si").css("color", "rgba(0,0,0, 0.26)");
+		    	$("#res-automatica-add-check").val("no")
 		    	
 		    }
 		   });
 
-			$('.ModalEditarProducto').on('click',function(){
+			$('.ModalAgregarProducto').on('click',function(){
 				media_id =$(this).attr('data-media');
 				comentario =$(this).attr('data-comentario');
 
-				$('#comentario-edit').val(comentario);			
-				$('#media_id_edit').val(media_id);
-		    $('#ModalEditarProducto').modal('show');
+				$('#comentario-add').val(comentario);			
+				$('#media_id_add').val(media_id);
+		    $('#ModalAgregarProducto').modal('show');
 
 			});
+			
 
-	  	$("#ModalEditarProducto").on("submit", ".form-edit-producto", function (e) {
+	  	$("#ModalAgregarProducto").on("submit", ".form-add-producto", function (e) {
 				
 				e.preventDefault();
 				var array_img= []
-				var talla = $('#talla-edit-p').val();
-				var modelo = $('#modelo-edit-p').val();
-				var cantidad = $('#cantidad-editar').val();
-				var descripcion = $('#descripcion-edit-p').val();
-				var res_automatica = $('#res-automatica-check').val();
-				var media_id = $('#media_id_edit').val();
+				var cantidad = $('#cantidad-agregar').val();
+				var descripcion = $('#descripcion-add-p').val();
+				var res_automatica = $('#res-automatica-check-add').val();
+				var media_id = $('#media_id_add').val();
 				var csrftoken = getCookie('csrftoken');
-				var texto = $('#comentario-edit').val();
+				var texto = $('#comentario-add').val();
 				$('input[id^="img-publi"]').each(function() {
 				  array_img.push([this.name, this.value]);
 
@@ -834,17 +1021,150 @@
 					return false;
 				}else{
 					$.ajax({
+				    url : '{% url "admingo:agregar_producto" %}',
+				    type : 'POST',
+				    data : 
+				    	{	'csrfmiddlewaretoken' : csrftoken,
+				    		'media_id' : media_id,
+				    		'cantidad' : cantidad,
+				    		'descripcion' : descripcion,
+				    		'result_img[]' : result_img,
+				    		'texto': texto,
+				    		'res_automatica' : res_automatica
+				    	},
+						beforeSend: function() {
+			        // setting a timeout
+			        $('#ModalAgregarProducto').modal('hide');
+			        $(".load").fadeIn();
+			        //console.log("Before Send");
+		  				//$.ajaxSettings.beforeSend(xhr, settings);
+			    	},
+				    success : function(data){
+							//console.log(data);
+							$(".load").fadeOut();
+							$('#ModalAgregarProducto').modal('hide');
+								demo.showNotificationSucces('top','center','Producto editado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
+								/*setTimeout(function(){// wait for 5 secs(2)
+	           			location.reload(); // then reload the page.(3)
+	      				}, 2000); */
+						//$(".load").fadeOut();
+				        
+				    },
+		        error : function(xhr,errmsg,err) {
+		        	$(".load").fadeOut();
+						 	console.log(xhr.status + ": " + xhr.responseText); 
+							$('#ModalAgregarProducto').modal('hide');
+						}              
+				
+					});
+				}
+				
+					
+
+	  	});
+
+	  	if($('#res-automatica-edit').is(':checked')){
+				$("#res-automatica-edit-si").css("color", "black");
+		    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
+		    $("#res-automatica-edit-check").val("si")
+
+			}else{
+				$("#res-automatica-edit-no").css("color", "black");
+		   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
+		   	$("#res-automatica-edit-check").val("no")
+			}
+
+			$("#res-automatica-edit").change(function() {
+		    if(this.checked) {
+		      $("#res-automatica-edit-si").css("color", "black");
+		      $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
+		      $("#res-automatica-edit-check").val("si")
+		    }else{
+		    	$("#res-automatica-edit-no").css("color", "black");
+		    	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
+		    	$("#res-automatica-edit-check").val("no")
+		    	
+		    }
+		   });
+
+	  	
+
+	  	$('.ModalEditarProducto').on('click',function(){
+				media_id =$(this).attr('data-media');
+				var csrftoken = getCookie('csrftoken');
+				$.ajax({
+			    url : '{% url "admingo:get_producto" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id,
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+		        //$('#myModal').modal('hide');
+		        //console.log("Before Send");
+    				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){
+						//console.table(data.producto);
+						if (data.producto.encontre == true){
+							$("#cantidad-editar").val(data.producto.cantidad);
+							$("#descripcion-edit-p").val(data.producto.descripcion_producto);
+							$('#media_id_edit').val(data.producto.media_id);
+							$("#div-modelo").removeClass("has-error")
+							$("#div-talla").removeClass("has-error")
+					  	
+					  	if(data.producto.res_automatica == 1){
+								$("#res-automatica-edit-si").css("color", "black");
+						    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
+						 		$("#res-automatica-edit-check").val("si")
+
+							}else{
+								$("#res-automatica-edit-no").css("color", "black");
+						   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
+						   	$("#res-automatica-edit-check").val("no")
+							}
+
+							$(".load").fadeOut();
+					    $('#ModalEditarProducto').modal('show');
+							
+						}
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+
+				
+
+			});
+
+	  	$("#btn-guardar-edit-pro").on("click",  function (e) {
+				
+				e.preventDefault();
+				var cantidad = $('#cantidad-editar').val();
+				var descripcion = $('#descripcion-edit-p').val();
+				var res_automatica = $('#res-automatica-edit-check').val();
+				var media_id = $('#media_id_edit').val();
+				var csrftoken = getCookie('csrftoken');
+
+				if (cantidad < 0){
+					$("#div-cantidad").addClass("has-error");
+					$("#erro-cantidad").css("display", "block");
+					
+					return false;
+				}else{
+					$.ajax({
 				    url : '{% url "admingo:editar_producto" %}',
 				    type : 'POST',
 				    data : 
 				    	{	'csrfmiddlewaretoken' : csrftoken,
 				    		'media_id' : media_id,
-				    		'talla' : talla,
-				    		'modelo' : modelo,
 				    		'cantidad' : cantidad,
 				    		'descripcion' : descripcion,
-				    		'result_img[]' : result_img,
-				    		'texto': texto,
 				    		'res_automatica' : res_automatica
 				    	},
 						beforeSend: function() {
@@ -856,12 +1176,18 @@
 			    	},
 				    success : function(data){
 							//console.log(data);
-							$(".load").fadeOut();
-							$('#ModalEditarProducto').modal('hide');
-								demo.showNotificationSucces('top','center','Producto editado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
-								/*setTimeout(function(){// wait for 5 secs(2)
-	           			location.reload(); // then reload the page.(3)
-	      				}, 2000); */
+							//$(".load").fadeOut();
+							if (data.estado == 1){
+								$(".load").fadeOut();
+								demo.showNotificationSucces('top','center','Producto editado con exito.');
+								
+							}else{
+								$(".load").fadeOut();
+								console.table(data)
+							}
+							
+								
+								/* */
 						//$(".load").fadeOut();
 				        
 				    },

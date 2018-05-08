@@ -12,4 +12,6 @@ admin.site.register(Ganadores)
 admin.site.register(Productos)
 admin.site.register(Pausas)
 admin.site.register(Finanzas)
+admin.site.register(Tallas)
+admin.site.register(Modelos)
 

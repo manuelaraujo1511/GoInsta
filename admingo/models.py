@@ -29,8 +29,8 @@ class Usuarios(models.Model):
 class Productos(models.Model):
 	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
 	media_id = models.CharField( max_length = 1000 )
-	talla = models.CharField( max_length = 1000, null=True )
-	modelo = models.CharField( max_length = 1000, null=True )
+	talla = models.IntegerField(default=-1)
+	modelo = models.IntegerField(default=-1)
 	cantidad = models.IntegerField(default=0)
 	disponible = models.IntegerField(default=1)
 	texto = models.TextField(max_length= 1000, default = None)
@@ -41,7 +41,7 @@ class Productos(models.Model):
 
 class Ventas(models.Model):
 	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE, default = None)
+	id_producto = models.IntegerField(default=0)
 	media_id = models.CharField( max_length = 1000 )
 	cantidad = models.IntegerField(default=0)
 	varias = models.IntegerField(default=0)
@@ -112,3 +112,18 @@ class Finanzas(models.Model):
 	telefono_cliente = models.CharField(max_length= 100, default = None)
 	descripcion_finanza = models.TextField(max_length= 1000, default = None)
 	fecha_creacion = models.DateTimeField(default= datetime.now)
+
+class Modelos(models.Model):
+	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
+	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE)
+	media_id = models.CharField( max_length = 1000 )
+	nombre = models.CharField( max_length = 1000 )
+	fecha_creacion = models.DateTimeField(default= datetime.now)
+
+class Tallas(models.Model):
+	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
+	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE)
+	media_id = models.CharField( max_length = 1000 )
+	nombre = models.CharField( max_length = 1000 )
+	fecha_creacion = models.DateTimeField(default= datetime.now)
+

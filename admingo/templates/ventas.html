@@ -92,6 +92,8 @@
 					</div>
 				</div>
 
+				
+
 				<div class="row">
 					<div class="col-md-12">
             <div class="card card-plain">
@@ -99,123 +101,303 @@
                 <h4 class="title">Mis Ventas</h4>
                 <p class="category">Todas las ventas que has realizado desde la herramienta</p>
               </div>
+              
+            </div>
+          </div>
+				</div>
+				<div class="content">
+					<div class="container-fluid">
+						<!--div class="row"-->
               {% if todas_ventas%}
-              <div class="card-content table-responsive">
-                <table id="tabla" class="table table-hover ">
-                  <thead class="text-succes" style="font-weight: bold">
-                  	<!--tr>
-                  		<th style="width: 160px;">Imagen</th>
-                  		<th>Cliente</th>
-                  		<th>Telefono</th>
-                  		<th>Descripción</th>
-                  		<th>Cantidad</th>
-                  		<th>Precio</th>
-                  		<th>Total</th>
-                  	</tr-->
-                  	<tr>
+	              <!--div class="card-content table-responsive">
+	                <table id="tabla" class="table table-hover ">
+	                  <thead class="text-succes" style="font-weight: bold">
+	                  	<tr>
 
-                  		<th style="width: 160px;"><center>Producto</center></th>
-                  		<th><center> Acciones </center></th>
-                  	</tr>
-                  </thead>
-                  <tbody>
-                 
-                  {% for v in todas_ventas %}
-                  	
-                  <tr>
-                  	<td>
-										          		
-                  		{% if v.cant_img == 1%}
-                  			{% for fotos in v.imagen%}
-	                  			<img class="img" src="{{fotos}}"  />
-	                  			<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
-	                  		{%endfor%}
+	                  		<th style="width: 160px;"><center>Producto</center></th>
+	                  		<th><center> Acciones </center></th>
+	                  	</tr>
+	                  </thead>
+	                  <tbody>
+	                 
+	                  {% for v in todas_ventas %}
+	                  	
+	                  <tr>
+	                  	<td>
+											          		
+	                  		{% if v.cant_img == 1%}
+	                  			{% for fotos in v.imagen%}
+		                  			<img class="img" src="{{fotos}}"  />
+		                  			<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
+		                  		{%endfor%}
 
-                  		{% else %}
-                  	
-                  		
+	                  		{% else %}
+	                  	
+	                  		
 
-	                  		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
-	                  			<ol class="carousel-indicators">
-		                  			{% for orden in v.imagen%}	
-				              				{% if forloop.first %}
-												      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
-												      
-												      {% else %}
-												      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
-												      {% endif %}
-												    
-												    {% endfor %}
-											    </ol>
-										    
-										    <div class="carousel-inner">
-										    	{% for fotos in v.imagen%}
-												    		
-										    		{%if forloop.first %}
-										    			<div class="item active">
-										    				<img src="{{fotos}}" alt="" style="width:100%;" >
-										    			</div>
-										    			
-										    		{% else %}
-										    			<div class="item">
-										    				<img src="{{fotos}}" alt="" style="width:100%;" >
-										    			</div>
-										    		{% endif %}
-										    		
-										    	{% endfor %}
-										    
-										    </div>
-										    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
-										    	
-										    	<i class="material-icons">keyboard_arrow_left</i>
+		                  		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
+		                  			<ol class="carousel-indicators">
+			                  			{% for orden in v.imagen%}	
+					              				{% if forloop.first %}
+													      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
+													      
+													      {% else %}
+													      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
+													      {% endif %}
+													    
+													    {% endfor %}
+												    </ol>
+											    
+											    <div class="carousel-inner">
+											    	{% for fotos in v.imagen%}
+													    		
+											    		{%if forloop.first %}
+											    			<div class="item active">
+											    				<img src="{{fotos}}" alt="" style="width:100%;" >
+											    			</div>
+											    			
+											    		{% else %}
+											    			<div class="item">
+											    				<img src="{{fotos}}" alt="" style="width:100%;" >
+											    			</div>
+											    		{% endif %}
+											    		
+											    	{% endfor %}
+											    
+											    </div>
+											    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
+											    	
+											    	<i class="material-icons">keyboard_arrow_left</i>
 
-										    </a>
-										    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
+											    </a>
+											    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
 
-										    	<i class="material-icons">keyboard_arrow_right</i>
-										      
-										    </a>
-										  </div>
-                  		<!--img class="img" src="{{obj.carousel_media.0.image_versions2.candidates.0.url}} " />
-                  		</td-->
+											    	<i class="material-icons">keyboard_arrow_right</i>
+											      
+											    </a>
+											  </div>
 
-                  	{% endif %}
 
-                  	<!--td> {{v.nombre_cliente}} </td>
-                  	<td> {{v.telefono_cliente}} </td>
-                  	<td> {{v.descripcion_venta}} </td>
-                  	<td> {{v.cantidad}} </td>
-                  	<td> {{v.precio|floatformat:2 }} </td>
-                  	<td> {{v.precio_total|floatformat:2 }} </td-->
-                  	<td> 
-                			<div class="row">
-                			 	<div class="col-sm-6">
-                			 		<button id="btn-detalles" type="button" class="btn btn-simple pull-right ModalDetalles"  data-mediaid="{{v.media_id}}" id="btn-ganadores" title="Ver Detalles de Compradores" style="padding: 0px 0px !important">
+	                  	{% endif %}
 
-										 			<i class="material-icons text-success" style="font-size: 30px">remove_red_eye</i>
+	                  	<td> 
+	                			<div class="row">
+	                			 	<div class="col-sm-6">
+	                			 		<button id="btn-detalles" type="button" class="btn btn-simple pull-right ModalDetalles"  data-mediaid="{{v.media_id}}" id="btn-ganadores" title="Ver Detalles de Compradores" style="padding: 0px 0px !important">
 
-										 			</button>
+											 			<i class="material-icons text-success" style="font-size: 30px">remove_red_eye</i>
 
-                			 	</div>
-                			 	<div class="col-sm-6">
-                			 		<button id="btn-eliminar-venta" type="button" class="btn btn-simple "  data-mediaid="{{v.media_id}}" title="Eliminar Venta" style="padding: 0px 0px !important">
+											 			</button>
 
-										 			<i class="material-icons text-default" style="font-size: 30px">delete_sweep</i>
+	                			 	</div>
+	                			 	<div class="col-sm-6">
+	                			 		<button id="btn-eliminar-venta" type="button" class="btn btn-simple "  data-mediaid="{{v.media_id}}" title="Eliminar Venta" style="padding: 0px 0px !important">
 
-                			 	</div>
-                			</div>	
+											 			<i class="material-icons text-default" style="font-size: 30px">delete</i>
 
-                  	</td>
-									</tr>
-                  {% endfor%}
-              		</tbody>
+	                			 	</div>
+	                			</div>	
 
-                </table>
-              </div>
+	                  	</td>
+										</tr>
+	                  {% endfor%}
+	              		</tbody>
+
+	                </table>
+	              </div-->
+        				{% for v in todas_ventas %}
+
+        				{% if forloop.counter == 1 %}
+        					<div class="row"><!-- firs row-->
+
+		        				<div class="col-lg-3 col-md-6 col-sm-6">
+		        					<div class="card card-stats">
+		        						<div class="card-header" style="padding: 0px;">
+		        							{% if v.cant_img == 1%}
+		                  			{% for fotos in v.imagen%}
+		                    			<img class="img" src="{{fotos}}"  />
+		                    			<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
+		                  			{%endfor%}
+
+		                  		{% else %}
+		                  	
+		                  		
+
+		                    		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
+		                    			<ol class="carousel-indicators">
+		                      			{% for orden in v.imagen%}	
+		                      				{% if forloop.first %}
+		        								      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
+		        								      
+		        								      {% else %}
+		        								      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
+		        								      {% endif %}
+		        								    
+		        								    {% endfor %}
+		        							    </ol>
+		        						    
+		        							    <div class="carousel-inner">
+		        							    	{% for fotos in v.imagen%}
+		        									    		
+		        							    		{%if forloop.first %}
+		        							    			<div class="item active">
+		        							    				<img src="{{fotos}}" alt="" style="width:100%;" >
+		        							    			</div>
+		        							    			
+		        							    		{% else %}
+		        							    			<div class="item">
+		        							    				<img src="{{fotos}}" alt="" style="width:100%;" >
+		        							    			</div>
+		        							    		{% endif %}
+		        							    		
+		        							    	{% endfor %}
+		        							    
+		        							    </div>
+		        							    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
+		        							    	
+		        							    	<i class="material-icons" style="font-size: 24px;line-height: 1;width: 20px">keyboard_arrow_left</i>
+
+		        							    </a>
+		        							    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
+
+		        							    	<i class="material-icons" style="font-size: 24px;line-height: 1;width: 20px">keyboard_arrow_right</i>
+		        							      
+		        							    </a>
+		        						  	</div>
+		                  		<!--img class="img" src="{{obj.carousel_media.0.image_versions2.candidates.0.url}} " />
+		                  		</td-->
+
+		                  		{% endif %}
+
+		        						</div>
+		        						<div class="card-content">
+
+		        							<div class="row">
+		                			 	<div class="col-sm-6">
+		                			 		<button id="btn-detalles" type="button" class="btn btn-simple pull-right ModalDetalles"  data-mediaid="{{v.media_id}}" id="btn-ganadores" title="Ver Detalles de Compradores" style="padding: 0px 0px !important">
+
+		        						 			<i class="material-icons text-success" style="font-size: 30px">remove_red_eye</i>
+
+		        						 			</button>
+
+		                			 	</div>
+		                			 	<div class="col-sm-6">
+		                			 		<button id="btn-eliminar-venta-{{forloop.counter}}" type="button" class="btn btn-simple pull-left class-eliminar-venta"  data-mediaid="{{v.media_id}}" title="Eliminar Venta" style="padding: 0px 0px !important">
+
+		        						 			<i class="material-icons text-default" style="font-size: 30px">delete</i>
+		        						 			</button>
+
+		                			 	</div>
+		                			</div>	
+		        						</div>
+		        						<!--div class="card-footer">
+		        							<div class="stats">
+		        								<i class="material-icons text-danger">warning</i> <a href="#pablo">Get More Space...</a>
+		        							</div>
+		        						</div-->
+		        					</div>
+		        				</div>
+	        				
+	        			{%else%}
+
+	        				<div class="col-lg-3 col-md-6 col-sm-6">
+	        					<div class="card card-stats">
+	        						<div class="card-header" style="padding: 0px;">
+	        							{% if v.cant_img == 1%}
+	                  			{% for fotos in v.imagen%}
+	                    			<img class="img" src="{{fotos}}"  />
+	                    			<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
+	                  			{%endfor%}
+
+	                  		{% else %}
+	                  	
+	                  		
+
+	                    		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
+	                    			<ol class="carousel-indicators">
+	                      			{% for orden in v.imagen%}	
+	                      				{% if forloop.first %}
+	        								      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
+	        								      
+	        								      {% else %}
+	        								      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
+	        								      {% endif %}
+	        								    
+	        								    {% endfor %}
+	        							    </ol>
+	        						    
+	        							    <div class="carousel-inner">
+	        							    	{% for fotos in v.imagen%}
+	        									    		
+	        							    		{%if forloop.first %}
+	        							    			<div class="item active">
+	        							    				<img src="{{fotos}}" alt="" style="width:100%;" >
+	        							    			</div>
+	        							    			
+	        							    		{% else %}
+	        							    			<div class="item">
+	        							    				<img src="{{fotos}}" alt="" style="width:100%;" >
+	        							    			</div>
+	        							    		{% endif %}
+	        							    		
+	        							    	{% endfor %}
+	        							    
+	        							    </div>
+	        							    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
+	        							    	
+	        							    	<i class="material-icons" style="font-size: 24px;line-height: 1;width: 20px">keyboard_arrow_left</i>
+
+	        							    </a>
+	        							    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
+
+	        							    	<i class="material-icons" style="font-size: 24px;line-height: 1;width: 20px">keyboard_arrow_right</i>
+	        							      
+	        							    </a>
+	        						  	</div>
+	                  		<!--img class="img" src="{{obj.carousel_media.0.image_versions2.candidates.0.url}} " />
+	                  		</td-->
+
+	                  		{% endif %}
+
+	        						</div>
+	        						<div class="card-content">
+
+	        							<div class="row">
+	                			 	<div class="col-sm-6">
+	                			 		<button id="btn-detalles" type="button" class="btn btn-simple pull-right ModalDetalles"  data-mediaid="{{v.media_id}}" id="btn-ganadores" title="Ver Detalles de Compradores" style="padding: 0px 0px !important">
+
+	        						 			<i class="material-icons text-success" style="font-size: 30px">remove_red_eye</i>
+
+	        						 			</button>
+
+	                			 	</div>
+	                			 	<div class="col-sm-6">
+	                			 		<button id="btn-eliminar-venta-{{forloop.counter}}" type="button" class="btn btn-simple pull-left class-eliminar-venta"  data-mediaid="{{v.media_id}}" title="Eliminar Venta" style="padding: 0px 0px !important">
+
+	        						 			<i class="material-icons text-default" style="font-size: 30px">delete</i>
+
+
+	                			 	</div>
+	                			</div>	
+	        						</div>
+	        						<!--div class="card-footer">
+	        							<div class="stats">
+	        								<i class="material-icons text-danger">warning</i> <a href="#pablo">Get More Space...</a>
+	        							</div>
+	        						</div-->
+	        					</div>
+	        				</div>
+	        				{%if forloop.counter|divisibleby:4 is True%}
+	        				</div><!--end firs row-->
+	        				<div class="row"><!-- second row-->
+	        				{%endif%}
+	        			{%endif%}
+        				
+        				{%endfor%}
               {%else%}
               
 								<center>
-								<h3> Aun no vendes tus productos</h3>
+									<h3> Aun no vendes tus productos</h3>
 									<div class="row">
 										<div class="col-md-6">
 											<center>
@@ -233,8 +415,8 @@
 								</center>
 					
               {%endif%}
-            </div>
-          </div>
+				    <!--/div-->
+				  </div>
 				</div>
 				
 			</div>
@@ -252,7 +434,7 @@
 
 <!-- Modal Detalles de la venta -->
 <div class="modal fade" id="ModalDetalles" tabindex="-1" role="dialog" aria-labelledby="ModalDetallesLabel" aria-hidden="true">
-  <div class="modal-dialog" style="width: 1000px;">
+  <div class="modal-dialog" >
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -408,20 +590,21 @@
 
 			    
 				});
+      	for (i =0;  i <= $('.class-eliminar-venta').length ; i++){
+      		$('#btn-eliminar-venta-'+i).on('click',function(){
+						media_id =$(this).attr('data-mediaid');
+						$("#btn-si-eliminar-venta").attr("data-mediaid",media_id);
+						$("#ModalPregutaEliminar").modal("show");
 
-				$('#btn-eliminar-venta').on('click',function(){
-					console.log("entre a eliminar");
-					media_id =$(this).attr('data-mediaid');
-					$("#btn-si-eliminar-venta").attr("data-mediaid",media_id);
-					$("#ModalPregutaEliminar").modal("show");
-
-				});
+					});	
+      	}
+				
 
 				$("#btn-si-eliminar-venta").on('click',function(){
 					media_id =$(this).attr('data-mediaid');
 					var csrftoken = getCookie('csrftoken');
 					$.ajax({
-				    url : "{% url 'admingo:eliminar_venta'%}",
+				    url : "{% url 'admingo:delete_venta'%}",
 				    type : 'POST',
 				    data : 
 				    	{	'csrfmiddlewaretoken' : csrftoken,

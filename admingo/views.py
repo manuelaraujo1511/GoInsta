@@ -70,20 +70,108 @@ def resize_image(input_image_path,output_image_path,size):
 	
 	resized_image.save(output_image_path)
 
-def get_save_info(api,user_id, user_insta, pass_insta):
+def get_save_info(api,user_r, user_insta, pass_insta):
 	if (api != None):
 		api.searchUsername(str(user_insta))
 		img_profile = api.LastJson['user']['profile_pic_url']
 		follower = api.LastJson['user']['follower_count']
 		following = api.LastJson['user']['following_count']
-		info_user = Info.objects.get(id_usuario_id=user_id)
+		info_user = Info.objects.get(id_usuario=user_r)
 		info_user.seguidores = follower
 		info_user.seguidos = following
 		info_user.foto_perfil= img_profile
 		info_user.save()
 	else:
-		info_user = Info.objects.get(id_usuario_id=user_id)
+		info_user = Info.objects.get(id_usuario=user_r)
 	return info_user
+
+def get_producto(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			media_id = request.POST.get('media_id')
+			if (Productos.objects.filter(media_id=media_id).exists()):
+				pro = Productos.objects.get(media_id=media_id)
+				producto = {'encontre': True,'media_id':pro.media_id, 'cantidad': pro.cantidad,  'disponible': pro.disponible, 'descripcion_producto': pro.descripcion_producto, 'res_automatica': pro.res_automatica}
+			else:
+				producto = {'encontre': False}
+
+		
+			context = {
+				'producto':producto
+			}
+			#print ("get_producto Producto cantidad "+ str(pro.cantidad))
+			return JsonResponse(context)
+
+
+def save_talla(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			estado = 0
+			media_id = request.POST.get('media_id')
+			talla = request.POST.get('talla')
+
+			producto = Productos.objects.get(media_id=media_id)
+			if(Tallas.objects.filter(nombre=talla, media_id=media_id, id_usuario_id = request.user.id, id_producto=producto.id).exists()):
+				estado = 2
+			else:
+				Tallas(id_usuario_id=request.user.id, id_producto_id=producto.id, media_id=media_id, nombre=talla).save()
+				estado = 1
+		context = {'estado':estado}
+		return JsonResponse(context)
+
+def save_modelo(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			estado = 0
+			media_id = request.POST.get('media_id')
+			modelo = request.POST.get('modelo')
+
+			producto = Productos.objects.get(media_id=media_id)
+			if(Modelos.objects.filter(nombre=modelo, media_id=media_id, id_usuario_id = request.user.id, id_producto=producto.id).exists()):
+				estado = 2
+			else:
+				Modelos(id_usuario_id=request.user.id, id_producto_id=producto.id, media_id=media_id, nombre=modelo).save()
+				estado = 1
+		context = {'estado':estado}
+		return JsonResponse(context)
+
+def show_tallas(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			estado = 0
+			tallas = []
+			media_id = request.POST.get('media_id')
+			pro = Productos.objects.get(media_id=media_id)
+			if(Tallas.objects.filter(id_usuario_id= request.user.id, media_id=media_id).exists()):
+				tall = Tallas.objects.filter(id_usuario_id= request.user.id, media_id=media_id)
+				for t in tall:
+					tallas.append({'id': t.id, 'producto_id': t.id_producto_id, 'media_id': t.media_id, 'nombre': t.nombre})
+					print(str(t.nombre))
+				estado = 1
+				
+
+		context = {'estado': estado, 'tallas':tallas, 'producto_talla': pro.talla}
+		return JsonResponse(context)
+
+def show_modelos(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			estado = 0
+			modelos = []
+			media_id = request.POST.get('media_id')
+			pro = Productos.objects.get(media_id=media_id)
+			if(Modelos.objects.filter(id_usuario_id= request.user.id, media_id=media_id).exists()):
+				model = Modelos.objects.filter(id_usuario_id= request.user.id, media_id=media_id)
+				for m in model:
+					modelos.append({'id': m.id, 'producto_id': m.id_producto_id, 'media_id': m.media_id, 'nombre': m.nombre})
+					print(str(m.nombre))
+				estado = 1
+				
+
+		context = {'estado': estado, 'modelos':modelos, 'producto_modelo': pro.modelo}
+		return JsonResponse(context)
+
+				
 
 @login_required
 def index(request):
@@ -105,7 +193,7 @@ def index(request):
 	## Eliminar de la tabla los concursos que no terminaron de publicar
 	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
 	### cargar informacion actualizada de usuario
-	info_user=get_save_info(api,request.user.id,user_r.user_insta, user_r.pass_insta)
+	info_user=get_save_info(api,user_r,user_r.user_insta, user_r.pass_insta)
 	
 	concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
 	concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
@@ -119,6 +207,7 @@ def index(request):
 
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=1)
 	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
+	productos = Productos.objects.filter(id_usuario_id=request.user.id)
 
 
 	if (todos_concursos.exists()):		
@@ -134,6 +223,16 @@ def index(request):
 		  			item['caption']['pausado'] = True
 		  		else:
 		  			item['caption']['pausado'] = False
+		  	
+		  	item['caption']['cant_pro'] = -1
+
+		  	if productos:
+			  	for pro in productos:
+			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
+			  			item['caption']['producto'] = pro
+			  		else:
+			  				item['caption']['producto'] = False
+			  
 
 		  	for con in todos_concursos:
 		  		if(str(item['caption']['media_id']) == str(con.media_id)):
@@ -164,6 +263,14 @@ def index(request):
 		  			item['caption']['pausado'] = True
 		  		else:
 		  			item['caption']['pausado'] = False
+		  	item['caption']['cant_pro'] = -1
+		  	
+		  	if productos:
+			  	for pro in productos:
+			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
+			  			item['caption']['producto'] = pro
+			  		else:
+			  				item['caption']['producto'] = False
 		  	feed.append(item)
 
 		  if temp["more_available"] is False:
@@ -218,7 +325,16 @@ def singup(request):
 								# Guardo en info
 								api.searchUsername(str(user_u.user_insta))
 								img_profile = api.LastJson['user']['profile_pic_url']
-								Info(id_usuario_id=request.user.id, username=user_u.user, foto_perfil= img_profile).save()
+								follower = api.LastJson['user']['follower_count']
+								following = api.LastJson['user']['following_count']
+								
+								info_user =Info.objects.get(id_usuario_id=request.user.id)
+
+								info_user.img_profile=img_profile
+								info_user.seguidores=follower
+								info_user.seguidos=following
+								info_user.save()
+
 
 								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
 								api.logout()
@@ -329,6 +445,7 @@ def cerrar_sesion(request):
 @login_required
 def vender(request):
 	#print (str(request.user.id))
+	estado = 1
 	if request.method == "POST":
 		if request.is_ajax():
 			varias=0
@@ -348,45 +465,46 @@ def vender(request):
 				varias=1
 
 
-			#Ventas(id_usuario = user_r, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+		
 			if (Productos.objects.filter(id_usuario_id = request.user.id, media_id = media_id).exists()):
 
 				producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
 
-				#for pro in producto:
-				#print("producto.cantidad: "+ str(int(producto.cantidad))+" - cantidad: "+str(cantidad)+" = "+str(int(producto.cantidad) - int(cantidad)))
-				producto.cantidad = int(producto.cantidad) - int(cantidad)
-				producto.save()
-					
-				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+				#validar la cantidad en stock con la venta
+				print(str("validando cantidad: ----> "+str(int(producto.cantidad) - int(cantidad))))
+				if ((int(producto.cantidad) - int(cantidad)) < 0):
+					estado = 0
+				else:
+					producto.cantidad = int(producto.cantidad) - int(cantidad)
 
-				Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
+					producto.save()
+						
+					Ventas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
 
-				print("producto.id: "+ str(producto.id))
+					Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
+
+					#print("producto.id: "+ str(producto.id))
 			else:
 				print("sino")
 				
-				Productos(id_usuario = user_r, media_id=media_id, texto=texto, descripcion_producto=descripcion_venta).save()
+				#Productos(id_usuario = user_r, media_id=media_id, texto=texto, descripcion_producto=descripcion_venta).save()
 
-				producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
+				#producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
 
-				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+				Ventas(id_usuario = user_r, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
 
-				Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
-			#for para el array de rult_img#
-			'''
-			ventas = Ventas.objects.all()
-			for ven in ventas:
-				print(ven.id_usuario)
-			'''
-			#print("tamaño: "+ str(len(result_img)))
+				Finanzas(id_usuario = user_r, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
+		
 			for res in result_img:
-				#print (res.split(',')[1])
-				if not Imagenes.objects.filter(media_id= media_id, imagen=res.split(',')[1]).exists():
+			
+				if (not Imagenes.objects.filter(media_id= media_id).exists()):
 					Imagenes(id_usuario = user_r, media_id= media_id, imagen=res.split(',')[1]).save()
+					print (str("NNNNNNNNNNNNNNN imagen----> "+res.split(',')[1]))
+				else:
+					print (str("IIIIIIIII imagen----> "+res.split(',')[1]))
 
 
-			context = {'estado': 1}
+			context = {'estado': estado}
 	return JsonResponse(context)
 
 @login_required
@@ -469,6 +587,7 @@ def play_venta(request):
 def ventas (request):
 
 	todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
+	ventas_distinc = Ventas.objects.filter(id_usuario_id=request.user.id).values_list('media_id', flat=True).distinct()
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
 	
 	user_r= Usuarios.objects.get(email=request.user.email)
@@ -483,16 +602,19 @@ def ventas (request):
 	arr_img = []
 	arr_ventas = []
 	into = False
-	for v in todas_ventas:
-		for av in arr_ventas:
-			if v.media_id == v.media_id:
-				into = True		
-		if (not into):
-			for img in imagenes:
-				if (img.media_id == v.media_id):
-					arr_img.append(img.imagen)
+	
+	for vd in ventas_distinc:
+		'''
+		for v in todas_ventas:
+			if (v.media_id == vd):
+				
+		'''
+		for img in imagenes:
+			if (img.media_id == vd):
+
+				arr_img.append(img.imagen)
 			
-			arr_ventas.append({'media_id': v.media_id, 'imagen': arr_img, 'cant_img': len(arr_img)})
+		arr_ventas.append({'media_id': vd, 'imagen': arr_img, 'cant_img': len(arr_img)})
 
 		arr_img = []
 		
@@ -527,7 +649,7 @@ def detalles_venta (request):
 		}
 		return JsonResponse(context)
 
-def eliminar_venta (request):
+def delete_venta (request):
 	if request.method == "POST":
 		media_id = request.POST.get('media_id')
 		ventas=Ventas.objects.filter(media_id=media_id)
@@ -623,7 +745,7 @@ def nuevo_concurso (request, nuevo =None):
 				hastag+= " #"+c+" "
 
 			print(str(hastag))
-			if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id, imagen=img_url).exists()):
+			if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id).exists()):
 				Imagenes(id_usuario = user_r,media_id=media_id, imagen=img_url).save()
 
 				Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id,hastags = hastag,  seguir_otros= "",condiciones = comentario, view_otro = 1).save()
@@ -634,7 +756,7 @@ def nuevo_concurso (request, nuevo =None):
 
 			for img in media_info["items"][0]["carousel_media"]:
 			
-				if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).exists()):
+				if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id).exists()):
 
 					Imagenes(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).save()
 
@@ -1029,6 +1151,10 @@ def delete_concurso(request):
 		if request.is_ajax():
 			media_id= request.POST.get('media_id')
 			concurso = Concursos.objects.get(media_id=media_id)
+			imganes = Imagenes.objects.filter(media_id=media_id)
+			for img in imagenes:
+				img.delete()
+
 			if (concurso.delete()):
 				estado = 1
 
@@ -1191,12 +1317,12 @@ def publicar_ganadores(request):
 
 
 
-def editar_producto(request):
+def agregar_producto(request):
 
 	if request.is_ajax():
 		media_id = request.POST.get('media_id')
-		talla = request.POST.get('talla')
-		modelo = request.POST.get('modelo')
+		#talla = request.POST.get('talla')
+		#modelo = request.POST.get('modelo')
 		cantidad = request.POST.get('cantidad')
 		descripcion = request.POST.get('descripcion')
 		res_auto = request.POST.get('res_automatica')
@@ -1216,8 +1342,6 @@ def editar_producto(request):
 			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
 
 			for p in producto:
-				p.talla = talla
-				p.modelo = modelo
 				p.cantidad = cantidad
 				p.descripcion_producto = descripcion
 				p.res_automatica = res_automatica
@@ -1227,7 +1351,7 @@ def editar_producto(request):
 
 
 		else:
-			Productos(id_usuario_id= request.user.id, media_id= media_id, talla=talla, modelo=modelo, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica).save()
+			Productos(id_usuario_id= request.user.id, media_id= media_id, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica).save()
 			user_r= Usuarios.objects.get(email=request.user.email)
 
 			for res in result_img:
@@ -1241,12 +1365,61 @@ def editar_producto(request):
 		context= {'estado':estado}
 		return JsonResponse(context)
 
+
+def editar_producto(request):
+	if request.method == "POST":
+		if request.is_ajax():
+			print("entre a editar_ producto")
+			media_id = request.POST.get('media_id')
+			cantidad = request.POST.get('cantidad')
+			descripcion = request.POST.get('descripcion')
+			res_auto = request.POST.get('res_automatica')
+			talla = request.POST.get('talla')
+			talla_id = request.POST.get('talla_id')
+			modelo = request.POST.get('modelo')
+			modelo_id = request.POST.get('modelo_id')
+
+			estado = 0
+			if (res_auto == "si"):
+				res_automatica = 1
+			else:
+				res_automatica = 0
+
+			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
+
+
+			for p in producto:
+				if (talla_id == ""):
+					tal = Tallas.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = talla)
+					tal.save()
+					talla_id = tal.id
+
+				if (modelo_id == ""):
+					mode = Modelos.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = modelo)
+					mode.save()
+					modelo_id = mode.id
+
+				p.cantidad = cantidad
+				p.descripcion_producto = descripcion
+				p.res_automatica = res_automatica
+				p.talla=talla_id
+				p.modelo=modelo_id
+				p.save()
+				estado =1
+
+
+			
+		context= {'estado':estado}
+		return JsonResponse(context)
 def delete_producto(request):
 
 	if request.is_ajax():
 		estado =0
 		media_id = request.POST.get('media_id')		
 		pro = Productos.objects.get(media_id= media_id)
+		imagenes = Imagenes.objects.filter(media_id=media_id)
+		for img in imagenes:
+			img.delete()
 
 		if (pro.delete()):
 			estado = 1
