@@ -366,61 +366,6 @@
       <div class="modal-body">
       	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
 				{% csrf_token %} 
-		      
-			    <div class="row">
-			    	<div class="col-lg-4 " id="not-tallas"  style="margin-top: 31px">
-			    		<div  class="form-group label-floating">
-    						<label class="control-label">Talla</label>
-    						<input type="text" name="nueva-talla-not" id="nueva-talla-not" class="form-control" required="">
-    					</div>	
-    				</div>
-    				<div  id="tallas-fine">
-				    	<div class="col-lg-4 ">		    		
-
-				    		<div class="form-group">
-				    			<label class="control-label">Talla</label>
-				    			<select class="form-control" id="tallas-select">
-				    			</select> 
-				    			
-				    		</div>
-
-				    		
-				    	</div>
-				    	<div class="col-lg-2  form-group">
-				    		<button type="button" class="btn btn-simple" id ="agregar-talla" title="Agregar nueva talla" style="padding: 0px 0px !important">
-
-						 			<i class="material-icons text-success" style="font-size: 30px">add</i>
-
-					 			</button>
-					 			<p style="font-size: 9px">Nueva talla</p>
-				    	</div>
-    				</div>
-    				<div class="col-lg-4 " id="not-modelos"  style="margin-top: 31px">
-			    		<div  class="form-group label-floating">
-    						<label class="control-label">Modelo</label>
-    						<input type="text" name="nueva-modelo-not" id="nueva-modelo-not" class="form-control" required="">
-    					</div>	
-    				</div>
-			    	<div  id="modelos-fine">
-				    	<div class="col-lg-4 ">
-				    		<div class="form-group">
-				    			<label class="control-label">Modelo</label>
-				    			<select class="form-control" id="modelos-select">
-
-				    			</select> 
-				    		</div>
-				    		
-				    	</div>
-				    	<div class="col-lg-2 form-group">
-				    		<button type="button" class="btn btn-simple"  id="agregar-modelo" title="Agregar nuevo modelo" style="padding: 0px 0px !important">
-
-						 			<i class="material-icons text-success" style="font-size: 30px">add</i>
-
-					 			</button>
-					 			<p style="font-size: 9px">Nuevo modelo</p>
-				    	</div>
-				    </div>
-			    </div> 
 		      <div class="row">
 		      	<div class="col-lg-4">
 		      		<div class="div-cantidad form-group label-floating">
@@ -468,62 +413,6 @@
 	    </div>
 	  </div>
   </div>
-</div>
-
-<!-- Modal agregar talla-->
-<div class="modal fade" id="ModalAgregarTalla" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarTallatoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" >Nueva Talla</h4>
-      </div>
-      <div class="modal-body">
-		    <div class="row">
-				      
-	      	<div class="col-lg-6">
-			      <div class="form-group label-floating has-error">
-							<label class="control-label">Talla</label>
-							<input type="text" name="nueva-talla-new" id="nueva-talla-new" class="form-control" required="">
-							<input type="text" name="nueva-talla-mediaid" id="nueva-talla-mediaid" style="display: none;">
-						</div>	
-	      	</div>
-	    	</div>
-	    	<div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		      <button type="submit" class="btn btn-success btn-simple" id="btn-save-nueva-talla-new">Guardar</button>
-	      </div>
-		  </div>
-		</div>
-	</div>
-</div>
-
-<!-- Modal agregar modelo-->
-<div class="modal fade" id="ModalAgregarModelo" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarModelotoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" >Nuevo Modelo</h4>
-      </div>
-      <div class="modal-body">
-	    	<div class="row">
-			      
-	      	<div class="col-lg-6">
-			      <div class="form-group label-floating has-error">
-							<label class="control-label"> Modelo</label>
-							<input type="text" name="nueva-modelo-new" id="nueva-modelo-new" class="form-control" required="">
-							<input type="text" name="nueva-modelo-mediaid" id="nueva-modelo-mediaid" style="display: none;">
-						</div>	
-	      	</div>
-	    	</div>
-	    	<div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		      <button type="submit" class="btn btn-success btn-simple" id="btn-save-nueva-modelo-new">Guardar</button>
-	      </div>
-		  </div>
-		</div>
-	</div>
 </div>
 
     
@@ -952,9 +841,6 @@
 					beforeSend: function() {
 		        // setting a timeout
 		        $(".load").fadeIn();
-		        //$('#myModal').modal('hide');
-		        //console.log("Before Send");
-    				//$.ajaxSettings.beforeSend(xhr, settings);
 		    	},
 			    success : function(data){
 						console.table(data.producto);
@@ -962,8 +848,6 @@
 							$("#cantidad-editar").val(data.producto.cantidad);
 							$("#descripcion-edit-p").val(data.producto.descripcion_producto);
 							$('#media_id_edit').val(data.producto.media_id);
-							$("#div-modelo").removeClass("has-error")
-							$("#div-talla").removeClass("has-error")
 					  	
 					  	if(data.producto.res_automatica == 1){
 					  		$('#res-automatica-edit').prop('checked', true);
@@ -979,8 +863,7 @@
 							}
 
 							$(".load").fadeOut();
-							mostrar_tallas(media_id);
-							mostrar_modelos(media_id)
+							
 															
 					    $('#ModalEditarProducto').modal('show');
 							
@@ -1004,28 +887,7 @@
 				var media_id = $('#media_id_edit').val();
 				var csrftoken = getCookie('csrftoken');
 				var texto = $('#comentario-edit').val();
-				var talla_id = ""
-				var talla = ""
-				var modelo_id = ""
-				var modelo = ""
-
-				if ($("#nueva-talla-not").val() != ""){
-					// no tiene talla
-					talla = $("#nueva-talla-not").val()
-				}else{
-					// con el select
-					talla_id= $( "#tallas-select" ).val();
-				}
-
-				if ($("#nueva-modelo-not").val() != ""){
-					// no tiene modelo
-					modelo = $("#nueva-modelo-not").val()
-				}else{
-					// con el select
-					modelo_id= $( "#modelos-select" ).val();
-				}
-
-
+			
 				if (cantidad < 0){
 					$("#div-cantidad").addClass("has-error");
 					$("#erro-cantidad").css("display", "block");
@@ -1041,10 +903,6 @@
 				    		'cantidad' : cantidad,
 				    		'descripcion' : descripcion,
 				    		'res_automatica' : res_automatica,
-				    		'talla': talla,
-				    		'talla_id': talla_id,
-				    		'modelo': modelo,
-				    		'modelo_id': modelo_id
 				    	},
 						beforeSend: function() {
 			        // setting a timeout
@@ -1080,201 +938,7 @@
 
 	  	
 
-			function mostrar_tallas(media_id) {
-				valor = false
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-			    url : '{% url "admingo:show_tallas" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id' : media_id
-			    	},
-			    success : function(data){
-
-						if (data.estado == 1){
-							$("#tallas-fine").css('display', 'block')
-														
-							$("#not-tallas").css('display', 'none');
-							$("#nueva-talla-not").val("");
-
-							select = ''
-								for (var i = 0; i < data.tallas.length; i++) {
-									if (data.tallas[i].id == data.producto_talla){
-										select+='<option value="'+data.tallas[i].id+'" selected="true" >'+data.tallas[i].nombre+'</option>';	
-									}else{
-										select+='<option value="'+data.tallas[i].id+'" >'+data.tallas[i].nombre+'</option>';	
-									}
-									
-								}
-							$("#tallas-select").html(select);
-							valor = true
-						}else{
-							$("#tallas-fine").css('display', 'none');
-														
-							$("#not-tallas").css('display', 'block');
-						}
-					
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText);
-					 	$(".load").fadeOut();
-					 }              
-			
-				});
-				return valor;
-			}
-			
-			$("#agregar-talla").on('click',function(){
-				media_id = $("#media_id_edit").val();
-				$("#nueva-talla-mediaid").val(media_id);
-				$("#ModalAgregarTalla").modal('show');
-			});
-
-			$("#btn-save-nueva-talla-new").on('click',function(){
-				var csrftoken = getCookie('csrftoken');
-				media_id=$("#nueva-talla-mediaid").val();
-				talla = $("#nueva-talla-new").val();
-
-
-				$.ajax({
-			    url : '{% url "admingo:save_talla" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id' : media_id,
-			    		'talla' : talla
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $(".load").fadeIn();
-
-		    	},
-			    success : function(data){
-						//console.log(data);
-						$(".load").fadeOut();
-						if (data.estado == 2){
-							
-							demo.showNotificationError('top','center','Talla ya existe para este producto');
-						}else{
-							mostrar_tallas(media_id);
-							$('#ModalAgregarTalla').modal('hide');
-							demo.showNotificationSucces('top','center','Talla agregada con exito');
-							
-							if (mostrar_tallas(media_id)){
-								$("#nueva-talla-not").val("");
-							}
-							
-						}
-					
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText);
-					 	$(".load").fadeOut();
-					 }              
-			
-				});
-			});
-
-			function mostrar_modelos(media_id) {
-				valor = false
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-			    url : '{% url "admingo:show_modelos" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id' : media_id
-			    	},
-			    success : function(data){
-
-						if (data.estado == 1){
-							$("#modelos-fine").css('display', 'block')
-														
-							$("#not-modelos").css('display', 'none');
-							$("#nueva-modelo-not").val("");	
-							select = ''
-								for (var i = 0; i < data.modelos.length; i++) {
-									if (data.modelos[i].id == data.producto_modelo){
-										select+='<option value="'+data.modelos[i].id+'" selected="true" >'+data.modelos[i].nombre+'</option>';	
-									}else{
-										select+='<option value="'+data.modelos[i].id+'" >'+data.modelos[i].nombre+'</option>';	
-									}
-									
-								}
-							$("#modelos-select").html(select);
-							valor = true
-						}else{
-							$("#modelos-fine").css('display', 'none');
-														
-							$("#not-modelos").css('display', 'block');
-						}
-					
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText);
-					 	$(".load").fadeOut();
-					 }              
-			
-				});
-				return valor
-			}
-
-			$("#agregar-modelo").on('click',function(){
-				media_id = $("#media_id_edit").val();
-				$("#nueva-modelo-mediaid").val(media_id);
-				$("#ModalAgregarModelo").modal('show');
-			});
-
-
-			$("#btn-save-nueva-modelo-new").on('click',function(){
-				var csrftoken = getCookie('csrftoken');
-				media_id=$("#nueva-modelo-mediaid").val();
-				modelo = $("#nueva-modelo-new").val();
-
-
-				$.ajax({
-			    url : '{% url "admingo:save_modelo" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id' : media_id,
-			    		'modelo' : modelo
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $(".load").fadeIn();
-
-		    	},
-			    success : function(data){
-						//console.log(data);
-						$(".load").fadeOut();
-						if (data.estado == 2){
-							
-							demo.showNotificationError('top','center','Modelo ya existe para este producto');
-						}else{
-							$('#ModalAgregarModelo').modal('hide');
-							demo.showNotificationSucces('top','center','Modelo agregado con exito');
-							
-							if (mostrar_modelos(media_id)){
-								$("#nueva-modelo-not").val("");	
-							}
-							
-						}
-					
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText);
-					 	$(".load").fadeOut();
-					 }              
-			
-				});
-			});
-	
+		
 	}); // end document Ready
 	</script>
 

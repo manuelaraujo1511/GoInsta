@@ -4,7 +4,12 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'admingo'
-
+''' PAra las tallas y Modelos
+	url(r'^show_tallas$', views.show_tallas, name='show_tallas'),
+	url(r'^save_talla$', views.save_talla, name='save_talla'),
+	url(r'^show_modelos$', views.show_modelos, name='show_modelos'),
+	url(r'^save_modelo$', views.save_modelo, name='save_modelo'),
+'''
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
 	url(r'^singup$', views.singup, name='singup'),
@@ -29,10 +34,7 @@ urlpatterns = [
 	url(r'^productos$', views.productos, name='productos'),
 	url(r'^agregar_producto$', views.agregar_producto, name='agregar_producto'),
 	url(r'^editar_producto$', views.editar_producto, name='editar_producto'),
-	url(r'^show_tallas$', views.show_tallas, name='show_tallas'),
-	url(r'^save_talla$', views.save_talla, name='save_talla'),
-	url(r'^show_modelos$', views.show_modelos, name='show_modelos'),
-	url(r'^save_modelo$', views.save_modelo, name='save_modelo'),
+
 	url(r'^get_producto$', views.get_producto, name='get_producto'),
 	url(r'^delete_producto$', views.delete_producto, name='delete_producto'),
 

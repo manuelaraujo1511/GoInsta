@@ -29,8 +29,6 @@ class Usuarios(models.Model):
 class Productos(models.Model):
 	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
 	media_id = models.CharField( max_length = 1000 )
-	talla = models.IntegerField(default=0)
-	modelo = models.IntegerField(default=0)
 	cantidad = models.IntegerField(default=0)
 	disponible = models.IntegerField(default=1)
 	texto = models.TextField(max_length= 1000, default = None)

@@ -103,6 +103,7 @@ def get_producto(request):
 			return JsonResponse(context)
 
 
+''' Para las Tallas y los Modelos
 def save_talla(request):
 	if request.method == "POST":
 		if request.is_ajax():
@@ -170,7 +171,7 @@ def show_modelos(request):
 
 		context = {'estado': estado, 'modelos':modelos, 'producto_modelo': pro.modelo}
 		return JsonResponse(context)
-
+'''
 				
 
 @login_required
@@ -1329,18 +1330,11 @@ def agregar_producto(request):
 
 	if request.is_ajax():
 		media_id = request.POST.get('media_id')
-		talla = request.POST.get('talla')
-		modelo = request.POST.get('modelo')
 		cantidad = request.POST.get('cantidad')
 		descripcion = request.POST.get('descripcion')
 		res_auto = request.POST.get('res_automatica')
 		result_img = request.POST.getlist('result_img[]')
 		texto = request.POST.get('texto')
-
-		if talla == "":
-			talla = 0
-		if modelo == "":
-			modelo = 0
 
 		estado = 1
 		if (res_auto == "si"):
@@ -1348,7 +1342,7 @@ def agregar_producto(request):
 		else:
 			res_automatica = 0
 
-		print("respuesta automatica: "+str(res_automatica))
+		#print("respuesta automatica: "+str(res_automatica))
 
 		if (Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id).exists()):
 
@@ -1359,8 +1353,6 @@ def agregar_producto(request):
 				p.descripcion_producto = descripcion
 				p.res_automatica = res_automatica
 				p.texto=texto
-				p.talla= talla
-				p.modelo= modelo
 				p.save()
 				estado =2
 
@@ -1369,13 +1361,6 @@ def agregar_producto(request):
 			
 
 			pro = Productos.objects.create(id_usuario_id= request.user.id, media_id= media_id, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica)
-			pro.save()
-			tal = Tallas.objects.create(media_id=media_id, id_producto_id= pro.id, id_usuario_id=request.user.id, nombre = talla)
-			tal.save()
-			model = Modelos.objects.create(media_id=media_id, id_producto_id= pro.id, id_usuario_id=request.user.id, nombre = modelo)
-			model.save()
-			pro.talla=tal.id
-			pro.modelo=model.id
 			pro.save()
 
 			#user_r= Usuarios.objects.get(email=request.user.email)
@@ -1400,11 +1385,7 @@ def editar_producto(request):
 			cantidad = request.POST.get('cantidad')
 			descripcion = request.POST.get('descripcion')
 			res_auto = request.POST.get('res_automatica')
-			talla = request.POST.get('talla')
-			talla_id = request.POST.get('talla_id')
-			modelo = request.POST.get('modelo')
-			modelo_id = request.POST.get('modelo_id')
-
+			print("--- GET res_automatica: "+str(res_auto))
 			estado = 0
 			if (res_auto == "si"):
 				res_automatica = 1
@@ -1412,31 +1393,14 @@ def editar_producto(request):
 				res_automatica = 0
 
 			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
-			print("talla_id: "+str(talla_id))
-			print("modelo_id: "+str(modelo_id))
-			print("talla: "+str(talla))
-			print("modelo: "+str(modelo))
 
 			for p in producto:
-				if (talla_id == ""):
-					
-					tal = Tallas.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = talla)
-					tal.save()
-					talla_id = tal.id
-					
-
-				if (modelo_id == ""):
-					
-					mode = Modelos.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = modelo)
-					mode.save()
-					modelo_id = mode.id
 					
 
 				p.cantidad = cantidad
 				p.descripcion_producto = descripcion
 				p.res_automatica = res_automatica
-				p.talla=talla_id
-				p.modelo=modelo_id
+				print("save res_automatica: "+str(p.res_automatica))
 				p.save()
 				estado =1
 
@@ -1486,7 +1450,7 @@ def productos(request):
 			if (img.media_id == pro.media_id):
 				arr_img.append(img.imagen)
 
-		products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto, 'talla': pro.talla, 'modelo': pro.modelo, 'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
+		products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto,  'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
 		arr_img = []
 	
 
