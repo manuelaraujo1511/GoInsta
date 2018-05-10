@@ -172,7 +172,7 @@
               </div>
             	{% else%}
 								<center>
-									<h3> Aun no vendes o no editas tus productos</h3>
+									<h3> Aun no vendes o no agregas tus productos</h3>
 									<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
 								</center>
 							{%endif%}
@@ -427,7 +427,7 @@
 		      			<label class="control-label">Cantidad</label>
 		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
 		      		</div>
-		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser un valor positivo.</p>   
+		      		<p id="erro-cantidad-editar" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser un valor positivo.</p>   
 		      	</div>
 
 	      		<div class="col-md-8">
@@ -454,7 +454,7 @@
 		      	<div class="form-group label-floating" style="display: none">
 		      	<input  name="media_id_edit" id="media_id_edit" style="display: none" >
 		      	<input  name="comentario-edit" id="comentario-edit" value="" style="display: none" >
-		      	<input  name="res-automatica-edit-check" id="res-automatica-check" value="" style="display: none" >
+		      	<input  name="res-automatica-edit-check" id="res-automatica-edit-check" value="" style="display: none" >
 		      	</div>
 		      	
 		      </div>
@@ -841,7 +841,59 @@
 				});
 					
 
-	  	});		
+	  	});
+	  	for (i =0;  i <= $('.class-eliminar-pro').length ; i++){
+    		$('#btn-eliminar-pro-'+i).on('click',function(){
+					media_id =$(this).attr('data-mediaid');
+					$("#btn-si-eliminar-pro").attr('data-mediaid',media_id);
+					$('#ModalEliminarProducto').modal('show');
+
+				});	
+    	}
+
+			$("#btn-no-eliminar-pro").on('click',function(){
+					
+				$('#ModalEliminarProducto').modal('hide');
+
+			});
+
+			$("#btn-si-eliminar-pro").on('click',function(){
+				
+				media_id = $(this).attr('data-mediaid');
+				var csrftoken = getCookie('csrftoken');
+				$.ajax({
+			    url : '{% url "admingo:delete_producto" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id': media_id,
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $('#ModalEliminarProducto').modal('hide');
+		        $(".load").fadeIn();
+		        //console.log("Before Send");
+    				//$.ajaxSettings.beforeSend(xhr, settings);
+		    	},
+			    success : function(data){						
+						
+						if (data.estado == 1){
+							demo.showNotificationSucces('top','center','El producto fue Eliminado con Exito!');
+							location.reload();
+						}else{
+							demo.showNotificationError('top','center','Hubo un problema al eliminar el producto. Intentalo nuevamente.');
+							location.reload();	
+						}
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+						$(".load").fadeOut();
+					}              
+			
+				});
+				
+			});	
 	  	
 
 			if($('#res-automatica-edit').is(':checked')){
@@ -866,9 +918,28 @@
 		    	$("#res-automatica-edit-check").val("no")
 		    	
 		    }
-		   });
+		  });
 
+		  $("#cantidad-editar").change(function() {
+
+
+				cantidad = $('#cantidad-editar').val();
+				if (cantidad < 0){
+					$("#erro-cantidad-editar").addClass("has-error");
+					$("#erro-cantidad-editar").html("- Debe ser un valor positivo.");
+					$("#erro-cantidad-editar").css("display", "block");
+					
+					
+				}else{
+					$("#erro-cantidad-editar").removeClass("has-error");
+					$("#erro-cantidad-editar").css("display", "none");
+				}
+				
+			});
+
+			
 			$('.ModalEditarProducto').on('click',function(){
+
 				media_id =$(this).attr('data-media');
 				var csrftoken = getCookie('csrftoken');
 				$.ajax({
@@ -886,7 +957,7 @@
     				//$.ajaxSettings.beforeSend(xhr, settings);
 		    	},
 			    success : function(data){
-						//console.table(data.producto);
+						console.table(data.producto);
 						if (data.producto.encontre == true){
 							$("#cantidad-editar").val(data.producto.cantidad);
 							$("#descripcion-edit-p").val(data.producto.descripcion_producto);
@@ -895,11 +966,13 @@
 							$("#div-talla").removeClass("has-error")
 					  	
 					  	if(data.producto.res_automatica == 1){
+					  		$('#res-automatica-edit').prop('checked', true);
 								$("#res-automatica-edit-si").css("color", "black");
 						    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
 						    $("#res-automatica-edit-check").val("si")
 
 							}else{
+								$('#res-automatica-edit').prop('checked', false);
 								$("#res-automatica-edit-no").css("color", "black");
 						   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
 						   	$("#res-automatica-edit-check").val("no")
@@ -907,9 +980,8 @@
 
 							$(".load").fadeOut();
 							mostrar_tallas(media_id);
-							mostrar_modelos(media_id);
-
-							
+							mostrar_modelos(media_id)
+															
 					    $('#ModalEditarProducto').modal('show');
 							
 						}
@@ -928,7 +1000,7 @@
 
 				var cantidad = $('#cantidad-editar').val();
 				var descripcion = $('#descripcion-edit-p').val();
-				var res_automatica = $('#res-automatica-check').val();
+				var res_automatica = $('#res-automatica-edit-check').val();
 				var media_id = $('#media_id_edit').val();
 				var csrftoken = getCookie('csrftoken');
 				var texto = $('#comentario-edit').val();
@@ -936,7 +1008,6 @@
 				var talla = ""
 				var modelo_id = ""
 				var modelo = ""
-				console.log("entre a editar submit")
 
 				if ($("#nueva-talla-not").val() != ""){
 					// no tiene talla
@@ -1007,60 +1078,10 @@
 
 	  	});
 
-	  	for (i =0;  i <= $('.class-eliminar-pro').length ; i++){
-    		$('#btn-eliminar-pro-'+i).on('click',function(){
-					media_id =$(this).attr('data-mediaid');
-					$("#btn-si-eliminar-pro").attr('data-mediaid',media_id);
-					$('#ModalEliminarProducto').modal('show');
-
-				});	
-    	}
-
-			$("#btn-no-eliminar-pro").on('click',function(){
-					
-				$('#ModalEliminarProducto').modal('hide');
-
-			});
-
-			$("#btn-si-eliminar-pro").on('click',function(){
-				
-				media_id = $(this).attr('data-mediaid');
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-			    url : '{% url "admingo:delete_producto" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id': media_id,
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $('#ModalEliminarProducto').modal('hide');
-		        $(".load").fadeIn();
-		        //console.log("Before Send");
-    				//$.ajaxSettings.beforeSend(xhr, settings);
-		    	},
-			    success : function(data){						
-						
-						if (data.estado == 1){
-							demo.showNotificationSucces('top','center','El producto fue Eliminado con Exito!');
-							location.reload();
-						}else{
-							demo.showNotificationError('top','center','Hubo un problema al eliminar el producto. Intentalo nuevamente.');
-							location.reload();	
-						}
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-						$(".load").fadeOut();
-					}              
-			
-				});
-				
-			});
+	  	
 
 			function mostrar_tallas(media_id) {
+				valor = false
 				var csrftoken = getCookie('csrftoken');
 				$.ajax({
 			    url : '{% url "admingo:show_tallas" %}',
@@ -1075,6 +1096,8 @@
 							$("#tallas-fine").css('display', 'block')
 														
 							$("#not-tallas").css('display', 'none');
+							$("#nueva-talla-not").val("");
+
 							select = ''
 								for (var i = 0; i < data.tallas.length; i++) {
 									if (data.tallas[i].id == data.producto_talla){
@@ -1085,6 +1108,7 @@
 									
 								}
 							$("#tallas-select").html(select);
+							valor = true
 						}else{
 							$("#tallas-fine").css('display', 'none');
 														
@@ -1099,6 +1123,7 @@
 					 }              
 			
 				});
+				return valor;
 			}
 			
 			$("#agregar-talla").on('click',function(){
@@ -1136,7 +1161,10 @@
 							mostrar_tallas(media_id);
 							$('#ModalAgregarTalla').modal('hide');
 							demo.showNotificationSucces('top','center','Talla agregada con exito');
-							mostrar_tallas(media_id);
+							
+							if (mostrar_tallas(media_id)){
+								$("#nueva-talla-not").val("");
+							}
 							
 						}
 					
@@ -1151,6 +1179,7 @@
 			});
 
 			function mostrar_modelos(media_id) {
+				valor = false
 				var csrftoken = getCookie('csrftoken');
 				$.ajax({
 			    url : '{% url "admingo:show_modelos" %}',
@@ -1165,6 +1194,7 @@
 							$("#modelos-fine").css('display', 'block')
 														
 							$("#not-modelos").css('display', 'none');
+							$("#nueva-modelo-not").val("");	
 							select = ''
 								for (var i = 0; i < data.modelos.length; i++) {
 									if (data.modelos[i].id == data.producto_modelo){
@@ -1175,6 +1205,7 @@
 									
 								}
 							$("#modelos-select").html(select);
+							valor = true
 						}else{
 							$("#modelos-fine").css('display', 'none');
 														
@@ -1189,12 +1220,12 @@
 					 }              
 			
 				});
+				return valor
 			}
 
 			$("#agregar-modelo").on('click',function(){
 				media_id = $("#media_id_edit").val();
 				$("#nueva-modelo-mediaid").val(media_id);
-				console.log("$(#ModalAgregarModelo).modal('show')");
 				$("#ModalAgregarModelo").modal('show');
 			});
 
@@ -1227,7 +1258,10 @@
 						}else{
 							$('#ModalAgregarModelo').modal('hide');
 							demo.showNotificationSucces('top','center','Modelo agregado con exito');
-							mostrar_modelos(media_id);
+							
+							if (mostrar_modelos(media_id)){
+								$("#nueva-modelo-not").val("");	
+							}
 							
 						}
 					

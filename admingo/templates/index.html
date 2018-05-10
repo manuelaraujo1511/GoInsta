@@ -268,12 +268,24 @@
       	<form class="form form-add-producto" method="post" action='{% url "admingo:agregar_producto" %}'>
 				{% csrf_token %}
 		      <div class="row">
+		      	<div class="col-lg-6">
+		      		<div class="div-talla form-group label-floating">
+		      			<label class="control-label">Talla</label>
+		      			<input type="text" name="talla-agregar" id="talla-agregar" class="form-control" >
+		      		</div>
+		      	</div>
+		      	<div class="col-lg-6">
+		      		<div class="div-modelo form-group label-floating">
+		      			<label class="control-label">Modelo</label>
+		      			<input type="text" name="modelo-agregar" id="modelo-agregar" class="form-control" >
+		      		</div>
+		      	</div>
 		      	<div class="col-lg-4">
-		      		<div class="div-cantidad form-group label-floating">
+		      		<div class="div-cantidad-agregar form-group label-floating">
 		      			<label class="control-label">Cantidad</label>
 		      			<input type="number" name="cantidad-agregar" id="cantidad-agregar" class="form-control" required="" >
 		      		</div>
-		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      		<p id="erro-cantidad-agregar" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
 		      	</div>
 		      		<div class="col-md-8">
 			      		<div class="togglebutton">
@@ -299,8 +311,8 @@
 		      	</div>
 		      	<div class="form-group label-floating" style="display: none">
 		      	<input  name="media_id_add" id="media_id_add" value="" style="display: none" >
-		      	<input  name="comentario-edit" id="comentario-edit" value="" style="display: none" >
-		      	<input  name="res-automatica-add-check" id="res-automatica-check-add" value="" style="display: none" >
+		      	<input  name="comentario-add" id="comentario-add" value="" style="display: none" >
+		      	<input  name="res-automatica-add-check" id="res-automatica-add-check" value="" style="display: none" >
 		      	</div>
 		      	
 		      </div>
@@ -490,21 +502,74 @@
       	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
 				{% csrf_token %} 
 		      
-			      
+			    <div class="row">
+			    	<div class="col-lg-4 " id="not-tallas"  style="margin-top: 31px">
+			    		<div  class="form-group label-floating">
+    						<label class="control-label">Talla</label>
+    						<input type="text" name="nueva-talla-not" id="nueva-talla-not" class="form-control" required="">
+    					</div>	
+    				</div>
+    				<div  id="tallas-fine">
+				    	<div class="col-lg-4 ">		    		
+
+				    		<div class="form-group">
+				    			<label class="control-label">Talla</label>
+				    			<select class="form-control" id="tallas-select">
+				    			</select> 
+				    			
+				    		</div>
+
+				    		
+				    	</div>
+				    	<div class="col-lg-2  form-group">
+				    		<button type="button" class="btn btn-simple" id ="agregar-talla" title="Agregar nueva talla" style="padding: 0px 0px !important">
+
+						 			<i class="material-icons text-success" style="font-size: 30px">add</i>
+
+					 			</button>
+					 			<p style="font-size: 9px">Nueva talla</p>
+				    	</div>
+    				</div>
+    				<div class="col-lg-4 " id="not-modelos"  style="margin-top: 31px">
+			    		<div  class="form-group label-floating">
+    						<label class="control-label">Modelo</label>
+    						<input type="text" name="nueva-modelo-not" id="nueva-modelo-not" class="form-control" required="">
+    					</div>	
+    				</div>
+			    	<div  id="modelos-fine">
+				    	<div class="col-lg-4 ">
+				    		<div class="form-group">
+				    			<label class="control-label">Modelo</label>
+				    			<select class="form-control" id="modelos-select">
+
+				    			</select> 
+				    		</div>
+				    		
+				    	</div>
+				    	<div class="col-lg-2 form-group">
+				    		<button type="button" class="btn btn-simple"  id="agregar-modelo" title="Agregar nuevo modelo" style="padding: 0px 0px !important">
+
+						 			<i class="material-icons text-success" style="font-size: 30px">add</i>
+
+					 			</button>
+					 			<p style="font-size: 9px">Nuevo modelo</p>
+				    	</div>
+				    </div>
+			    </div>
 		      <div class="row">
 		      	<div class="col-lg-4">
 		      		<div class="div-cantidad form-group label-floating">
 		      			<label class="control-label">Cantidad</label>
 		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
 		      		</div>
-		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser un valor positivo.</p>
+		      		<p id="erro-cantidad-editar" style="display: none; color: #6d0074; font-size: 12px;"> </p>
 		      	</div>
 		      		<div class="col-md-8">
 			      		<div class="togglebutton">
 		            	<label>
 		            		<span id ="res-automatica-edit-no" >No</span> 
 		               	
-		               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" >
+		               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" value="">
 
 		               	<span id ="res-automatica-edit-si">Si</span> 
 		            	</label>
@@ -537,6 +602,62 @@
 	    </div>
 	  </div>
   </div>
+</div>
+
+<!-- Modal agregar talla-->
+<div class="modal fade" id="ModalAgregarTalla" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarTallatoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" >Nueva Talla</h4>
+      </div>
+      <div class="modal-body">
+		    <div class="row">
+				      
+	      	<div class="col-lg-6">
+			      <div class="form-group label-floating has-error">
+							<label class="control-label">Talla</label>
+							<input type="text" name="nueva-talla-new" id="nueva-talla-new" class="form-control" required="">
+							<input type="text" name="nueva-talla-mediaid" id="nueva-talla-mediaid" style="display: none;">
+						</div>	
+	      	</div>
+	    	</div>
+	    	<div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		      <button type="submit" class="btn btn-success btn-simple" id="btn-save-nueva-talla-new">Guardar</button>
+	      </div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal agregar modelo-->
+<div class="modal fade" id="ModalAgregarModelo" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarModelotoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" >Nuevo Modelo</h4>
+      </div>
+      <div class="modal-body">
+	    	<div class="row">
+			      
+	      	<div class="col-lg-6">
+			      <div class="form-group label-floating has-error">
+							<label class="control-label"> Modelo</label>
+							<input type="text" name="nueva-modelo-new" id="nueva-modelo-new" class="form-control" required="">
+							<input type="text" name="nueva-modelo-mediaid" id="nueva-modelo-mediaid" style="display: none;">
+						</div>	
+	      	</div>
+	    	</div>
+	    	<div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		      <button type="submit" class="btn btn-success btn-simple" id="btn-save-nueva-modelo-new">Guardar</button>
+	      </div>
+		  </div>
+		</div>
+	</div>
 </div>
 
 
@@ -700,6 +821,7 @@
 		    $('#MyPausar').modal('show');
 
 			});
+
 			$("#MyPausar").on("submit", ".form-pausar-venta", function (e) {
 				e.preventDefault();
 				var texto = $('#text-publi').val();
@@ -984,6 +1106,22 @@
 		    	
 		    }
 		   });
+			$("#cantidad-agregar").change(function() {
+
+
+			cantidad = $('#cantidad-agregar').val();
+				if (cantidad <= 0){
+					$("#erro-cantidad-agregar").addClass("has-error");
+					$("#erro-cantidad-agregar").html("- Debe ser mayor a cero(0).");
+					$("#erro-cantidad-agregar").css("display", "block");
+					
+					
+				}else{
+					$("#erro-cantidad-agregar").removeClass("has-error");
+					$("#erro-cantidad-agregar").css("display", "none");
+				}
+				
+			});
 
 			$('.ModalAgregarProducto').on('click',function(){
 				media_id =$(this).attr('data-media');
@@ -995,17 +1133,19 @@
 
 			});
 			
-
+			
 	  	$("#ModalAgregarProducto").on("submit", ".form-add-producto", function (e) {
 				
 				e.preventDefault();
 				var array_img= []
 				var cantidad = $('#cantidad-agregar').val();
 				var descripcion = $('#descripcion-add-p').val();
-				var res_automatica = $('#res-automatica-check-add').val();
+				var res_automatica = $('#res-automatica-add-check').val();
 				var media_id = $('#media_id_add').val();
 				var csrftoken = getCookie('csrftoken');
 				var texto = $('#comentario-add').val();
+				var talla = $('#talla-agregar').val();
+				var modelo = $('#modelo-agregar').val();
 				$('input[id^="img-publi"]').each(function() {
 				  array_img.push([this.name, this.value]);
 
@@ -1015,8 +1155,8 @@
 				  return v[0] === media_id;
 				});
 				if (cantidad <= 0){
-					$("#div-cantidad").addClass("has-error");
-					$("#erro-cantidad").css("display", "block");
+					$("#div-cantidad-agregar").addClass("has-error");
+					$("#erro-cantidad-agregar").css("display", "block");
 					
 					return false;
 				}else{
@@ -1030,6 +1170,8 @@
 				    		'descripcion' : descripcion,
 				    		'result_img[]' : result_img,
 				    		'texto': texto,
+				    		'modelo': modelo,
+				    		'talla': talla,
 				    		'res_automatica' : res_automatica
 				    	},
 						beforeSend: function() {
@@ -1041,9 +1183,10 @@
 			    	},
 				    success : function(data){
 							//console.log(data);
-							$(".load").fadeOut();
+
 							$('#ModalAgregarProducto').modal('hide');
-								demo.showNotificationSucces('top','center','Producto editado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
+								demo.showNotificationSucces('top','center','Producto Agregado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
+									location.reload();
 								/*setTimeout(function(){// wait for 5 secs(2)
 	           			location.reload(); // then reload the page.(3)
 	      				}, 2000); */
@@ -1087,7 +1230,22 @@
 		    }
 		   });
 
-	  	
+	  	$("#cantidad-editar").change(function() {
+
+
+				cantidad = $('#cantidad-editar').val();
+				if (cantidad < 0){
+					$("#erro-cantidad-editar").addClass("has-error");
+					$("#erro-cantidad-editar").html("- Debe ser un valor positivo.");
+					$("#erro-cantidad-editar").css("display", "block");
+					
+					
+				}else{
+					$("#erro-cantidad-editar").removeClass("has-error");
+					$("#erro-cantidad-editar").css("display", "none");
+				}
+				
+			});
 
 	  	$('.ModalEditarProducto').on('click',function(){
 				media_id =$(this).attr('data-media');
@@ -1107,26 +1265,32 @@
     				//$.ajaxSettings.beforeSend(xhr, settings);
 		    	},
 			    success : function(data){
-						//console.table(data.producto);
+						console.table(data.producto);
 						if (data.producto.encontre == true){
 							$("#cantidad-editar").val(data.producto.cantidad);
 							$("#descripcion-edit-p").val(data.producto.descripcion_producto);
 							$('#media_id_edit').val(data.producto.media_id);
 							$("#div-modelo").removeClass("has-error")
 							$("#div-talla").removeClass("has-error")
-					  	
+							
 					  	if(data.producto.res_automatica == 1){
+					  		console.log("data.producto.res_automatica: "+ data.producto.res_automatica );
+					  		$('#res-automatica-edit').prop('checked', true);
 								$("#res-automatica-edit-si").css("color", "black");
 						    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
-						 		$("#res-automatica-edit-check").val("si")
+						    $("#res-automatica-edit-check").val("si")
 
 							}else{
+								$('#res-automatica-edit').prop('checked', false);
 								$("#res-automatica-edit-no").css("color", "black");
 						   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
 						   	$("#res-automatica-edit-check").val("no")
 							}
 
 							$(".load").fadeOut();
+							mostrar_tallas(media_id);
+							mostrar_modelos(media_id)
+															
 					    $('#ModalEditarProducto').modal('show');
 							
 						}
@@ -1137,19 +1301,38 @@
 					 }              
 			
 				});
-
-				
-
 			});
-
-	  	$("#btn-guardar-edit-pro").on("click",  function (e) {
+	  	$("#btn-guardar-edit-pro").on("click", function (e) {
 				
 				e.preventDefault();
+
 				var cantidad = $('#cantidad-editar').val();
 				var descripcion = $('#descripcion-edit-p').val();
-				var res_automatica = $('#res-automatica-edit-check').val();
+				var res_automatica = $('#res-automatica-check').val();
 				var media_id = $('#media_id_edit').val();
 				var csrftoken = getCookie('csrftoken');
+				var texto = $('#comentario-edit').val();
+				var talla_id = ""
+				var talla = ""
+				var modelo_id = ""
+				var modelo = ""
+
+				if ($("#nueva-talla-not").val() != ""){
+					// no tiene talla
+					talla = $("#nueva-talla-not").val()
+				}else{
+					// con el select
+					talla_id= $( "#tallas-select" ).val();
+				}
+
+				if ($("#nueva-modelo-not").val() != ""){
+					// no tiene modelo
+					modelo = $("#nueva-modelo-not").val()
+				}else{
+					// con el select
+					modelo_id= $( "#modelos-select" ).val();
+				}
+
 
 				if (cantidad < 0){
 					$("#div-cantidad").addClass("has-error");
@@ -1165,7 +1348,11 @@
 				    		'media_id' : media_id,
 				    		'cantidad' : cantidad,
 				    		'descripcion' : descripcion,
-				    		'res_automatica' : res_automatica
+				    		'res_automatica' : res_automatica,
+				    		'talla': talla,
+				    		'talla_id': talla_id,
+				    		'modelo': modelo,
+				    		'modelo_id': modelo_id
 				    	},
 						beforeSend: function() {
 			        // setting a timeout
@@ -1175,21 +1362,16 @@
 		  				//$.ajaxSettings.beforeSend(xhr, settings);
 			    	},
 				    success : function(data){
-							//console.log(data);
-							//$(".load").fadeOut();
+							console.log(data);
+							$(".load").fadeOut();
 							if (data.estado == 1){
-								$(".load").fadeOut();
 								demo.showNotificationSucces('top','center','Producto editado con exito.');
 								
-							}else{
-								$(".load").fadeOut();
-								console.table(data)
-							}
 							
-								
-								/* */
-						//$(".load").fadeOut();
-				        
+							}else{
+								demo.showNotificationError('top','center','Hubo un problema al editar el producto. Intentalo nuevamente.')
+
+							}
 				    },
 		        error : function(xhr,errmsg,err) {
 		        	$(".load").fadeOut();
@@ -1203,6 +1385,203 @@
 					
 
 	  	});
+
+	  	
+
+			function mostrar_tallas(media_id) {
+				valor = false
+				var csrftoken = getCookie('csrftoken');
+				$.ajax({
+			    url : '{% url "admingo:show_tallas" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id
+			    	},
+			    success : function(data){
+
+						if (data.estado == 1){
+							$("#tallas-fine").css('display', 'block')
+														
+							$("#not-tallas").css('display', 'none');
+							$("#nueva-talla-not").val("");
+
+							select = ''
+								for (var i = 0; i < data.tallas.length; i++) {
+									if (data.tallas[i].id == data.producto_talla){
+										select+='<option value="'+data.tallas[i].id+'" selected="true" >'+data.tallas[i].nombre+'</option>';	
+									}else{
+										select+='<option value="'+data.tallas[i].id+'" >'+data.tallas[i].nombre+'</option>';	
+									}
+									
+								}
+							$("#tallas-select").html(select);
+							valor = true
+						}else{
+							$("#tallas-fine").css('display', 'none');
+														
+							$("#not-tallas").css('display', 'block');
+						}
+					
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+				return valor;
+			}
+			
+			$("#agregar-talla").on('click',function(){
+				media_id = $("#media_id_edit").val();
+				$("#nueva-talla-mediaid").val(media_id);
+				$("#ModalAgregarTalla").modal('show');
+			});
+
+			$("#btn-save-nueva-talla-new").on('click',function(){
+				var csrftoken = getCookie('csrftoken');
+				media_id=$("#nueva-talla-mediaid").val();
+				talla = $("#nueva-talla-new").val();
+
+
+				$.ajax({
+			    url : '{% url "admingo:save_talla" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id,
+			    		'talla' : talla
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+
+		    	},
+			    success : function(data){
+						//console.log(data);
+						$(".load").fadeOut();
+						if (data.estado == 2){
+							
+							demo.showNotificationError('top','center','Talla ya existe para este producto');
+						}else{
+							mostrar_tallas(media_id);
+							$('#ModalAgregarTalla').modal('hide');
+							demo.showNotificationSucces('top','center','Talla agregada con exito');
+							
+							if (mostrar_tallas(media_id)){
+								$("#nueva-talla-not").val("");
+							}
+							
+						}
+					
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+			});
+
+			function mostrar_modelos(media_id) {
+				valor = false
+				var csrftoken = getCookie('csrftoken');
+				$.ajax({
+			    url : '{% url "admingo:show_modelos" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id
+			    	},
+			    success : function(data){
+
+						if (data.estado == 1){
+							$("#modelos-fine").css('display', 'block')
+														
+							$("#not-modelos").css('display', 'none');
+							$("#nueva-modelo-not").val("");	
+							select = ''
+								for (var i = 0; i < data.modelos.length; i++) {
+									if (data.modelos[i].id == data.producto_modelo){
+										select+='<option value="'+data.modelos[i].id+'" selected="true" >'+data.modelos[i].nombre+'</option>';	
+									}else{
+										select+='<option value="'+data.modelos[i].id+'" >'+data.modelos[i].nombre+'</option>';	
+									}
+									
+								}
+							$("#modelos-select").html(select);
+							valor = true
+						}else{
+							$("#modelos-fine").css('display', 'none');
+														
+							$("#not-modelos").css('display', 'block');
+						}
+					
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+				return valor
+			}
+
+			$("#agregar-modelo").on('click',function(){
+				media_id = $("#media_id_edit").val();
+				$("#nueva-modelo-mediaid").val(media_id);
+				$("#ModalAgregarModelo").modal('show');
+			});
+
+
+			$("#btn-save-nueva-modelo-new").on('click',function(){
+				var csrftoken = getCookie('csrftoken');
+				media_id=$("#nueva-modelo-mediaid").val();
+				modelo = $("#nueva-modelo-new").val();
+
+
+				$.ajax({
+			    url : '{% url "admingo:save_modelo" %}',
+			    type : 'POST',
+			    data : 
+			    	{	'csrfmiddlewaretoken' : csrftoken,
+			    		'media_id' : media_id,
+			    		'modelo' : modelo
+			    	},
+					beforeSend: function() {
+		        // setting a timeout
+		        $(".load").fadeIn();
+
+		    	},
+			    success : function(data){
+						//console.log(data);
+						$(".load").fadeOut();
+						if (data.estado == 2){
+							
+							demo.showNotificationError('top','center','Modelo ya existe para este producto');
+						}else{
+							$('#ModalAgregarModelo').modal('hide');
+							demo.showNotificationSucces('top','center','Modelo agregado con exito');
+							
+							if (mostrar_modelos(media_id)){
+								$("#nueva-modelo-not").val("");	
+							}
+							
+						}
+					
+			        
+			    },
+	        error : function(xhr,errmsg,err) {
+						console.log(xhr.status + ": " + xhr.responseText);
+					 	$(".load").fadeOut();
+					 }              
+			
+				});
+			});
 
 	
 	}); // end document Ready

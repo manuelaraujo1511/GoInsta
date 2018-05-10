@@ -233,6 +233,7 @@ def index(request):
 		  		for pro in productos:
 			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
 			  			item['caption']['producto'] = pro
+			  			break
 			  		else:
 			  			item['caption']['producto'] = False
 		  		
@@ -274,8 +275,9 @@ def index(request):
 			  	for pro in productos:
 			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
 			  			item['caption']['producto'] = pro
+			  			break
 			  		else:
-			  				item['caption']['producto'] = False
+			  			item['caption']['producto'] = False
 			  	
 		  	feed.append(item)
 
@@ -1327,13 +1329,18 @@ def agregar_producto(request):
 
 	if request.is_ajax():
 		media_id = request.POST.get('media_id')
-		#talla = request.POST.get('talla')
-		#modelo = request.POST.get('modelo')
+		talla = request.POST.get('talla')
+		modelo = request.POST.get('modelo')
 		cantidad = request.POST.get('cantidad')
 		descripcion = request.POST.get('descripcion')
 		res_auto = request.POST.get('res_automatica')
 		result_img = request.POST.getlist('result_img[]')
 		texto = request.POST.get('texto')
+
+		if talla == "":
+			talla = 0
+		if modelo == "":
+			modelo = 0
 
 		estado = 1
 		if (res_auto == "si"):
@@ -1352,18 +1359,31 @@ def agregar_producto(request):
 				p.descripcion_producto = descripcion
 				p.res_automatica = res_automatica
 				p.texto=texto
+				p.talla= talla
+				p.modelo= modelo
 				p.save()
 				estado =2
 
 
 		else:
-			Productos(id_usuario_id= request.user.id, media_id= media_id, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica).save()
-			user_r= Usuarios.objects.get(email=request.user.email)
+			
+
+			pro = Productos.objects.create(id_usuario_id= request.user.id, media_id= media_id, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica)
+			pro.save()
+			tal = Tallas.objects.create(media_id=media_id, id_producto_id= pro.id, id_usuario_id=request.user.id, nombre = talla)
+			tal.save()
+			model = Modelos.objects.create(media_id=media_id, id_producto_id= pro.id, id_usuario_id=request.user.id, nombre = modelo)
+			model.save()
+			pro.talla=tal.id
+			pro.modelo=model.id
+			pro.save()
+
+			#user_r= Usuarios.objects.get(email=request.user.email)
 
 			for res in result_img:
 				#print (res.split(',')[1])
 				if not Imagenes.objects.filter(media_id= media_id, imagen=res.split(',')[1]).exists():
-					Imagenes(id_usuario = user_r, media_id= media_id, imagen=res.split(',')[1]).save()
+					Imagenes(id_usuario_id= request.user.id, media_id= media_id, imagen=res.split(',')[1]).save()
 					#print("noe existe")
 					#print(str(res.split(',')[1]))
 
@@ -1391,19 +1411,26 @@ def editar_producto(request):
 			else:
 				res_automatica = 0
 
-			producto = Productos.objects.filtre(id_usuario_id=request.user.id, media_id=media_id)
-
+			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
+			print("talla_id: "+str(talla_id))
+			print("modelo_id: "+str(modelo_id))
+			print("talla: "+str(talla))
+			print("modelo: "+str(modelo))
 
 			for p in producto:
 				if (talla_id == ""):
+					
 					tal = Tallas.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = talla)
 					tal.save()
 					talla_id = tal.id
+					
 
 				if (modelo_id == ""):
+					
 					mode = Modelos.objects.create(media_id=media_id, id_producto_id= p.id, id_usuario_id=request.user.id, nombre = modelo)
 					mode.save()
 					modelo_id = mode.id
+					
 
 				p.cantidad = cantidad
 				p.descripcion_producto = descripcion
