@@ -1159,8 +1159,8 @@ def delete_concurso(request):
 		if request.is_ajax():
 			media_id= request.POST.get('media_id')
 			concurso = Concursos.objects.get(media_id=media_id)
-			imganes = Imagenes.objects.filter(media_id=media_id)
-			for img in imagenes:
+			imaganes = Imagenes.objects.filter(media_id=media_id)
+			for img in imaganes:
 				img.delete()
 
 			if (concurso.delete()):
