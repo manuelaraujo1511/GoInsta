@@ -194,13 +194,30 @@
 												
 											 	</div>
 											 	<div class="col-sm-4">
-													<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
+											 	{% if obj.caption.producto == False %}
+											 	<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-success" style="font-size: 30px">shop</i>
 
-													</button> 		
+													</button> 	
+												{%else%}
+												 	{% if obj.caption.producto.cantidad > 0 %}
+												 	
+														<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
+														
+															<i class="material-icons text-success" style="font-size: 30px">shop</i>
+
+														</button> 		
+												 	
+												 	{%else%}
+												 		<button type="button" class="btn btn-simple pull-right"  title="No tienes suficientes" style="padding: 0px 0px !important" disabled="True">
+												 		
+												 			<i class="material-icons text-default" style="font-size: 30px">shop</i>
+
+												 		</button> 
+												 	{%endif%}
+												{%endif%}
 											 	</div>
-											 	
 											 </div>
 											 <div class="row">
 											 	<div class="col-sm-4">
