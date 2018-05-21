@@ -14,6 +14,8 @@ from decimal import *
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
+from resizeimage import resizeimage
+
 
 import json
 import re
@@ -52,23 +54,12 @@ def get_precio(request):
 
 	return locale.currency(precio, grouping=True )
 
-def resize_image(input_image_path,output_image_path,size):
-	
-	original_image = Image.open(input_image_path)
-	
-	width, height = original_image.size
-	
-	print('The original image size is {wide} wide x {height} ' 'high'.format(wide=width, height=height))
-	
-	resized_image = original_image.resize(size)
-	
-	width, height = resized_image.size
-	
-	print('The resized image size is {wide} wide x {height} ''high'.format(wide=width, height=height))
-	
-	resized_image.show()
-	
-	resized_image.save(output_image_path)
+def resize_image(input_image_path,output_image_path,x,y):
+
+	with open(input_image_path, 'r+b') as f:
+		with Image.open(f) as image:
+			cover = resizeimage.resize_cover(image, [x, y])
+			cover.save('cover-'+input_image_path, image.format)
 
 def get_save_info(api,user_r, user_insta, pass_insta):
 	if (api != None):
@@ -712,10 +703,10 @@ def upload_img(request):
 			uploaded_file_url = fs.url(filename)
 
 			
-
+		resize_image(ruta+'/'+myfile.name, ruta+'/'+myfile.name+'-resize',780, 780)
 		#me muevo a la ruta del proyecto
 		os.chdir(ruta_original)
-		#resize_image(ruta+'/'+myfile.name, ruta+'/'+myfile.name+'-resize',size=(780, 780))
+		
 
 
 	context = {'imagen': str(myfile)}

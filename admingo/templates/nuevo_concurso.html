@@ -576,7 +576,7 @@
 								<div class="col-md-6">
 									<center>
 										{% if concursos is None  %}
-											<input type="button" class="btn btn-info btn-round" id="btn-regresar-condi" value="Regresar">
+											<input type="button" class="btn btn-info btn-round" id="btn-regresar-previa" value="Regresar">
 										{%else%}
 											
 											<input type="button" class="btn btn-info btn-round" id="btn-regresar-condiciones" value="Regresar">
@@ -677,7 +677,7 @@ $('#btn-publicar').click(function(){
 			var amigos_seguir_otros = ajax_amigos_seguir_otros;
 			var ganadores = ajax_ganadores
 			
-			var media_id = 0
+			var media_id = 0;
 			$.ajax({
 		    url : '{% url "admingo:publicar_concurso" %}',
 		    type : 'POST',
