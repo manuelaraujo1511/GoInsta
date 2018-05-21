@@ -869,26 +869,9 @@ def publicar_concurso(request):
 			amigos_seguir_otros = request.POST.get('amigos_seguir_otros')
 			ganadores = request.POST.get('ganadores')
 			media_id = request.POST.get('media_id')
-
-			if (media_id != 0):
-				print("media_id != 0")
-				concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
-				for con in concurso:
-					con.seguirnos=seguirme
-					con.like=like
-					con.hastags=hastag
-					con.seguir_otros=seguir_otros
-					con.cant_etiqueta=cant_etiqueta
-					con.like_amigo_otros=amigos_like_otros
-					con.seguirme_amigos=amigos_seguirme
-					con.seguir_amigos_otras=amigos_seguir_otros
-					con.ganadores=ganadores
-					con.activo = 1
-					con.fin_carga = 1
-					con.save()
-				context = {'estado': 1}
-			else:			
-
+			print("media_id es: "+ str(media_id))
+			if (media_id == '0'):
+				print("media_id == 0")
 				## subir foto al Insta
 				api.uploadPhoto(str(img2), ""+comentario+"")
 				subir_foto=api.LastJson
@@ -943,11 +926,31 @@ def publicar_concurso(request):
 					#print(str(comentario))
 					#print("Despues de publicar: " +str(api.LastJson));
 					api.logout()
-						
+					print("Subi la foto")
 					context = {'estado': 1}
 				else:
 					api.logout()
 					context = {'estado': 0}
+				
+			else:
+				print("media_id no es 0")
+				concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
+				for con in concurso:
+					con.seguirnos=seguirme
+					con.like=like
+					con.hastags=hastag
+					con.seguir_otros=seguir_otros
+					con.cant_etiqueta=cant_etiqueta
+					con.like_amigo_otros=amigos_like_otros
+					con.seguirme_amigos=amigos_seguirme
+					con.seguir_amigos_otras=amigos_seguir_otros
+					con.ganadores=ganadores
+					con.activo = 1
+					con.fin_carga = 1
+					con.save()
+				context = {'estado': 1}		
+
+			
 			
 	return JsonResponse(context)
 

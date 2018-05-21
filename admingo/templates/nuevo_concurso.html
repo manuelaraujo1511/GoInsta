@@ -708,11 +708,12 @@ $('#btn-publicar').click(function(){
 		    success : function(data){
 					//console.log(data);
 					if (data.estado == 1){
-						$(".load").fadeOut();
+						//$(".load").fadeOut();
 						demo.showNotificationSucces('top','center','Publicación hecha satisfactoriamente')
 						window.location.href= '{% url "admingo:mis_concursos" %}';
-						$(".load").fadeIn();
+						//$(".load").fadeIn();
 					}else{
+						$(".load").fadeOut();
 						demo.showNotificationError('top','center','La imagen debe ser JPG')
 					}
 					
