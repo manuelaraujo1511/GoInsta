@@ -1,0 +1,4 @@
+--upgrade setuptools
+InstagramAPI
+Pillow
+python-resize-image 
