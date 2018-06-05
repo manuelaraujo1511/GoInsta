@@ -54,12 +54,13 @@ def get_precio(request):
 
 	return locale.currency(precio, grouping=True )
 
-def resize_image(input_image_path,output_image_path,x,y):
-
-	with open(input_image_path, 'r+b') as f:
-		with Image.open(f) as image:
-			cover = resizeimage.resize_cover(image, [x, y])
-			cover.save('cover-'+input_image_path, image.format)
+def resize_image(file_name,input_image_path,x,y):
+	fd_img = open(str(input_image_path)+str(file_name), 'r+b')
+	image = Image.open(fd_img)
+	cover = resizeimage.resize_cover(image, [x, y])
+	cover.save(str(input_image_path)+'cover-'+str(file_name), image.format)
+	fd_img.close()
+	return 'cover-'+str(file_name)
 
 def get_save_info(api,user_r, user_insta, pass_insta):
 	if (api != None):
@@ -669,11 +670,10 @@ def delete_venta (request):
 
 def upload_img(request):
 	ruta_original=os.getcwd()
-	
 
 	if request.method == 'POST' and request.FILES['img-ig']:
 		# Creo carpeta de Usuario
-		ruta = os.getcwd()+"/admingo/static/img/usuario-"+str(request.user.id)+"/"
+		ruta = ruta_original+"/admingo/static/img/usuario-"+str(request.user.id)+"/"
 
 		if(os.path.exists(ruta)):
 			
@@ -688,7 +688,8 @@ def upload_img(request):
 			os.chdir(ruta)		
 
 		myfile = request.FILES['img-ig']
-		#print ("myfile: "+ str(myfile))
+		myfile_resize = request.FILES['img-ig']
+		
 
 		if not os.path.isfile(str(myfile)):	
 
@@ -701,16 +702,24 @@ def upload_img(request):
 			
 			#Guardo el archivo
 			uploaded_file_url = fs.url(filename)
+			im = Image.open(ruta+'/'+myfile.name)
+			width, height =im.size
+			im.close()
 
+			if (width and height > 780 ):
+				myfile_resize=resize_image(myfile.name, ruta,780, 780)
 			
-		resize_image(ruta+'/'+myfile.name, ruta+'/'+myfile.name+'-resize',780, 780)
-		#me muevo a la ruta del proyecto
-		os.chdir(ruta_original)
+			
+			#me muevo a la ruta del proyecto
+			os.chdir(ruta_original)
+			os.remove(str(ruta_original)+"/admingo/static/img/usuario-"+str(request.user.id)+"/"+myfile.name)
+		
 		
 
 
-	context = {'imagen': str(myfile)}
-	return JsonResponse(context)
+
+			context = {'imagen': str(myfile_resize)}
+		return JsonResponse(context)
 
 @login_required
 def nuevo_concurso (request, nuevo =None):

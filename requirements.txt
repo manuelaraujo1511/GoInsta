@@ -1,4 +1,7 @@
 --upgrade setuptools
+Numpy
 InstagramAPI
 Pillow
 python-resize-image 
+brotlipy
+whitenoise

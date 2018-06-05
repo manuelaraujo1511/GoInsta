@@ -68,7 +68,7 @@
     	</div>
   </nav>
 
-    <div class="wrapper">
+  <div class="wrapper">
 		<div class="header header-filter" style="background-image: url('/static/singups/img/city.jpg'); background-size: cover; background-position: top center;">
 			<div class="container">
 				
@@ -150,6 +150,31 @@
 								</div>
 							</form>
 						</div>
+						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+							<input type="hidden" name="cmd" value="_s-xclick">
+							<input type="hidden" name="hosted_button_id" value="CKEY68YVT9RA8">
+							<table>
+								<tr>
+									<td>
+										<input type="hidden" name="on0" value="Servicios">Servicios
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<select name="os0">
+											<option value="Servicio Normal">Servicio Normal $10,00 USD</option>
+											<option value="Mediano">Mediano $15,00 USD</option>
+											<option value="Premium">Premium $17,00 USD</option>
+											<option value="VIP">VIP $20,00 USD</option>
+										</select>
+									</td>
+								</tr>
+							</table>
+							<input type="hidden" name="currency_code" value="USD">
+							<input type="image" src="https://www.paypalobjects.com/es_ES/ES/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal, la forma rápida y segura de pagar en Internet.">
+							<img alt="" border="0" src="https://www.paypalobjects.com/es_ES/i/scr/pixel.gif" width="1" height="1">
+						</form>
+
 					</div>
 				</div>
 			</div>
