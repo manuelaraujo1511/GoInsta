@@ -90,7 +90,7 @@
 					<div class="col-md-12">
             <div class="card card-plain">
               <div class="card-header" data-background-color="purple">
-                <h4 class="title">Productos</h4>
+                <h4 class="title">Mis Publicaciones</h4>
                 <p class="category">Información basada en tus publicaciones de instagram</p>
               </div>
               <div class="card-content table-responsive">
@@ -148,7 +148,7 @@
 										    			
 										    		{% else %}
 										    			<div class="item">
-										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" ">
+										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
 										    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
 										    			</div>
 										    		{% endif %}
@@ -388,7 +388,7 @@
 		      		</div>
 		      	</div>
 		      	<div class="form-group label-floating" style="display: none">
-		      	<input  name="media_id" id="media_id" value="" style="display: none" >
+		      	<input  name="media_id_vender" id="media_id_vender" value="" style="display: none" >
 		      	<input  name="comentario-vender" id="comentario-vender" value="" style="display: none" >
 		      	</div>
 		      	
@@ -423,8 +423,7 @@
 	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
 	    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
 	    		</div>
-	    		<input  name="media_id" id="media_id" value="" style="display: none" >
-	      
+	    		<input  name="media_id_pausa" id="media_id_pausa" style="display: none" >    
       
 	      	
 	      </div>
@@ -456,7 +455,7 @@
 	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
 	    			<textarea id="text-publi-play" name="text-publi-play" class="form-control" rows="5" required=""></textarea>
 	    		</div>
-	    		<input  name="media_id" id="media_id" value="" style="display: none" >
+	    		<input  name="media_id_play" id="media_id_play" value="" style="display: none" >
 	      
       
 	      	
@@ -555,7 +554,7 @@
   </div>
 </div>
 
-
+{% include 'layout/modal_cambiar_ig.html'%}
 	
 
     
@@ -653,7 +652,7 @@
 
 				
 				$('#text-publi-play').val(text_publi);				
-				$('#media_id').val(media_id);
+				$('#media_id_play').val(media_id);
 		    $('#MyPlay').modal('show');
 
 			});
@@ -661,7 +660,7 @@
 			$("#MyPlay").on("submit", ".form-play-venta", function (e) {
 				e.preventDefault();
 				var texto = $('#text-publi-play').val();
-				var media_id = $('#media_id').val();
+				var media_id = $('#media_id_play').val();
 				var csrftoken = getCookie('csrftoken');
 				//var array_img = $('#array_img').serializeArray()
 				$.ajax({
@@ -700,6 +699,7 @@
 			    },
 	        error : function(xhr,errmsg,err) {
 					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+					 $(".load").fadeOut();
 					 }              
 			
 				});
@@ -712,7 +712,7 @@
 
 				
 				$('#text-publi').val("--- Venta PAUSADA --- "+text_publi);				
-				$('#media_id').val(media_id);
+				$('#media_id_pausa').val(media_id);
 		    $('#MyPausar').modal('show');
 
 			});
@@ -720,7 +720,7 @@
 			$("#MyPausar").on("submit", ".form-pausar-venta", function (e) {
 				e.preventDefault();
 				var texto = $('#text-publi').val();
-				var media_id = $('#media_id').val();
+				var media_id = $('#media_id_pausa').val();
 				var csrftoken = getCookie('csrftoken');
 				//var array_img = $('#array_img').serializeArray()
 				$.ajax({
@@ -753,6 +753,7 @@
 			    },
 	        error : function(xhr,errmsg,err) {
 					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+					 $(".load").fadeOut();
 					 }              
 			
 				});
@@ -765,7 +766,7 @@
 				comentario = $(this).attr('data-comentario');
 				var csrftoken = getCookie('csrftoken');
 				
-				$('#media_id').val(media_id);
+				$('#media_id_vender').val(media_id);
 				$('#comentario-vender').val(comentario);
 
 				$.ajax({
@@ -894,7 +895,7 @@
 				var cant_pro = $('#cantidad_pro_input').val();// cantidad guardada
 				var precio = $('#precio').val();
 				var descripcion = $('#descripcion').val();
-				var media_id = $('#media_id').val();
+				var media_id = $('#media_id_vender').val();
 				var texto =  $('#comentario-vender').val();
 				console.log("desde el modal: "+texto)
 				

@@ -24,7 +24,7 @@
 				<div class="card-header" data-background-color="purple">
 					<div class="nav-tabs-navigation">
 						<div class="nav-tabs-wrapper">
-							<span class="nav-tabs-title">Pasossss:</span>
+							<span class="nav-tabs-title">Pasos:</span>
 							<ul class="nav nav-tabs" data-tabs="tabs">
 								<li class="active">
 									<a id="imagen-id" href="#imagen" data-toggle="tab" style="pointer-events: none;cursor: default;">
@@ -184,7 +184,7 @@
 			           
 			            
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-3">
 									<div class="togglebutton">
 			            	<label>
 			            		<span id ="hastag-no" >No</span> 
@@ -607,6 +607,7 @@
 </div>
 </body>
 
+{% include 'layout/modal_cambiar_ig.html'%}
 
 <script type="text/javascript">
 $(function(){
@@ -778,21 +779,19 @@ $('#btn-monitorear').click(function(){
 	      //console.log("Before Send");
 				//$.ajaxSettings.beforeSend(xhr, settings);
 	  	},
-	  	complete: function(){
-	  		$(".load").fadeOut();
-	  	},
 	    success : function(data){
 				//console.log(data);
 				if (data.estado == 1){
-					$(".load").fadeOut();
+					
 					demo.showNotificationSucces('top','center','Ahora podemos monitorear tu concurso')
 					window.location.href= '{% url "admingo:mis_concursos" %}';
-					$(".load").fadeIn();
+					
 				}else{
 					demo.showNotificationError('top','center','La imagen debe ser JPG')
+					$(".load").fadeOut();
 				}
 				
-				$(".load").fadeOut();
+				
 	        
 	    },
 	    error : function(xhr,errmsg,err) {

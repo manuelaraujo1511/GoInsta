@@ -62,19 +62,24 @@ def resize_image(file_name,input_image_path,x,y):
 	fd_img.close()
 	return 'cover-'+str(file_name)
 
-def get_save_info(api,user_r, user_insta, pass_insta):
+def get_save_info(api,user_id, user_insta, pass_insta,nuevo):
 	if (api != None):
 		api.searchUsername(str(user_insta))
 		img_profile = api.LastJson['user']['profile_pic_url']
 		follower = api.LastJson['user']['follower_count']
 		following = api.LastJson['user']['following_count']
-		info_user = Info.objects.get(id_usuario=user_r)
-		info_user.seguidores = follower
-		info_user.seguidos = following
-		info_user.foto_perfil= img_profile
-		info_user.save()
+		if (nuevo == 1):
+			
+			Info(id_usuario= user_id, username= user_insta, seguidores=follower, seguidos=following, foto_perfil=img_profile).save()
+			info_user = Info.objects.get(id_usuario=user_id)
+		else:
+			info_user = Info.objects.get(id_usuario=user_id)
+			info_user.seguidores = follower
+			info_user.seguidos = following
+			info_user.foto_perfil= img_profile
+			info_user.save()
 	else:
-		info_user = Info.objects.get(id_usuario=user_r)
+		info_user = Info.objects.get(id_usuario=user_id)
 	return info_user
 
 def get_producto(request):
@@ -186,7 +191,7 @@ def index(request):
 	## Eliminar de la tabla los concursos que no terminaron de publicar
 	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
 	### cargar informacion actualizada de usuario
-	info_user=get_save_info(api,user_r,user_r.user_insta, user_r.pass_insta)
+	info_user=get_save_info(api,user_r,user_r.user_insta, user_r.pass_insta,0)
 	
 	concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
 	concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
@@ -211,15 +216,16 @@ def index(request):
 		  temp = api.LastJson
 
 		  for item in temp["items"]:
-		  	for p in pausas:
-		  		if(str(item['caption']['media_id']) == str(p.media_id)):
-		  			item['caption']['pausado'] = True
-		  		else:
-		  			item['caption']['pausado'] = False
+		  	if pausas.exists():
+			  	for p in pausas:
+			  		if(str(item['caption']['media_id']) == str(p.media_id)):
+			  			item['caption']['pausado'] = True
+			  		else:
+			  			item['caption']['pausado'] = False
 		  	
-		  	item['caption']['cant_pro'] = -1
+		  		item['caption']['cant_pro'] = -1
 
-		  	if (not productos):
+		  	if (not productos.exists()):
 		  		item['caption']['producto'] = False
 		  		
 		  	else:
@@ -255,14 +261,15 @@ def index(request):
 		  temp = api.LastJson
 
 		  for item in temp["items"]:
-		  	for p in pausas:
-		  		if(str(item['caption']['media_id']) == str(p.media_id)):
-		  			item['caption']['pausado'] = True
-		  		else:
-		  			item['caption']['pausado'] = False
-		  	item['caption']['cant_pro'] = -1
+		  	if pausas.exists():
+			  	for p in pausas:
+			  		if(str(item['caption']['media_id']) == str(p.media_id)):
+			  			item['caption']['pausado'] = True
+			  		else:
+			  			item['caption']['pausado'] = False
+		  		item['caption']['cant_pro'] = -1
 		  	
-		  	if not productos:
+		  	if (not productos.exists()):
 		  		item['caption']['producto'] = False
 		  	else:
 			  	for pro in productos:
@@ -297,11 +304,12 @@ def singup(request):
 	#if request.user is not None:
 	#	return redirect("admingo:index")
 	#global api
-	print (str(request))
+	print ("---- request:"+str(request))
 	
 	if request.method == "POST":
 		email = request.POST['email']
 		password = request.POST['password']
+		context2={'error': 0}
 
 		try:
 
@@ -320,8 +328,8 @@ def singup(request):
 							
 
 							api = InstagramAPI(user_u.user_insta, user_u.pass_insta)
+
 							if api.login():
-								
 								login(request, user)
 								# Guardo en info
 								api.searchUsername(str(user_u.user_insta))
@@ -340,12 +348,18 @@ def singup(request):
 								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
 								api.logout()
 								return redirect('admingo:index')
+							else:
+								if (api.LastJson['error_type']== 'bad_password'):
+									messages.error(request, 'Hemos detectados cambios en tus datos de instagram')
+									context2 = {'error': 1}
+									return render(request, 'singup.html', context2)
 						else:
+							
 							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-						return render(request, 'singup.html')		
+						return render(request, 'singup.html', context2)		
 					else:
 						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-						return render(request, 'singup.html')	
+						return render(request, 'singup.html', context2)	
 			else:
 				#request.method= "GET"
 				context = {
@@ -436,6 +450,151 @@ def registroinsta(request):
 
 	return render(request, 'registroinsta.html')
 
+def nuevos_datos(request):
+	
+	#global api 
+
+	if request.method == "POST":
+		
+		cuenta = request.POST['cuenta']		
+		password_i = request.POST['password_i']		
+		email = request.POST['email']
+		password = request.POST['password']
+
+		if Usuarios.objects.filter(email=email).exists():
+			
+			user_u = Usuarios.objects.get(email=email)
+			user = authenticate(request, username=user_u.username, password=password)
+
+			if user is not None:
+				if user.is_active:
+					
+					api = InstagramAPI(cuenta, password_i)
+					login(request, user)
+					if api.login():
+						Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
+
+
+						
+						# Guardo en info
+						info_user=get_save_info(api,user_u.id, cuenta, password_i,0)
+						messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+						api.logout()
+						return redirect("admingo:index")						
+					else:
+						if (api.LastJson['error_type']== 'bad_password'):
+							messages.error(request, 'Los datos de instagram, no son correctos')
+							context2 = {'error': 1}
+							return render(request, 'nuevos_datos.html', context2)
+				else:
+					messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+
+				
+			else:
+				messages.error(request, "La contraseña no coincide con el correo electronico")	
+		else:
+			messages.error(request, "El correo electronico no se encuentra registrado")
+
+	return render(request, 'nuevos_datos.html')
+
+
+@login_required
+def cambiar_cuenta(request):
+
+	if request.method == "POST":
+		
+		cuenta = request.POST['cuenta']		
+		password_i = request.POST['password_i']		
+		email = request.POST['email']
+		password = request.POST['password']
+
+		if Usuarios.objects.filter(email=email).exists():
+			
+			user_u = Usuarios.objects.get(email=email)
+			user = authenticate(request, username=user_u.username, password=password)
+
+			if user is not None:
+				if user.is_active:
+					
+					api = InstagramAPI(cuenta, password_i)
+					login(request, user)
+					if api.login():
+						Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
+
+
+						info_user=get_save_info(api,user_u, cuenta, password_i,1)
+						messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+						api.logout()
+						return redirect("admingo:index")						
+					else:
+						if (api.LastJson['error_type']== 'bad_password'):
+							messages.error(request, 'Los datos de instagram, no son correctos')
+							context2 = {'error': 1}
+							return render(request, 'cambiar_cuenta.html', context2)
+				else:
+					messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+
+				
+			else:
+				messages.error(request, "La contraseña no coincide con el correo electronico")	
+		else:
+			messages.error(request, "El correo electronico no se encuentra registrado")
+
+	else:
+		todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
+		todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
+		todos_productos = Productos.objects.filter(id_usuario_id=request.user.id)
+		todas_imaganes = Imagenes.objects.filter(id_usuario_id=request.user.id)
+		todas_pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
+		todos_infos = Info.objects.filter(id_usuario_id=request.user.id)
+
+		todos_ganadores = Ganadores.objects.filter(id_usuario_id=request.user.id)
+
+		todas_finanazas = Finanzas.objects.filter(id_usuario_id=request.user.id)
+		
+		# Elimino las ventas
+		if todas_ventas.exists():
+			
+			for v in todas_ventas:
+				v.delete()
+
+		# Elimino los concursos
+		if todos_concursos.exists():
+			for c in todos_concursos:
+				c.delete()
+
+		# Elimino los productos
+		if todos_productos.exists():
+			for p in todos_productos:
+				p.delete()
+
+		# Elimino las imagenes
+		if todas_imaganes.exists():
+			for i in todas_imaganes:
+				i.delete()
+
+		# Elimino las pausas
+		if todas_pausas.exists():
+			for pa in todas_pausas:
+				pa.delete()
+
+		# Elimino la info
+		if todos_infos.exists():
+			for inf in todos_infos:
+				inf.delete()
+
+		# Elimino los ganadores
+		if todos_ganadores.exists():
+			for win in todos_ganadores:
+				win.delete()
+
+		# Elimino las finanazas
+		if todas_finanazas.exists():
+			for fin in todas_finanazas:
+				fin.delete()
+
+	return render(request, 'cambiar_cuenta.html')
+
 @login_required
 def cerrar_sesion(request):
 	#api.logout() # logout in Instagram
@@ -522,7 +681,7 @@ def pausar_venta(request):
 
 		if request.is_ajax():
 			desde_pro =request.POST.get('desde_pro')
-			if desde_pro == 0:
+			if desde_pro == '0':
 				texto = request.POST.get('texto')
 				media_id = request.POST.get('media_id')
 				if(Productos.objects.filter(media_id=media_id).exists()):
@@ -573,8 +732,9 @@ def play_venta(request):
 				estado =1
 			api.logout()
 			# buscar en productos si esta pausada la venta
-			product=Productos.objects.get(media_id=media_id)
-			if (product):
+			#product=Productos.objects.filter(media_id=media_id)
+			if (Productos.objects.filter(media_id=media_id).exists()):
+				Productos.objects.get(media_id=media_id)
 				product.texto = texto
 				product.save()
 
@@ -595,7 +755,7 @@ def ventas (request):
 
 	
 	### cargar informacion actualizada de usuario
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)
 
 	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
 
@@ -710,12 +870,11 @@ def upload_img(request):
 				myfile_resize=resize_image(myfile.name, ruta,780, 780)
 			
 			
-			#me muevo a la ruta del proyecto
-			os.chdir(ruta_original)
-			os.remove(str(ruta_original)+"/admingo/static/img/usuario-"+str(request.user.id)+"/"+myfile.name)
-		
-		
-
+				#me muevo a la ruta del proyecto
+				os.chdir(ruta_original)
+				os.remove(str(ruta_original)+"/admingo/static/img/usuario-"+str(request.user.id)+"/"+myfile.name)
+			else:
+				os.chdir(ruta_original)
 
 
 			context = {'imagen': str(myfile_resize)}
@@ -797,7 +956,7 @@ def nuevo_concurso (request, nuevo =None):
 
 
 		### cargar informacion actualizada de usuario
-		info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)
+		info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)
 		
 		concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
 		concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
@@ -1079,8 +1238,6 @@ def validar_comentarios(api,array_comentario, media):
 
 ## Fin validando el comentario para generar ganadores
 
-
-
 @login_required
 def mis_concursos(request):
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
@@ -1141,7 +1298,7 @@ def mis_concursos(request):
 	## Esto esta por hacer ##
 	#usuario = Info.objects.get(id_usuario_id=request.user.id)
 	####
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)	
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)	
 
 	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
 	#todos_comments=getTotalCommentsMedia(api,str(1660217691590099505))
@@ -1328,7 +1485,6 @@ def publicar_ganadores(request):
 	return JsonResponse(context)
 
 
-
 def agregar_producto(request):
 
 	if request.is_ajax():
@@ -1411,6 +1567,7 @@ def editar_producto(request):
 			
 		context= {'estado':estado}
 		return JsonResponse(context)
+
 def delete_producto(request):
 
 	if request.is_ajax():
@@ -1437,7 +1594,7 @@ def productos(request):
 	user_r= Usuarios.objects.get(email=request.user.email)
 	username_insta = ""+user_r.user_insta+""
 	
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta)	
+	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)	
 
 	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
 	

@@ -92,7 +92,16 @@
 		            {% endfor %}
 
 	            </div>
+	            {%if error == 1 %}
+				        <div>
+				        	<div class="footer text-center">
+				        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar datos" value="Cambiar datos"></a>
+				        	</div>			        	
+				        </div>
+			        {% endif %}
 		        </div>
+		       
+
 		      {% endif %}
 						<div class="card card-signup" style="margin: 100px 0 40px;">
 							<form class="form" method="post" action='{% url "admingo:singup" %}' >
@@ -113,13 +122,6 @@
 								</div>
 								
 								<div class="content">
-
-									<!--div class="input-group">
-										<span class="input-group-addon">
-											<i class="material-icons">face</i>
-										</span>
-										<input type="text" class="form-control" placeholder="First Name...">
-									</div-->
 
 									<div class="input-group">
 										<span class="input-group-addon">

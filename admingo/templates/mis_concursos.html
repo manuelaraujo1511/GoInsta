@@ -30,7 +30,7 @@
                 <h4 class="title">Mis Concursos</h4>
                 <!--p class="category">información basada en las ventas registradas en la aplicación</p-->
               </div>
-              {% if comentarios%}
+              {% if comentarios %}
               <div class="card-content table-responsive">
                 <table id="tabla" class="table table-hover ">
                   <thead class="text-succes" style="font-weight: bold">
@@ -215,6 +215,7 @@
 	        <h4 class="modal-title" id="Modal{{forloop.counter0}}Label">Comentarios Validos</h4>
 	      </div>
 	      <div class="modal-body">
+	      	{% if com_validos%}
 		      	{% for com_validos in c.validos%}
 		      		<p>
 		      			<span style="font-weight: bold;">@{{com_validos.user.username}}</span> 
@@ -223,6 +224,11 @@
 
 		      		</p>
 		      	{%endfor%}
+		      {%else%}
+			      <center>
+			      	<h5>Aun no tenemos comentarios Validos</h5>
+		      	</center>
+		      {%endif%}
 	      	
 	      </div>
 	        	
@@ -337,6 +343,7 @@
 	</div>
 </div>
 
+{% include 'layout/modal_cambiar_ig.html'%}
 
 	<script type="text/javascript">
     	$(document).ready(function(){

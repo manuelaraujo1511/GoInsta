@@ -15,6 +15,8 @@ urlpatterns = [
 	url(r'^singup$', views.singup, name='singup'),
 	url(r'^registroinsta$', views.registroinsta, name='registroinsta'),
 	url(r'^registro$', views.registro, name='registro'),
+	url(r'^nuevos_datos$', views.nuevos_datos, name='nuevos_datos'),
+	url(r'^cambiar_cuenta$', views.cambiar_cuenta, name='cambiar_cuenta'),
 	url(r'^cerrar_sesion$', views.cerrar_sesion, name='cerrar_sesion'),
 	url(r'^vender$', views.vender, name='vender'),
 	url(r'^pausar_venta$', views.pausar_venta, name='pausar_venta'),
@@ -34,7 +36,6 @@ urlpatterns = [
 	url(r'^productos$', views.productos, name='productos'),
 	url(r'^agregar_producto$', views.agregar_producto, name='agregar_producto'),
 	url(r'^editar_producto$', views.editar_producto, name='editar_producto'),
-
 	url(r'^get_producto$', views.get_producto, name='get_producto'),
 	url(r'^delete_producto$', views.delete_producto, name='delete_producto'),
 

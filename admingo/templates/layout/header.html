@@ -116,26 +116,34 @@
 							</li-->
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<i class="material-icons">notifications</i>
+									<i class="material-icons">menu</i>
 									<!--span class="notification">5</span-->
-									<p class="hidden-lg hidden-md">Notifications</p>
+									<p class="hidden-lg hidden-md">menu</p>
 								</a>
 								<ul class="dropdown-menu">
-									<li><a href="#">Seccion</a></li>
-									<li><a href="#">de</a></li>
-									<li><a href="#">Las</a></li>
-									<li><a href="#">Notificaciones</a></li>
-									<li><a href="#">que debo colocar</a></li>
+									<li>
+
+										<a id="a-cambiar-cuenta-ig" placeholder ="Cambiar usuario IG" style="cursor: pointer;">
+											<i class="material-icons">account_circle</i>
+											<p id="a-cambiar-cuenta-ig" class="hidden-lg hidden-md">Cambiar usuario IG</p> Cambiar usuario IG
+										</a>
+									</li>
+									<li>
+										<a href='{% url "admingo:cerrar_sesion" %}' placeholder ="Cerrar Sesión">
+											<i class="material-icons">power_settings_new</i>
+											<p class="hidden-lg hidden-md">Cerrar Sesión</p> Cerrar Sesión
+										</a>
+									</li>
+									
 								</ul>
 							</li>
-							<li>
+							<!--li>
 								
 								<a href='{% url "admingo:cerrar_sesion" %}' placeholder ="Cerrar Sesión">
-									<i class="material-icons">power_settings_new</i>
-									<p class="hidden-lg hidden-md">Cerrar Sesión</p>
+									
 								</a>
 							
-							</li>
+							</li-->
 						</ul>
 
 						<!--form class="navbar-form navbar-right" role="search">
