@@ -134,3 +134,9 @@ STATICFILES_DIRS = [
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'araujonorelys@gmail.com' 
+EMAIL_HOST_PASSWORD = '14989645'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

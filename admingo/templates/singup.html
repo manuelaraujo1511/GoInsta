@@ -75,34 +75,56 @@
 					   
 					
 				<div class="row">
+					<div class="mv col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3" >
+						{% if messages %}
+							{%if envie_email == 1 %}
+					      <div class="alert alert-success">
+				        	<div class="container-fluid">
+								 		<div class="alert-icon">
+											<i class="material-icons">check</i>
+										</div>
+										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true"><i class="material-icons">clear</i></span>
+										</button>
+										{% for message in messages %}
+											{{ message }}
+				              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+				            {% endfor %}
+
+			            </div>
+				        </div>
+			        {% else %}
+								<div class="alert alert-danger">
+				        	<div class="container-fluid">
+								 		<div class="alert-icon">
+											<i class="material-icons">error_outline</i>
+										</div>
+										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true"><i class="material-icons">clear</i></span>
+										</button>
+										{% for message in messages %}
+											{{ message }}
+				              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+				            {% endfor %}
+
+			            </div>
+			            {%if error == 1 %}
+						        <div>
+						        	<div class="footer text-center">
+						        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar datos" value="Cambiar datos"></a>
+						        	</div>			        	
+						        </div>
+					        {% endif %}
+
+				        </div>
+				       
+
+				      {% endif %}
+				    {%endif%}
+			    </div>
 
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3" style="margin-top: 5%;">
-					{% if messages %}
-						<div class="alert alert-danger">
-		        	<div class="container-fluid">
-						 		<div class="alert-icon">
-									<i class="material-icons">error_outline</i>
-								</div>
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true"><i class="material-icons">clear</i></span>
-								</button>
-								{% for message in messages %}
-									{{ message }}
-		              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-		            {% endfor %}
 
-	            </div>
-	            {%if error == 1 %}
-				        <div>
-				        	<div class="footer text-center">
-				        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar datos" value="Cambiar datos"></a>
-				        	</div>			        	
-				        </div>
-			        {% endif %}
-		        </div>
-		       
-
-		      {% endif %}
 						<div class="card card-signup" style="margin: 100px 0 40px;">
 							<form class="form" method="post" action='{% url "admingo:singup" %}' >
 							{% csrf_token %}
@@ -145,6 +167,9 @@
 											Subscribe to newsletter
 										</label>
 									</div> -->
+								</div>
+								<div class="footer text-center">
+									<a href='{% url "admingo:recuperar_password" %}' style="color: #9c27b0; text-decoration: none"> <p>¿Olvidaste tu contraseña?</p></a>
 								</div>
 								<div class="footer text-center">
 									<button class="btn btn-success" type="submit">GO!</button>

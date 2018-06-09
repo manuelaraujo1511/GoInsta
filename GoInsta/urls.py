@@ -15,8 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import *
 
 urlpatterns = [
 		path(r'', include('admingo.urls')),
     path('admin/', admin.site.urls),
 ]
+handler400 = 'admingo.views.error_400_view'
+handler403 = 'admingo.views.error_403_view'
+handler404 = 'admingo.views.error_404_view'
+handler500 = 'admingo.views.error_500_view'

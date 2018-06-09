@@ -38,7 +38,8 @@ urlpatterns = [
 	url(r'^editar_producto$', views.editar_producto, name='editar_producto'),
 	url(r'^get_producto$', views.get_producto, name='get_producto'),
 	url(r'^delete_producto$', views.delete_producto, name='delete_producto'),
-
+	url(r'^enviar_pass$', views.enviar_pass, name='enviar_pass'),
+	url(r'^recuperar_password$', views.recuperar_password, name='recuperar_password'),
 
 	
 ]

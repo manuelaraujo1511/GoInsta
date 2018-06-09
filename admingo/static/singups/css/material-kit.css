@@ -3712,7 +3712,10 @@ h2.title {
 .index-page .navbar-transparent {
   padding-top: 25px;
 }
-
+.mv{
+  margin-top: 5%;
+  margin-bottom: -10%
+  }
 @media (max-width: 991px) {
   .landing-page .header {
     height: auto;
@@ -3741,6 +3744,11 @@ h2.title {
     margin-left: 10px;
     margin-right: 10px;
   }
+  .mv{
+    margin-top: 19%;
+    margin-bottom: -10%;  
+  }
+  
 }
 
 /*# sourceMappingURL=material-kit.css.map */

@@ -1,12 +1,15 @@
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
+from django.contrib.auth.hashers import *
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
 from InstagramAPI import InstagramAPI
 from .models import *
@@ -22,27 +25,30 @@ import re
 import os, sys
 import random
 import locale
+
+
 locale.setlocale( locale.LC_ALL, '' )
 
+array_media_id=[]
 
 # Create your views here.
 def getTotalCommentsMedia(api, mediaId):
-  verdad= True
-  next_max_id = ''
-  all_comments = []
-  while verdad:
-      #print("Entre al while")
-      api.getMediaComments(mediaId, next_max_id)
-      tem = api.LastJson
-      for t in tem['comments']:
-          all_comments.append(t)
+	verdad= True
+	next_max_id = ''
+	all_comments = []
+	while verdad:
+			#print("Entre al while")
+			api.getMediaComments(mediaId, next_max_id)
+			tem = api.LastJson
+			for t in tem['comments']:
+					all_comments.append(t)
 
-      if tem['has_more_comments'] is True:
-          #print(str(json.loads(tem['next_max_id'])['server_cursor']))
-          next_max_id = json.loads(tem['next_max_id'])['server_cursor']
-      else:
-          verdad = False
-  return all_comments
+			if tem['has_more_comments'] is True:
+					#print(str(json.loads(tem['next_max_id'])['server_cursor']))
+					next_max_id = json.loads(tem['next_max_id'])['server_cursor']
+			else:
+					verdad = False
+	return all_comments
 
 def get_precio(request):
 	precio = 0
@@ -174,6 +180,9 @@ def show_modelos(request):
 @login_required
 def index(request):
 	# IMPORTANTE: comprobar conexion a internet
+	
+
+	request.session['array_media_id']=[]
 	user_r= Usuarios.objects.get(email=request.user.email)
 	#username_insta = ""+user_r.user_insta+""
 
@@ -191,7 +200,8 @@ def index(request):
 	## Eliminar de la tabla los concursos que no terminaron de publicar
 	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
 	### cargar informacion actualizada de usuario
-	info_user=get_save_info(api,user_r,user_r.user_insta, user_r.pass_insta,0)
+
+	info_user=get_save_info(api, request.user.id, user_r.user_insta, user_r.pass_insta, 0)
 	
 	concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
 	concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
@@ -212,83 +222,96 @@ def index(request):
 
 		while has_more_feed:
 
-		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
-		  temp = api.LastJson
+			api.getUserFeed(usernameId, next_max_id, minTimestamp)
+			temp = api.LastJson
 
-		  for item in temp["items"]:
-		  	if pausas.exists():
-			  	for p in pausas:
-			  		if(str(item['caption']['media_id']) == str(p.media_id)):
-			  			item['caption']['pausado'] = True
-			  		else:
-			  			item['caption']['pausado'] = False
-		  	
-		  		item['caption']['cant_pro'] = -1
+			for item in temp["items"]:
+				if (item["caption"] != None):
+					if pausas.exists():
+						for p in pausas:
+							if(str(item['caption']['media_id']) == str(p.media_id)):
+								item['caption']['pausado'] = True
+							else:
+								item['caption']['pausado'] = False
+					
+						item['caption']['cant_pro'] = -1
 
-		  	if (not productos.exists()):
-		  		item['caption']['producto'] = False
-		  		
-		  	else:
-		  		for pro in productos:
-			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
-			  			item['caption']['producto'] = pro
-			  			break
-			  		else:
-			  			item['caption']['producto'] = False
-		  		
+					if (productos.exists()):
+						for pro in productos:
+							if(str(item['caption']['media_id']) == str(pro.media_id)):
+								item['caption']['producto'] = pro
+								break
+							else:
+								item['caption']['producto'] = False
+						
+					else:
+						item['caption']['producto'] = False		  		
 
-		  	for con in todos_concursos:
-		  		if(str(item['caption']['media_id']) == str(con.media_id)):
-		  			guardo = False
-		  			break
+					for con in todos_concursos:
+						if(str(item['caption']['media_id']) == str(con.media_id)):
+							guardo = False
+							break
 
 
-		  	if (guardo):
-		  		feed.append(item)
-		  	guardo = True
-		  if temp["more_available"] is False:
+					if (guardo):
+						request.session['array_media_id'].append(item['caption']['media_id'])
+						feed.append(item)
+					guardo = True
+			#end for
+			if temp["more_available"] is False:
 
-		    has_more_feed = False
-		  
-		  else:
-		  	guardo = True
-		  	next_max_id = temp["next_max_id"]
-	#print(str(feed))
+				has_more_feed = False
+			
+			else:
+				guardo = True
+				next_max_id = temp["next_max_id"]
+		#end while
+	
 	else:
+		
 		while has_more_feed:
 
-		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
-		  temp = api.LastJson
+			api.getUserFeed(usernameId, next_max_id, minTimestamp)
+			temp = api.LastJson
 
-		  for item in temp["items"]:
-		  	if pausas.exists():
-			  	for p in pausas:
-			  		if(str(item['caption']['media_id']) == str(p.media_id)):
-			  			item['caption']['pausado'] = True
-			  		else:
-			  			item['caption']['pausado'] = False
-		  		item['caption']['cant_pro'] = -1
-		  	
-		  	if (not productos.exists()):
-		  		item['caption']['producto'] = False
-		  	else:
-			  	for pro in productos:
-			  		if(str(item['caption']['media_id']) == str(pro.media_id)):
-			  			item['caption']['producto'] = pro
-			  			break
-			  		else:
-			  			item['caption']['producto'] = False
-			  	
-		  	feed.append(item)
+			for item in temp["items"]:
+				if (item['caption'] != None):
+					if pausas.exists():
+						for p in pausas:
+							if(str(item['caption']['media_id']) == str(p.media_id)):
+								item['caption']['pausado'] = True
+							else:
+								item['caption']['pausado'] = False
+						
+						item['caption']['cant_pro'] = -1
+					
+					if (productos.exists()):
+						for pro in productos:
+							if(str(item['caption']['media_id']) == str(pro.media_id)):
+								item['caption']['producto'] = pro
+								break
+							else:
+								item['caption']['producto'] = False
+						
+					else:
+						item['caption']['producto'] = False
+					request.session['array_media_id'].append(item['caption']['media_id'])
+					feed.append(item)
+					
+			#termino el for
 
-		  if temp["more_available"] is False:
-		    
-		    print("entre si es falso")
+			
+			if temp["more_available"] is False:
+				
+				print("entre si es falso")
 
-		    has_more_feed = False
-		  
-		  else:
-		  	next_max_id = temp["next_max_id"]
+				has_more_feed = False
+			
+			else:
+
+				next_max_id = temp["next_max_id"]
+			#sigo el while	
+	print("-------- INDEX: "+str(request.session['array_media_id']))
 	context = {
 		'usuario' : usuario_info,
 		'feed' : feed,
@@ -318,8 +341,6 @@ def singup(request):
 
 			if user_u.user_insta is not None:
 				if user_name is not False:
-					#print (user_name)
-					#print (password)
 					user = authenticate(request, username=user_name, password=password)
 
 					#print(user)
@@ -361,7 +382,8 @@ def singup(request):
 						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
 						return render(request, 'singup.html', context2)	
 			else:
-				#request.method= "GET"
+				user = authenticate(request, username=user_name, password=password)
+				login(request, user)
 				context = {
 					'username': user_name,
 					'password' : password
@@ -400,6 +422,9 @@ def registro(request):
 
 			u = Usuarios(nombre=nombre, apellido=apellido, email=email,password=password,username=username)
 			u.save()
+			user = authenticate(request, username=username, password=password)
+			login(request, user)
+
 			context = {
 				'username': username,
 				'password' : password
@@ -424,6 +449,7 @@ def registroinsta(request):
 		
 
 		api = InstagramAPI(cuenta, password_i)
+		#password_i = make_password(str(password_i))
 
 
 		if api.login():
@@ -431,15 +457,15 @@ def registroinsta(request):
 
 
 			Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i)
-			user = authenticate(request, username=username, password=password)
+			#user = authenticate(request, username=username, password=password)
 
 
-			login(request, user)
+			#login(request, user)
 			# Guardo en info
 			api.searchUsername(str(cuenta))
 			img_profile = api.LastJson['user']['profile_pic_url']
 
-			Info(id_usuario_id=request.user.id, username=username, foto_perfil= img_profile).save()
+			Info(id_usuario=user_u, username=username, foto_perfil= img_profile).save()
 
 			messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
 			api.logout()
@@ -747,6 +773,9 @@ def play_venta(request):
 @login_required
 def ventas (request):
 
+	global array_media_id
+	array_media_id = request.session.get('array_media_id')
+
 	todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
 	ventas_distinc = Ventas.objects.filter(id_usuario_id=request.user.id).values_list('media_id', flat=True).distinct()
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
@@ -765,17 +794,13 @@ def ventas (request):
 	into = False
 	
 	for vd in ventas_distinc:
-		'''
-		for v in todas_ventas:
-			if (v.media_id == vd):
-				
-		'''
 		for img in imagenes:
 			if (img.media_id == vd):
 
 				arr_img.append(img.imagen)
-			
-		arr_ventas.append({'media_id': vd, 'imagen': arr_img, 'cant_img': len(arr_img)})
+		
+		if (int(vd) in array_media_id):
+			arr_ventas.append({'media_id': vd, 'imagen': arr_img, 'cant_img': len(arr_img)})
 
 		arr_img = []
 		
@@ -1050,22 +1075,22 @@ def publicar_concurso(request):
 
 				while has_more_feed:
 
-				  api.getUserFeed(usernameId, next_max_id, minTimestamp)
-				  temp = api.LastJson
+					api.getUserFeed(usernameId, next_max_id, minTimestamp)
+					temp = api.LastJson
 
-				  for item in temp["items"]:
-				    
-				    feed.append(item)
+					for item in temp["items"]:
+						
+						feed.append(item)
 
-				  if temp["more_available"] is False:
-				    
-				    #print("entre si es falso")
+					if temp["more_available"] is False:
+						
+						#print("entre si es falso")
 
-				    has_more_feed = False
-				  
-				  else:
-				  	
-				    next_max_id = temp["next_max_id"]
+						has_more_feed = False
+					
+					else:
+						
+						next_max_id = temp["next_max_id"]
 
 				
 				for obj in feed:
@@ -1240,6 +1265,10 @@ def validar_comentarios(api,array_comentario, media):
 
 @login_required
 def mis_concursos(request):
+
+	global array_media_id
+	array_media_id = request.session.get('array_media_id')
+
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
 	
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
@@ -1258,7 +1287,7 @@ def mis_concursos(request):
 	#print("seguidores: "+str(api.LastJson))
 	imagenes_count = imagenes.count()
 	tam=len(todos_concursos)
-	print(str(len(todos_concursos)))
+	#print(str(len(todos_concursos)))
 	for c in todos_concursos:
 		
 		cont_comentario = 0
@@ -1267,31 +1296,32 @@ def mis_concursos(request):
 		imagen2 = []
 
 		if (c.media_id != None):
-			todos_comments=getTotalCommentsMedia(api,c.media_id)			
-			cont_comentario = len(todos_comments)
+			if (int(c.media_id) in array_media_id):
+				todos_comments=getTotalCommentsMedia(api,c.media_id)			
+				cont_comentario = len(todos_comments)
 
-			#api.getMediaComments(c.media_id)
-			#cont_comentario = api.LastJson['comment_count']
+				#api.getMediaComments(c.media_id)
+				#cont_comentario = api.LastJson['comment_count']
+				
+				if (cont_comentario > 0):
+					aux=validar_comentarios(api,todos_comments,c)
+					validos = aux['comentarios_validos']
+					cont_likers=aux['cont_likers']
+					cont_validos = len(validos)
+					#validos.append({'media_id':c.media_id})
+				else:
+					validos=[]
+
+				for img in imagenes:
+					if (c.media_id == img.media_id):
+						imagen2.append(img.imagen)
 			
-			if (cont_comentario > 0):
-				aux=validar_comentarios(api,todos_comments,c)
-				validos = aux['comentarios_validos']
-				cont_likers=aux['cont_likers']
-				cont_validos = len(validos)
-				#validos.append({'media_id':c.media_id})
-			else:
-				validos=[]
 
-			for img in imagenes:
-				if (c.media_id == img.media_id):
-					imagen2.append(img.imagen)
-		
-
-		if (imagen2):
-		
-			comentarios.append({'imagen2':imagen2,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
-		else:
-			comentarios.append({'imagen2':None,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
+				if (imagen2):
+				
+					comentarios.append({'imagen2':imagen2,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
+				else:
+					comentarios.append({'imagen2':None,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
 		print("comentarios["+str(i)+"]['imagen2']"+str(comentarios[i]['imagen2']))
 		i+=1
 	
@@ -1586,6 +1616,9 @@ def delete_producto(request):
 
 @login_required
 def productos(request):
+	global array_media_id
+	array_media_id = request.session.get('array_media_id')
+
 	product = Productos.objects.filter(id_usuario_id= request.user.id)
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
 	### Esto esta por HAcer ####
@@ -1602,16 +1635,23 @@ def productos(request):
 	products = []
 	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
 	play =False
-	for pro in product:
-		for p in pausas:
-			if (p.media_id == pro.media_id):
-				play = True
-		for img in imagenes:
-			if (img.media_id == pro.media_id):
-				arr_img.append(img.imagen)
+	
+	
 
-		products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto,  'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
-		arr_img = []
+	if product.exists():
+		print("products exist")
+		for pro in product:
+			for p in pausas:
+				if (p.media_id == pro.media_id):
+					play = True
+			for img in imagenes:
+				if (img.media_id == pro.media_id):
+					arr_img.append(img.imagen)
+			
+			if (int(pro.media_id) in array_media_id):
+
+				products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto,  'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
+				arr_img = []
 	
 
 	context = {
@@ -1620,3 +1660,58 @@ def productos(request):
 		'monto_total' : get_precio(request)
 	}
 	return render (request,'productos.html', context)
+
+
+#### ERRORES De servidor
+def error_400_view(request):
+	return render(request,'error_500.html')
+
+def error_403_view(request):
+	return render(request,'error_500.html')
+
+def error_404_view(request):
+  return render(request,'error_404.html')
+
+def error_500_view(request):
+	return render(request,'error_500.html')
+
+def csrf_failure(request,  reason="error_server"):
+	return HttpResponseForbidden('Error en nuestros servidores')
+
+####   Emails
+
+def recuperar_password(request):
+	context ={'user': request.user}
+	return render(request, 'recuperar_password.html', context)
+
+def enviar_pass(request):
+	email = request.POST.get('email')
+
+	user = Usuarios.objects.filter(email=email)
+	if (user.exists()):
+		user = Usuarios.objects.get(email=email)
+		body = render_to_string(
+			'recuperar_pass.html',
+				{
+					'name': user.nombre+' '+user.apellido,
+					'email': email,
+				},
+		)
+		email = EmailMessage(
+			subject='Recuperar Contraseña',
+			body = body,
+			from_email=email,
+			to=['email@email.com']
+			)
+		email.content_subtype= 'html'
+		email.send()
+		messages.error(request, 'Hemos enviado el correo electronico satisfactoriamente.\n Revisa tu bandeja de entrada')
+		context ={'envie_email': 1}
+		return render(request, 'singup.html', context)
+	else:
+		messages.error(request, 'El correo introducido no existe. Intente de nuevo')
+
+		context ={'user': request.user}
+		return render(request, 'recuperar_password.html', context)
+
+

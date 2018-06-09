@@ -1,298 +1,278 @@
-{% include 'layout/header.html'%}
-{% for message in messages %}
-<!--dir class="alert alert-info" {{message.tags}} alert-dismissible" role="alert" style="width: auto;">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-		<span aria-hidden="true">&times;</span>
-	</button>
-	{{message}}
-</dir-->
-<script type="text/javascript">
-	window.onload = function() {
-		$(".load").fadeOut();
-  	demo.showNotificationSucces('top','center', "{{message}}")
-	};
-	
-</script>
-{% endfor %}
-		<div class="content">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-3 col-md-6 col-sm-6">
-						<div class="card card-stats">
-							<div class="card-header" data-background-color="green">
-								 <i class="material-icons">card_giftcard</i>
+{% extends "layout/header.html" %}
+{%block titulo %}Mis Publicaciones{%endblock%}
 
-							</div>
-							<div class="card-content">
+{%block mensajes %}
+	{% for message in messages %}
+	<!--dir class="alert alert-info" {{message.tags}} alert-dismissible" role="alert" style="width: auto;">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		{{message}}
+	</dir-->
+	<script type="text/javascript">
+		window.onload = function() {
+			$(".load").fadeOut();
+	  	demo.showNotificationSucces('top','center', "{{message}}")
+		};
+		
+	</script>
+	{% endfor %}
+{%endblock%}
 
-								<p class="category">Concursos Abierto</p>
-								<h3 class="title">{{usuario.concursos_abiertos}}</h3>
-							</div>
-							<!--div class="card-footer">
-								<div class="stats">
-									<i class="material-icons text-danger">warning</i> <a href="#pablo">Get More Space...</a>
-								</div>
-							</div-->
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6 col-sm-6">
-						<div class="card card-stats">
-							<div class="card-header" data-background-color="orange">
-								 <i class="material-icons">card_travel</i>
-							</div>
-							<div class="card-content">
-								<p class="category">Concursos Cerrados</p>
-								<h3 class="title">{{usuario.concursos_cerrados}}</h3>
-							</div>
-							<!--div class="card-footer">
-								<div class="stats">
-									<i class="material-icons">date_range</i> Last 24 Hours
-								</div>
-							</div-->
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6 col-sm-6">
-						<div class="card card-stats">
-							<div class="card-header" data-background-color="red">
-								<i class="material-icons">group</i>
-							</div>
-							<div class="card-content">
-								<p class="category">Seguidores</p>
-								<h3 class="title">{{usuario.seguidores}}</h3>
-							</div>
-							<!--div class="card-footer">
-								<div class="stats">
-									<i class="material-icons">local_offer</i> Tracked from Github
-								</div>
-							</div-->
-						</div>
-					</div>
+{%block contenido%}
+	<div class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-3 col-md-6 col-sm-6">
+					<div class="card card-stats">
+						<div class="card-header" data-background-color="green">
+							 <i class="material-icons">card_giftcard</i>
 
-					<div class="col-lg-3 col-md-6 col-sm-6">
-						<div class="card card-stats">
-							<div class="card-header" data-background-color="blue">
-								<i class="material-icons">group</i>
-							</div>
-							<div class="card-content">
-								<p class="category">Seguidos</p>
-								<h3 class="title">{{usuario.seguidos}}</h3>
-							</div>
-							<!--div class="card-footer">
-								<div class="stats">
-									<i class="material-icons">update</i> Just Updated
-								</div>
-							</div-->
 						</div>
+						<div class="card-content">
+
+							<p class="category">Concursos Abierto</p>
+							<h3 class="title">{{usuario.concursos_abiertos}}</h3>
+						</div>
+						
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6">
+					<div class="card card-stats">
+						<div class="card-header" data-background-color="orange">
+							 <i class="material-icons">card_travel</i>
+						</div>
+						<div class="card-content">
+							<p class="category">Concursos Cerrados</p>
+							<h3 class="title">{{usuario.concursos_cerrados}}</h3>
+						</div>
+						
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6">
+					<div class="card card-stats">
+						<div class="card-header" data-background-color="red">
+							<i class="material-icons">group</i>
+						</div>
+						<div class="card-content">
+							<p class="category">Seguidores</p>
+							<h3 class="title">{{usuario.seguidores}}</h3>
+						</div>
+						
 					</div>
 				</div>
 
-				<div class="row">
-					<div class="col-md-12">
-            <div class="card card-plain">
-              <div class="card-header" data-background-color="purple">
-                <h4 class="title">Mis Publicaciones</h4>
-                <p class="category">Información basada en tus publicaciones de instagram</p>
-              </div>
-              <div class="card-content table-responsive">
-                <table id="tabla" class="table table-hover ">
-                  <thead class="text-succes" style="font-weight: bold">
-                  	<tr>
-                  		<center>
-                  			<th style="width: 160px;">Imagen</th>
-                  		</center>
-                  		<center>
-                  			<th>Descripción</th>	
-                  		</center>
-                  		
-                  		<center>
-                  			<th style="width: 149px;"> Acciones</th>
-                  		</center>
-                  	</tr>
-                  </thead>
-                  <tbody>
-                 
-                  {% for obj in feed %}
-                  <tr>
-                  	<td>
+				<div class="col-lg-3 col-md-6 col-sm-6">
+					<div class="card card-stats">
+						<div class="card-header" data-background-color="blue">
+							<i class="material-icons">group</i>
+						</div>
+						<div class="card-content">
+							<p class="category">Seguidos</p>
+							<h3 class="title">{{usuario.seguidos}}</h3>
+						</div>
+						
+					</div>
+				</div>
+			</div>
 
-                  	{% if obj.image_versions2 is not Null %}
-                  		<img class="img" src="{{obj.image_versions2.candidates.0.url}}"  />
-                  		<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{obj.image_versions2.candidates.0.url}}" style="display: none" />
-                  		
+			<div class="row">
+				<div class="col-md-12">
+          <div class="card card-plain">
+            <div class="card-header" data-background-color="purple">
+              <h4 class="title">Mis Publicaciones</h4>
+              <p class="category">Información basada en tus publicaciones de instagram</p>
+            </div>
+            <div class="card-content table-responsive">
+              <table id="tabla" class="table table-hover ">
+                <thead class="text-succes" style="font-weight: bold">
+                	<tr>
+                		<center>
+                			<th style="width: 160px;">Imagen</th>
+                		</center>
+                		<center>
+                			<th>Descripción</th>	
+                		</center>
+                		
+                		<center>
+                			<th style="width: 149px;"> Acciones</th>
+                		</center>
+                	</tr>
+                </thead>
+                <tbody>
+               
+                {% for obj in feed %}
+                <tr>
+                	<td>
 
-                  	{% else %}
-                  	
-                  		
-                  		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
-                  			<ol class="carousel-indicators">
-                  			{% for orden in obj.carousel_media%}
-                  				{% if forloop.first %}
-										      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
-										      
-										      {% else %}
-										      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
-										      {% endif %}
-										    
-										    {% endfor %}
-										    </ol>
-										    
-										    
-										    <div class="carousel-inner">
-										    	{% for fotos in obj.carousel_media%}
-										    		
-										    		{%if forloop.first %}
-										    			<div class="item active">
-										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
-										    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
-										    			</div>
-										    			
-										    		{% else %}
-										    			<div class="item">
-										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
-										    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
-										    			</div>
-										    		{% endif %}
-										    		
-										    	{% endfor %}
-										    
-										    </div>
-										    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
-										      <!--span class="glyphicon glyphicon-chevron-left"></span>
-										      <span class="sr-only">Previous</span-->
-										      <i class="material-icons">keyboard_arrow_left</i>
-										    </a>
-										    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
-										      <!--span class="glyphicon glyphicon-chevron-right"></span>
-										      <span class="sr-only">Next</span-->
-										      <i class="material-icons">keyboard_arrow_right</i>
-										    </a>
-										  </div>
-                  		<!--img class="img" src="{{obj.carousel_media.0.image_versions2.candidates.0.url}} " />
-                  		</td-->
+                		{% if obj.image_versions2 is not Null %}
+                		<img class="img" src="{{obj.image_versions2.candidates.0.url}}"  />
+                		<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{obj.image_versions2.candidates.0.url}}" style="display: none" />
+                		
 
-                  	{% endif %}
-                  	<td> {{obj.caption.text}}</td>
-                  	<!--td class="td-actions text-right"-->
-                  	<td>
-											 <!--div class="clearfix"></div-->
-											<div class="row">
-											 	<div class="col-sm-4">
-											 	
-										 		{% if obj.caption.pausado %}
-													<button type="button" class="btn btn-simple ModalPlay" data-media="{{obj.caption.media_id}}" data-texto="{{obj.caption.text}}" title="Play a Venta" style="padding: 0px 0px !important">
-													
-														<i class="material-icons text-warning" style="font-size: 30px">play_arrow</i>
+                		{% else %}
+                	
+                		
+                		<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
+                			<ol class="carousel-indicators">
+                			{% for orden in obj.carousel_media%}
+                				{% if forloop.first %}
+									      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
+									      
+									      {% else %}
+									      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
+									      {% endif %}
+									    
+									    {% endfor %}
+									    </ol>
+									    
+									    
+									    <div class="carousel-inner">
+									    	{% for fotos in obj.carousel_media%}
+									    		
+									    		{%if forloop.first %}
+									    			<div class="item active">
+									    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
+									    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
+									    			</div>
+									    			
+									    		{% else %}
+									    			<div class="item">
+									    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
+									    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
+									    			</div>
+									    		{% endif %}
+									    		
+									    	{% endfor %}
+									    
+									    </div>
+									    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
 
-													</button>
-												{%else%}
-													<button type="button" class="btn btn-simple Modalcancelar" data-media="{{obj.caption.media_id}}" data-texto="{{obj.caption.text}}" title="Pausar Venta" style="padding: 0px 0px !important">
-													
-														<i class="material-icons text-warning" style="font-size: 30px">pause</i>
+									      <i class="material-icons">keyboard_arrow_left</i>
+									    </a>
+									    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
+									      
+									      <i class="material-icons">keyboard_arrow_right</i>
+									    </a>
+									  </div>
 
-													</button>
-												{%endif%}
+                	{% endif %}
+                	<td> {{obj.caption.text}}</td>
+                	
+                	<td>
+										
+										<div class="row">
+										 	<div class="col-sm-4">
+										 	
+									 		{% if obj.caption.pausado %}
+												<button type="button" class="btn btn-simple ModalPlay" data-media="{{obj.caption.media_id}}" data-texto="{{obj.caption.text}}" title="Play a Venta" style="padding: 0px 0px !important">
 												
-											 	</div>
-											 	<div class="col-sm-4">
-											 	{% if obj.caption.producto == False %}
-											 	<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
+													<i class="material-icons text-warning" style="font-size: 30px">play_arrow</i>
+
+												</button>
+											{%else%}
+												<button type="button" class="btn btn-simple Modalcancelar" data-media="{{obj.caption.media_id}}" data-texto="{{obj.caption.text}}" title="Pausar Venta" style="padding: 0px 0px !important">
+												
+													<i class="material-icons text-warning" style="font-size: 30px">pause</i>
+
+												</button>
+											{%endif%}
+											
+										 	</div>
+										 	<div class="col-sm-4">
+										 	{% if obj.caption.producto == False %}
+										 	<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
+												
+													<i class="material-icons text-success" style="font-size: 30px">shop</i>
+
+												</button> 	
+											{%else%}
+											 	{% if obj.caption.producto.cantidad > 0 %}
+											 	
+													<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-success" style="font-size: 30px">shop</i>
 
-													</button> 	
-												{%else%}
-												 	{% if obj.caption.producto.cantidad > 0 %}
-												 	
-														<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
-														
-															<i class="material-icons text-success" style="font-size: 30px">shop</i>
-
-														</button> 		
-												 	
-												 	{%else%}
-												 		<button type="button" class="btn btn-simple pull-right"  title="No tienes suficientes" style="padding: 0px 0px !important" disabled="True">
-												 		
-												 			<i class="material-icons text-default" style="font-size: 30px">shop</i>
-
-												 		</button> 
-												 	{%endif%}
-												{%endif%}
-											 	</div>
-											 </div>
-											 <div class="row">
-											 	<div class="col-sm-4">
-											 		<button type="button" class="btn btn-simple ModalAgregarConcurso"  data-media="{{obj.caption.media_id}}" title="Agregar como un Concurso" style="padding: 0px 0px !important">
-
-											 			<i class="material-icons text-info" style="font-size: 30px">card_giftcard</i>
-
-											 		</button>
-											 	</div>
-											 	{% if obj.caption.producto == False %}
-											 	<div class="col-sm-4">						 	
-											 		<button type=" button" class="btn btn-simple ModalAgregarProducto"  data-media="{{obj.caption.media_id}}" data-comentario = "{{obj.caption.text}}" title="Agregar Producto" style="padding: 0px 0px !important">
-
-										 			<i class="material-icons text-primary" style="font-size: 30px">add_box</i>
-
-										 			</button>
-											 	</div>
-											 	{%else %}
-											 	<div class="col-sm-4">
-													<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.caption.producto.media_id}}" title="Editar Producto" style="padding: 0px 0px !important"> 
-													<i class="material-icons text-primary" style="font-size: 30px">edit</i>
-
-										 			</button>		
-											 	</div>
+													</button> 		
 											 	
-											 	{%endif%}
-										 		
-											</div>
-											
-											
-											
-											 <!--div class="clearfix"></div-->
-										</td>
-									</tr>
-                  {% endfor%}
-              		</tbody>
+											 	{%else%}
+											 		<button type="button" class="btn btn-simple pull-right"  title="No tienes suficientes" style="padding: 0px 0px !important" disabled="True">
+											 		
+											 			<i class="material-icons text-default" style="font-size: 30px">shop</i>
 
-                </table>
-              </div>
+											 		</button> 
+											 	{%endif%}
+											{%endif%}
+										 	</div>
+										 </div>
+										 <div class="row">
+										 	<div class="col-sm-4">
+										 		<button type="button" class="btn btn-simple ModalAgregarConcurso"  data-media="{{obj.caption.media_id}}" title="Agregar como un Concurso" style="padding: 0px 0px !important">
+
+										 			<i class="material-icons text-info" style="font-size: 30px">card_giftcard</i>
+
+										 		</button>
+										 	</div>
+										 	{% if obj.caption.producto == False %}
+										 	<div class="col-sm-4">						 	
+										 		<button type=" button" class="ModalAgregarProducto btn btn-simple "  data-media="{{obj.caption.media_id}}" data-comentario = "{{obj.caption.text}}" title="Agregar Producto" style="padding: 0px 0px !important">
+
+									 			<i class="material-icons text-primary" style="font-size: 30px">add_box</i>
+
+									 			</button>
+										 	</div>
+										 	{%else %}
+										 	<div class="col-sm-4">
+												<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.caption.producto.media_id}}" title="Editar Producto" style="padding: 0px 0px !important"> 
+												<i class="material-icons text-primary" style="font-size: 30px">edit</i>
+
+									 			</button>		
+										 	</div>
+										 	
+										 	{%endif%}
+									 		
+										</div>
+										
+										
+										
+										 <!--div class="clearfix"></div-->
+									</td>
+								</tr>
+                {% endfor%}
+            		</tbody>
+
+              </table>
             </div>
           </div>
-				</div>
-				
+        </div>
 			</div>
+			
 		</div>
-
-		{% include 'layout/footer.html'%}		
 	</div>
-</div>
+{%endblock%}
 
-
-</body>
-
-
-<!-- Modal Agregar Producto Index-->
-<div class="modal fade" id="ModalAgregarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarProductoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="ModalAgregarProductoLabel">Agregar Producto</h4>
-      </div>
-      <div class="modal-body">
-      	<p>Al agregar este producto podrar administrar mejor tus ventas</p>
-      	<form class="form form-add-producto" method="post" action='{% url "admingo:agregar_producto" %}'>
-				{% csrf_token %}
-		      <div class="row">
-		      	<div class="col-lg-4">
-		      		<div class="div-cantidad-agregar form-group label-floating">
-		      			<label class="control-label">Cantidad</label>
-		      			<input type="number" name="cantidad-agregar" id="cantidad-agregar" class="form-control" required="" >
-		      		</div>
-		      		<p id="erro-cantidad-agregar" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
-		      	</div>
-		      		<div class="col-md-8">
+{%block modales%}
+	<!-- Modal Agregar Producto Index-->
+	<div class="modal fade" id="ModalAgregarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalAgregarProductoLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="ModalAgregarProductoLabel">Agregar Producto</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<p>Al agregar este producto podrar administrar mejor tus ventas</p>
+	      	<form class="form form-add-producto" method="post" action='{% url "admingo:agregar_producto" %}'>
+					{% csrf_token %}
+			      <div class="row">
+			      	<div class="col-lg-4">
+			      		<div class="div-cantidad-agregar form-group label-floating">
+			      			<label class="control-label">Cantidad</label>
+			      			<input type="number" name="cantidad-agregar" id="cantidad-agregar" class="form-control" required="" >
+			      		</div>
+			      		<p id="erro-cantidad-agregar" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+			      	</div>
+		      		<!--div class="col-md-8">
 			      		<div class="togglebutton">
 		            	<label>
 		            		<span id ="res-automatica-add-no" >No</span> 
@@ -305,261 +285,261 @@
 		           		
 		            </div>
 		            <p style="font-size: 12px">al recibir un comentario preguntando, precio o disponibilidad, responderemos de forma automatica</p>
-		          </div>
-		      	
-		      	<div class="col-lg-12">
-		      		<div class="form-group label-floating">
-		      			<label class="control-label">Descripción</label>
-		      			<input type="text" name="descripcion-add-p" id="descripcion-add-p" class="form-control">
+		          </div-->
+			      	
+			      	<div class="col-lg-12">
+			      		<div class="form-group label-floating">
+			      			<label class="control-label">Descripción</label>
+			      			<input type="text" name="descripcion-add-p" id="descripcion-add-p" class="form-control">
 
-		      		</div>
-		      	</div>
-		      	<div class="form-group label-floating" style="display: none">
-		      	<input  name="media_id_add" id="media_id_add" value="" style="display: none" >
-		      	<input  name="comentario-add" id="comentario-add" value="" style="display: none" >
-		      	<input  name="res-automatica-add-check" id="res-automatica-add-check" value="" style="display: none" >
-		      	</div>
-		      	
-		      </div>
-		    
-        	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button type="submit" class="btn btn-success btn-simple" id="btn-add">Guardar</button>
-	      </div>
-	      </form>
-	    </div>
-	  </div>
-  </div>
-</div>
-
-<!-- Modal para Vender Index-->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Vender</h4>
-      </div>
-      <div class="modal-body">
-      	<form class="form form-vender" method="post" action='{% url "admingo:vender" %}'>
-				{% csrf_token %}
-		      <div class="row">
-			      
-		      	<div class="col-lg-6">
-	  		      <div class="form-group label-floating has-error">
-	  						<label class="control-label">Compadror</label>
-	  						<input type="text" name="nombre" id="nombre" class="form-control" required="">
-	  					</div>	
-		      	</div>
-
-		      	<div class="col-lg-6">
-		      		<div class="form-group label-floating has-error">
-		      			<label class="control-label">Telefono</label>
-		      			<input type="text" name="telefono" id="telefono" class="form-control" >
-		      		</div>	
-		      	</div>	      	
-		      </div>
-		      <div class="row">
-		      	<div class="col-lg-4">
-		      		<div class="div-cantidad-venta form-group label-floating">
-		      			<label class="control-label">Cantidad</label>
-		      			
-		      			<input type="number" name="cantidad_venta" id="cantidad_venta" value="" class="form-control" required="" >
-
-		      			<input type="number" name="cantidad_pro_input" id="cantidad_pro_input" style="display: none">
-
-		      		</div>
-		      		<p id="cant_pro_id" style="display: none; color: #6d0074; font-size: 12px;"></p>
-
-		      		<p id="erro-cantidad-venta" style="display: none; color: #e53935; font-size: 12px;"></p>
-		      	</div>
-		      	<div class="col-lg-4">
-		      		<div class="div-precio form-group label-floating">
-		      			<label class="control-label">Precio</label>
-		      			<input type="number" name="precio" id="precio" class="form-control" required="" >
-		      		</div>
-		      		<p id="erro-precio" style="display: none; color: #e53935; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
-		      	</div>
-		      	<div class="col-lg-12">
-		      		<div class="form-group label-floating">
-		      			<label class="control-label">Detalle de la venta</label>
-		      			<input type="text" name="descripcion" id="descripcion" class="form-control">
-		      		</div>
-		      	</div>
-		      	<div class="form-group label-floating" style="display: none">
-		      	<input  name="media_id_vender" id="media_id_vender" value="" style="display: none" >
-		      	<input  name="comentario-vender" id="comentario-vender" value="" style="display: none" >
-		      	</div>
-		      	
-		      </div>
-		    
-        	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button type="submit" class="btn btn-success btn-simple" id="btn-vender">Vender</button>
-	      </div>
-	      </form>
-	    </div>
-	  </div>
-  </div>
-</div>
-
-<!-- Modal Pausa la Venta Index-->
-<div class="modal fade" id="MyPausar" tabindex="-1" role="dialog" aria-labelledby="MyPausarLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="MyPausarLabel">Pausar Venta</h4>
-      </div>
-      <form class="form form-pausar-venta" method="post" >
-      	<div class="modal-body">
-	     
-	      	{% csrf_token %}
-	      	Al momento de pausar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
-	      	<div class="form-group label-floating ">
-	    			<label class="control-label">Titulo</label>
-	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
-	    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
-	    		</div>
-	    		<input  name="media_id_pausa" id="media_id_pausa" style="display: none" >    
-      
-	      	
-	      </div>
+			      		</div>
+			      	</div>
+			      	<div class="form-group label-floating" style="display: none">
+			      	<input  name="media_id_add" id="media_id_add" value="" style="display: none" >
+			      	<input  name="comentario-add" id="comentario-add" value="" style="display: none" >
+			      	<input  name="res-automatica-add-check" id="res-automatica-add-check" value="" style="display: none" >
+			      	</div>
+			      	
+			      </div>
+			    
 	        	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button type="submit" class="btn btn-success btn-simple">Pausar</button>
-	      </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Play la Venta Index-->
-<div class="modal fade" id="MyPlay" tabindex="-1" role="dialog" aria-labelledby="MyPlayLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="MyPlay">Play Venta</h4>
-      </div>
-      <form class="form form-play-venta" method="post">
-      	<div class="modal-body">
-	     
-	      	{% csrf_token %}
-	      	Al momento de republicar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
-	      	<div class="form-group label-floating ">
-	    			<label class="control-label">Titulo</label>
-	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
-	    			<textarea id="text-publi-play" name="text-publi-play" class="form-control" rows="5" required=""></textarea>
-	    		</div>
-	    		<input  name="media_id_play" id="media_id_play" value="" style="display: none" >
-	      
-      
-	      	
-	      </div>
-	        	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button type="submit" class="btn btn-success btn-simple">Play</button>
-	      </div>
-      </form>
-    </div>
-  </div>
-</div>
-<!-- Modal Preguntar Para Agregar Concurso Index-->
-<div class="modal fade" id="ModalPreguntaAgregarConcurso" tabindex="-1" role="dialog" aria-labelledby="ModalPreguntaAgregarConcursoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      </div>
-      <form class="form form-agregar-concurso" method="post">
-      {% csrf_token %}
-	      <div class="modal-body" id="texto-ganadores">
-	      	<h3> Deseas agregar esta publicación como concurso.?</h3>
-	      	<center>
-	      		<button type="button" class="btn btn-default" data-dismiss="modal" >NO</button>
-	        	<button type="button" class="btn btn-success" id="btn-si-agragar-concurso"  data-mediaid="">SI</button>	
-	      	</center>
-	      	
-	    	</div>
-    	</form>
-    	<div class="modal-footer">
-        
-      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		        <button type="submit" class="btn btn-success btn-simple" id="btn-add">Guardar</button>
+		      </div>
+		      </form>
+		    </div>
+		  </div>
 	  </div>
 	</div>
-</div>
 
-<!-- Modal Editar Producto-->
-<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
-      </div>
-      <div class="modal-body">
-      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
-				{% csrf_token %} 
+	<!-- Modal para Vender Index-->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">Vender</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<form class="form form-vender" method="post" action='{% url "admingo:vender" %}'>
+					{% csrf_token %}
+			      <div class="row">
+				      
+			      	<div class="col-lg-6">
+		  		      <div class="form-group label-floating has-error">
+		  						<label class="control-label">Compadror</label>
+		  						<input type="text" name="nombre" id="nombre" class="form-control" required="">
+		  					</div>	
+			      	</div>
 
-		      <div class="row">
-		      	<div class="col-lg-4">
-		      		<div class="div-cantidad form-group label-floating">
-		      			<label class="control-label">Cantidad</label>
-		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
-		      		</div>
-		      		<p id="erro-cantidad-editar" style="display: none; color: #6d0074; font-size: 12px;"> </p>
-		      	</div>
-		      		<div class="col-md-8">
-			      		<div class="togglebutton">
-		            	<label>
-		            		<span id ="res-automatica-edit-no" >No</span> 
-		               	
-		               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" value="">
+			      	<div class="col-lg-6">
+			      		<div class="form-group label-floating has-error">
+			      			<label class="control-label">Telefono</label>
+			      			<input type="text" name="telefono" id="telefono" class="form-control" >
+			      		</div>	
+			      	</div>	      	
+			      </div>
+			      <div class="row">
+			      	<div class="col-lg-4">
+			      		<div class="div-cantidad-venta form-group label-floating">
+			      			<label class="control-label">Cantidad</label>
+			      			
+			      			<input type="number" name="cantidad_venta" id="cantidad_venta" value="" class="form-control" required="" >
 
-		               	<span id ="res-automatica-edit-si">Si</span> 
-		            	</label>
-		            	<span style="margin-left: 10%">Respuesta automatica?</span>
-		           		
-		            </div>
-		            <p style="font-size: 12px">al recibir un comentario preguntando, precio o disponibilidad, responderemos de forma automatica</p>
-		          </div>
-		      	
-		      	<div class="col-lg-12">
-		      		<div class="form-group label-floating">
-		      			<label class="control-label">Descripción</label>
-		      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
-		      		</div>
-		      	</div>
-		      	<div class="form-group label-floating" style="display: none">
-		      	<input  name="media_id_edit" id="media_id_edit" value="" style="display: none" >
-		      	
-		      	<input  name="res-automatica-edit-check" id="res-automatica-edit-check" value="" style="display: none" >
-		      	</div>
+			      			<input type="number" name="cantidad_pro_input" id="cantidad_pro_input" style="display: none">
+
+			      		</div>
+			      		<p id="cant_pro_id" style="display: none; color: #6d0074; font-size: 12px;"></p>
+
+			      		<p id="erro-cantidad-venta" style="display: none; color: #e53935; font-size: 12px;"></p>
+			      	</div>
+			      	<div class="col-lg-4">
+			      		<div class="div-precio form-group label-floating">
+			      			<label class="control-label">Precio</label>
+			      			<input type="number" name="precio" id="precio" class="form-control" required="" >
+			      		</div>
+			      		<p id="erro-precio" style="display: none; color: #e53935; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+			      	</div>
+			      	<div class="col-lg-12">
+			      		<div class="form-group label-floating">
+			      			<label class="control-label">Detalle de la venta</label>
+			      			<input type="text" name="descripcion" id="descripcion" class="form-control">
+			      		</div>
+			      	</div>
+			      	<div class="form-group label-floating" style="display: none">
+			      	<input  name="media_id_vender" id="media_id_vender" value="" style="display: none" >
+			      	<input  name="comentario-vender" id="comentario-vender" value="" style="display: none" >
+			      	</div>
+			      	
+			      </div>
+			    
+	        	
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		        <button type="submit" class="btn btn-success btn-simple" id="btn-vender">Vender</button>
+		      </div>
+		      </form>
+		    </div>
+		  </div>
+	  </div>
+	</div>
+
+	<!-- Modal Pausa la Venta Index-->
+	<div class="modal fade" id="MyPausar" tabindex="-1" role="dialog" aria-labelledby="MyPausarLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="MyPausarLabel">Pausar Venta</h4>
+	      </div>
+	      <form class="form form-pausar-venta" method="post" >
+	      	<div class="modal-body">
+		     
+		      	{% csrf_token %}
+		      	Al momento de pausar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
+		      	<div class="form-group label-floating ">
+		    			<label class="control-label">Titulo</label>
+		    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
+		    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
+		    		</div>
+		    		<input  name="media_id_pausa" id="media_id_pausa" style="display: none" >    
+	      
 		      	
 		      </div>
-		    
-        	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-	        <button id="btn-guardar-edit-pro" type="submit" class="btn btn-success btn-simple" >Guardar</button>
-	      </div>
+		        	
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		        <button type="submit" class="btn btn-success btn-simple">Pausar</button>
+		      </div>
 	      </form>
 	    </div>
 	  </div>
-  </div>
-</div>
+	</div>
 
-{% include 'layout/modal_cambiar_ig.html'%}
+	<!-- Modal Play la Venta Index-->
+	<div class="modal fade" id="MyPlay" tabindex="-1" role="dialog" aria-labelledby="MyPlayLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="MyPlay">Play Venta</h4>
+	      </div>
+	      <form class="form form-play-venta" method="post">
+	      	<div class="modal-body">
+		     
+		      	{% csrf_token %}
+		      	Al momento de republicar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
+		      	<div class="form-group label-floating ">
+		    			<label class="control-label">Titulo</label>
+		    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
+		    			<textarea id="text-publi-play" name="text-publi-play" class="form-control" rows="5" required=""></textarea>
+		    		</div>
+		    		<input  name="media_id_play" id="media_id_play" value="" style="display: none" >
+		      
+	      
+		      	
+		      </div>
+		        	
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		        <button type="submit" class="btn btn-success btn-simple">Play</button>
+		      </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+	<!-- Modal Preguntar Para Agregar Concurso Index-->
+	<div class="modal fade" id="ModalPreguntaAgregarConcurso" tabindex="-1" role="dialog" aria-labelledby="ModalPreguntaAgregarConcursoLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	      </div>
+	      <form class="form form-agregar-concurso" method="post">
+	      {% csrf_token %}
+		      <div class="modal-body" id="texto-ganadores">
+		      	<h3> Deseas agregar esta publicación como concurso.?</h3>
+		      	<center>
+		      		<button type="button" class="btn btn-default" data-dismiss="modal" >NO</button>
+		        	<button type="button" class="btn btn-success" id="btn-si-agragar-concurso"  data-mediaid="">SI</button>	
+		      	</center>
+		      	
+		    	</div>
+	    	</form>
+	    	<div class="modal-footer">
+	        
+	      </div>
+		  </div>
+		</div>
+	</div>
+
+	<!-- Modal Editar Producto-->
+	<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
+					{% csrf_token %} 
+
+			      <div class="row">
+			      	<div class="col-lg-4">
+			      		<div class="div-cantidad form-group label-floating">
+			      			<label class="control-label">Cantidad</label>
+			      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
+			      		</div>
+			      		<p id="erro-cantidad-editar" style="display: none; color: #6d0074; font-size: 12px;"> </p>
+			      	</div>
+			      		<div class="col-md-8">
+				      		<div class="togglebutton">
+			            	<label>
+			            		<span id ="res-automatica-edit-no" >No</span> 
+			               	
+			               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" value="">
+
+			               	<span id ="res-automatica-edit-si">Si</span> 
+			            	</label>
+			            	<span style="margin-left: 10%">Respuesta automatica?</span>
+			           		
+			            </div>
+			            <p style="font-size: 12px">al recibir un comentario preguntando, precio o disponibilidad, responderemos de forma automatica</p>
+			          </div>
+			      	
+			      	<div class="col-lg-12">
+			      		<div class="form-group label-floating">
+			      			<label class="control-label">Descripción</label>
+			      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
+			      		</div>
+			      	</div>
+			      	<div class="form-group label-floating" style="display: none">
+			      	<input  name="media_id_edit" id="media_id_edit" value="" style="display: none" >
+			      	
+			      	<input  name="res-automatica-edit-check" id="res-automatica-edit-check" value="" style="display: none" >
+			      	</div>
+			      	
+			      </div>
+			    
+	        	
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+		        <button id="btn-guardar-edit-pro" type="submit" class="btn btn-success btn-simple" >Guardar</button>
+		      </div>
+		      </form>
+		    </div>
+		  </div>
+	  </div>
+	</div>
+
+{%endblock%}
 	
 
     
     
-
+{%block scripts%}
 	<script type="text/javascript">
   	$(document).ready(function(){
 
@@ -594,7 +574,7 @@
 
 			
 
-			$(".ModalAgregarConcurso").on('click',function(){
+			$('#tabla').on('click','.ModalAgregarConcurso',function(){
 				media_id =$(this).attr('data-media');			
 				
 				$('#btn-si-agragar-concurso').attr('data-mediaid', media_id);
@@ -646,7 +626,7 @@
 				});
 
 			});
-			$('.ModalPlay').on('click',function(){
+			$('#tabla').on('click','.ModalPlay',function(){
 				media_id =$(this).attr('data-media');
 				text_publi =$(this).attr('data-texto');
 
@@ -706,7 +686,7 @@
 					
 
 	  	});
-			$('.Modalcancelar').on('click',function(){
+			$('#tabla').on('click','.Modalcancelar',function(){
 				media_id =$(this).attr('data-media');
 				text_publi =$(this).attr('data-texto');
 
@@ -761,7 +741,7 @@
 
 	  	});
 
-	  	$('.Modalvender').on('click',function(){
+	  	$('#tabla').on('click','.Modalvender',function(){
 				media_id =$(this).attr('data-media');
 				comentario = $(this).attr('data-comentario');
 				var csrftoken = getCookie('csrftoken');
@@ -1022,10 +1002,10 @@
 				
 			});
 
-			$('.ModalAgregarProducto').on('click',function(){
+			$('#tabla').on('click','.ModalAgregarProducto',function(){
 				media_id =$(this).attr('data-media');
 				comentario =$(this).attr('data-comentario');
-
+				console.log("entre a modal agregar producto con media:id: "+ media_id);
 				$('#comentario-add').val(comentario);			
 				$('#media_id_add').val(media_id);
 		    $('#ModalAgregarProducto').modal('show');
@@ -1143,7 +1123,7 @@
 				
 			});
 
-	  	$('.ModalEditarProducto').on('click',function(){
+	  	$('#tabla').on('click','.ModalEditarProducto',function(){
 				media_id =$(this).attr('data-media');
 				var csrftoken = getCookie('csrftoken');
 				$.ajax({
@@ -1259,10 +1239,10 @@
 
 			
 	
-	}); // end document Ready
+		}); // end document Ready
 	</script>
+{%endblock%}
 
-</html>
 
 
 

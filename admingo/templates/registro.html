@@ -75,25 +75,27 @@
 					   
 					
 				<div class="row">
+					<div class="mv col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3" >
+						{% if messages %}
+							<div class="alert alert-danger">
+			        	<div class="container-fluid">
+							 		<div class="alert-icon">
+										<i class="material-icons">error_outline</i>
+									</div>
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+										<span aria-hidden="true"><i class="material-icons">clear</i></span>
+									</button>
+									{% for message in messages %}
+										{{ message }}
+			              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+			            {% endfor %}
 
+		            </div>
+			        </div>
+			      {% endif %}
+					</div>
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3" style="margin-top: 5%;">
-					{% if messages %}
-						<div class="alert alert-danger">
-		        	<div class="container-fluid">
-						 		<div class="alert-icon">
-									<i class="material-icons">error_outline</i>
-								</div>
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true"><i class="material-icons">clear</i></span>
-								</button>
-								{% for message in messages %}
-									{{ message }}
-		              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-		            {% endfor %}
-
-	            </div>
-		        </div>
-		      {% endif %}
+					
 						<div class="card card-signup" style="margin: 100px 0 40px;">
 							<form class="form" method="post" action='{% url "admingo:registro" %}'>
 							{% csrf_token %}
@@ -212,48 +214,6 @@
 			document.getElementById("nombre").focus();
 		});
 	
-	</script>
-	<script type="text/javascript">
-	
-	$(document).ready(function(){
-		$("#enviar-registro").click(function(){
-
-			
-
-			/*if (self.elements['usuario'])
-			if (self.elements['email'])*/
-			if ($("#contraseña").val().length < 6){
-					$("#div-pass").addClass("has-error");
-					$("#x-pass").css("display", "block");
-					return false;
-			}
-
-			/*$.ajax({
-	    url : '{% url "admingo:registro" %}',
-	    type : 'POST',
-	    data : form.serialize(),
-	    beforeSend: function() {
-        // setting a timeout
-        	$(".load").fadeIn();
-    	},
-	    success : function(data)
-	    {
-			 console.log(data);
-			 console.log("correcto");
-			//$(".load").fadeOut();
-			
-	        
-	    },
-	    error: function(data){
-	     	console.log(data);
-	    	console.log('Fallo conectando con el servidor')
-	   }               
-	});
-		});*/
-		
-		return true;
-	})
-		
 	</script>
 
 </html>
