@@ -1701,7 +1701,7 @@ def enviar_pass(request):
 			subject='Recuperar Contraseña',
 			body = body,
 			from_email=email,
-			to=['email@email.com']
+			to=['araujonorelys@gmail.com']
 			)
 		email.content_subtype= 'html'
 		email.send()
