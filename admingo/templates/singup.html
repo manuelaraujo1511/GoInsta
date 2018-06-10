@@ -77,7 +77,7 @@
 				<div class="row">
 					<div class="mv col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3" >
 						{% if messages %}
-							{%if envie_email == 1 %}
+							{%if success == 1 %}
 					      <div class="alert alert-success">
 				        	<div class="container-fluid">
 								 		<div class="alert-icon">
@@ -86,10 +86,12 @@
 										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 											<span aria-hidden="true"><i class="material-icons">clear</i></span>
 										</button>
-										{% for message in messages %}
-											{{ message }}
-				              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-				            {% endfor %}
+										<center>
+											{% for message in messages %}
+												{{ message }}
+					              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+					            {% endfor %}
+				            </center>
 
 			            </div>
 				        </div>
@@ -102,16 +104,18 @@
 										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 											<span aria-hidden="true"><i class="material-icons">clear</i></span>
 										</button>
-										{% for message in messages %}
-											{{ message }}
-				              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-				            {% endfor %}
+										<center>
+											{% for message in messages %}
+												{{ message }}
+					              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+					            {% endfor %}
+					           </center>
 
 			            </div>
 			            {%if error == 1 %}
 						        <div>
 						        	<div class="footer text-center">
-						        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar datos" value="Cambiar datos"></a>
+						        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar Contraseña" value="Cambiar Contraseña"></a>
 						        	</div>			        	
 						        </div>
 					        {% endif %}

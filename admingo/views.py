@@ -76,7 +76,7 @@ def get_save_info(api,user_id, user_insta, pass_insta,nuevo):
 		following = api.LastJson['user']['following_count']
 		if (nuevo == 1):
 			
-			Info(id_usuario= user_id, username= user_insta, seguidores=follower, seguidos=following, foto_perfil=img_profile).save()
+			Info(id_usuario_id= user_id, username= user_insta, seguidores=follower, seguidos=following, foto_perfil=img_profile).save()
 			info_user = Info.objects.get(id_usuario=user_id)
 		else:
 			info_user = Info.objects.get(id_usuario=user_id)
@@ -328,7 +328,7 @@ def singup(request):
 	#	return redirect("admingo:index")
 	#global api
 	print ("---- request:"+str(request))
-	
+	cerrar_sesion(request)
 	if request.method == "POST":
 		email = request.POST['email']
 		password = request.POST['password']
@@ -353,17 +353,11 @@ def singup(request):
 							if api.login():
 								login(request, user)
 								# Guardo en info
-								api.searchUsername(str(user_u.user_insta))
-								img_profile = api.LastJson['user']['profile_pic_url']
-								follower = api.LastJson['user']['follower_count']
-								following = api.LastJson['user']['following_count']
 								
-								info_user =Info.objects.get(id_usuario_id=request.user.id)
-
-								info_user.img_profile=img_profile
-								info_user.seguidores=follower
-								info_user.seguidos=following
-								info_user.save()
+								if Info.objects.filter(id_usuario_id=request.user.id).exists():
+									get_save_info(api,request.user.id, user_u.user_insta, user_u.pass_insta,0)
+								else:
+									get_save_info(api,request.user.id, user_u.user_insta, user_u.pass_insta,1)
 
 
 								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
@@ -371,15 +365,15 @@ def singup(request):
 								return redirect('admingo:index')
 							else:
 								if (api.LastJson['error_type']== 'bad_password'):
-									messages.error(request, 'Hemos detectados cambios en tus datos de instagram')
+									messages.error(request, 'Hemos detectado cambios en la contraseña de instagram')
 									context2 = {'error': 1}
 									return render(request, 'singup.html', context2)
 						else:
 							
-							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+							messages.error(request, 'Datos Incorrectos 3, Intente de Nuevo')
 						return render(request, 'singup.html', context2)		
 					else:
-						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+						messages.error(request, 'Datos Incorrectos 2, Intente de Nuevo')
 						return render(request, 'singup.html', context2)	
 			else:
 				user = authenticate(request, username=user_name, password=password)
@@ -393,12 +387,13 @@ def singup(request):
 
 
 		except ObjectDoesNotExist:
-			messages.error(request, 'Datos Incorrectos, Intente de Nuevo.')
+			messages.error(request, 'Datos Incorrectos 1, Intente de Nuevo.')
 			return render(request, 'singup.html')
 	return render(request, 'singup.html')
 
 def registro(request):
-	#print (request.method)
+	
+	cerrar_sesion(request)
 	if request.method == "POST":
 		nombre = request.POST['nombre']
 		apellido = request.POST['apellido']
@@ -413,7 +408,25 @@ def registro(request):
 		else:
 		'''
 		if Usuarios.objects.filter(email=email).exists():
-			messages.error(request ,'Email ya se encuentra registrado')
+			user = Usuarios.objects.get(email=email)
+			if user.fin_registro == 1:
+				messages.error(request ,'Email ya se encuentra registrado')
+			else:
+
+				if user.fin_registro == 0:
+					if user.password == password:
+						messages.success(request, 'Finaliza tu registro.')
+						user = authenticate(request, username=username, password=password)
+						login(request, user)
+						context = {
+							'username': username,
+							'password' : password,
+							'success':1
+						}
+						return render(request, 'registroinsta.html', context)
+					else:
+						messages.success(request, 'Puedes finalizar tu resgistro.')
+						return render(request, 'singup.html',{'success':1})
 		else:
 			user = User.objects.create_user(username, email, password)
 			user.first_name = nombre
@@ -445,41 +458,46 @@ def registroinsta(request):
 		# ---------------
 		username = request.POST['username']
 		password = request.POST['password']
-		user_u = Usuarios.objects.get(username=username)
-		
 
-		api = InstagramAPI(cuenta, password_i)
-		#password_i = make_password(str(password_i))
+		if (Usuarios.objects.filter(user_insta=cuenta).exists()):
+			messages.error(request, "Usuario de instagram ya se encuentra registrado.")
+		else:
 
-
-		if api.login():
+			user_u = Usuarios.objects.get(username=username)
 			
 
+			api = InstagramAPI(cuenta, password_i)
+			#password_i = make_password(str(password_i))
 
-			Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i)
-			#user = authenticate(request, username=username, password=password)
+
+			if api.login():
+				
 
 
-			#login(request, user)
-			# Guardo en info
-			api.searchUsername(str(cuenta))
-			img_profile = api.LastJson['user']['profile_pic_url']
+				Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i, fin_registro = 1)
+				#user = authenticate(request, username=username, password=password)
 
-			Info(id_usuario=user_u, username=username, foto_perfil= img_profile).save()
 
-			messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-			api.logout()
-			return redirect("admingo:index")
-		else:
-			#api.logout()
-			messages.error(request, "Usuario no existe o Contraseñana invalida")
+				#login(request, user)
+				# Guardo en info
+				#api.searchUsername(str(cuenta))
+				#img_profile = api.LastJson['user']['profile_pic_url']
+				get_save_info(api,request.user.id, cuenta, password_i,1)
+				#Info(id_usuario=user_u, username=username, foto_perfil= img_profile).save()
+
+				messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+				api.logout()
+				return redirect("admingo:index")
+			else:
+				#api.logout()
+				messages.error(request, "Usuario no existe o Contraseñana invalida")
 
 	return render(request, 'registroinsta.html')
 
 def nuevos_datos(request):
 	
 	#global api 
-
+	cerrar_sesion(request)
 	if request.method == "POST":
 		
 		cuenta = request.POST['cuenta']		
@@ -490,34 +508,42 @@ def nuevos_datos(request):
 		if Usuarios.objects.filter(email=email).exists():
 			
 			user_u = Usuarios.objects.get(email=email)
-			user = authenticate(request, username=user_u.username, password=password)
-
-			if user is not None:
-				if user.is_active:
-					
-					api = InstagramAPI(cuenta, password_i)
-					login(request, user)
-					if api.login():
-						Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
-
-
+			
+			if (user_u.user_insta == cuenta):
+				user = authenticate(request, username=user_u.username, password=password)
+				if user is not None:
+					if user.is_active:
 						
-						# Guardo en info
-						info_user=get_save_info(api,user_u.id, cuenta, password_i,0)
-						messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-						api.logout()
-						return redirect("admingo:index")						
-					else:
-						if (api.LastJson['error_type']== 'bad_password'):
-							messages.error(request, 'Los datos de instagram, no son correctos')
-							context2 = {'error': 1}
-							return render(request, 'nuevos_datos.html', context2)
-				else:
-					messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+						api = InstagramAPI(cuenta, password_i)
+						login(request, user)
+						if api.login():
+							Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
 
-				
+
+							
+							# Guardo en info
+							
+							if Info.objects.filter(id_usuario_id=request.user.id).exists():
+								get_save_info(api,request.user.id, cuenta, password_i,0)
+							else:
+								get_save_info(api,request.user.id, cuenta, password_i,1)
+
+							messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+							api.logout()
+							return redirect("admingo:index")						
+						else:
+							if (api.LastJson['error_type']== 'bad_password'):
+								messages.error(request, 'Los datos de instagram, no son correctos')
+								context2 = {'error': 1}
+								return render(request, 'nuevos_datos.html', context2)
+					else:
+						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+
+					
+				else:
+					messages.error(request, "La contraseña no coincide con el correo electronico")	
 			else:
-				messages.error(request, "La contraseña no coincide con el correo electronico")	
+				messages.error(request, "La cuenta de instagram no pertece al usuario registrado")	
 		else:
 			messages.error(request, "El correo electronico no se encuentra registrado")
 
@@ -537,36 +563,70 @@ def cambiar_cuenta(request):
 		if Usuarios.objects.filter(email=email).exists():
 			
 			user_u = Usuarios.objects.get(email=email)
-			user = authenticate(request, username=user_u.username, password=password)
+			if Usuarios.objects.filter(user_insta=cuenta).exists():
+				if Usuarios.objects.get(user_insta=cuenta).cambiar_pass_insta == 1:
+					user = authenticate(request, username=user_u.username, password=password)
 
-			if user is not None:
-				if user.is_active:
-					
-					api = InstagramAPI(cuenta, password_i)
-					login(request, user)
-					if api.login():
-						Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
+					if user is not None:
+						if user.is_active:
+							
+							api = InstagramAPI(cuenta, password_i)
+							login(request, user)
+							if api.login():
+								Usuarios.objects.filter(username=user_u.username).update(pass_insta=password_i, cambiar_pass_insta= 0)
 
 
-						info_user=get_save_info(api,user_u, cuenta, password_i,1)
-						messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-						api.logout()
-						return redirect("admingo:index")						
+								info_user=get_save_info(api,user_u.id, cuenta, password_i,1)
+
+								messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+								api.logout()
+								return redirect("admingo:index")						
+							else:
+								if (api.LastJson['error_type']== 'bad_password'):
+									messages.error(request, 'Los datos de instagram, no son correctos')
+									context2 = {'error': 1}
+									return render(request, 'cambiar_cuenta.html', context2)
+						else:
+							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+
+						
 					else:
-						if (api.LastJson['error_type']== 'bad_password'):
-							messages.error(request, 'Los datos de instagram, no son correctos')
-							context2 = {'error': 1}
-							return render(request, 'cambiar_cuenta.html', context2)
+						messages.error(request, "La contraseña no coincide con el correo electronico")
 				else:
-					messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-
-				
+					messages.error(request, "La cuenta de Instagram ya se encuentra registrada")
 			else:
-				messages.error(request, "La contraseña no coincide con el correo electronico")	
+				user = authenticate(request, username=user_u.username, password=password)
+
+				if user is not None:
+					if user.is_active:
+						
+						api = InstagramAPI(cuenta, password_i)
+						login(request, user)
+						if api.login():
+							Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i, cambiar_pass_insta=0)
+
+							info_user=get_save_info(api,user_u.id, cuenta, password_i,1)
+							messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
+							api.logout()
+							return redirect("admingo:index")						
+						else:
+							if (api.LastJson['error_type']== 'bad_password'):
+								messages.error(request, 'Los datos de instagram, no son correctos')
+								context2 = {'error': 1}
+								return render(request, 'cambiar_cuenta.html', context2)
+					else:
+						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+
+					
+				else:
+					messages.error(request, "La contraseña no coincide con el correo electronico")
 		else:
 			messages.error(request, "El correo electronico no se encuentra registrado")
 
 	else:
+		user = Usuarios.objects.get(id=request.user.id)
+		user.cambiar_pass_insta=1
+		user.save()
 		todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
 		todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
 		todos_productos = Productos.objects.filter(id_usuario_id=request.user.id)
@@ -1706,7 +1766,7 @@ def enviar_pass(request):
 		email.content_subtype= 'html'
 		email.send()
 		messages.error(request, 'Hemos enviado el correo electronico satisfactoriamente.\n Revisa tu bandeja de entrada')
-		context ={'envie_email': 1}
+		context ={'success': 1}
 		return render(request, 'singup.html', context)
 	else:
 		messages.error(request, 'El correo introducido no existe. Intente de nuevo')

@@ -65,10 +65,12 @@
 								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 									<span aria-hidden="true"><i class="material-icons">clear</i></span>
 								</button>
-								{% for message in messages %}
-									{{ message }}
-		              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-		            {% endfor %}
+								<center>
+									{% for message in messages %}
+										{{ message }}
+			              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+			            {% endfor %}
+		           	</center>
 
 	            </div>
 		        </div>

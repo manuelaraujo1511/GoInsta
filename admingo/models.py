@@ -11,6 +11,8 @@ class Usuarios(models.Model):
 	sexo = models.CharField( max_length = 9, blank = True, null = True)
 	user_insta = models.CharField( max_length = 100, blank = True, null = True)
 	pass_insta = models.CharField( max_length = 100, blank = True, null = True)
+	fin_registro = models.IntegerField(default=0)
+	cambiar_pass_insta = models.IntegerField(default=0)
 	fecha_creacion = models.DateTimeField(default=datetime.now)
 	fecha_modificacion = models.DateTimeField(default=datetime.now)
 	#description = models.TextField( max_length = 300 )
