@@ -1760,8 +1760,8 @@ def enviar_pass(request):
 		email = EmailMessage(
 			subject='Recuperar Contraseña',
 			body = body,
-			from_email=email,
-			to=['araujonorelys@gmail.com']
+			from_email='contactotestgo@testgo.com.ve',
+			to=[email]
 			)
 		email.content_subtype= 'html'
 		email.send()
