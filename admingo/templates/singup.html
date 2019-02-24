@@ -68,72 +68,37 @@
     	</div>
   </nav>
 
-  <div class="wrapper">
+    <div class="wrapper">
 		<div class="header header-filter" style="background-image: url('/static/singups/img/city.jpg'); background-size: cover; background-position: top center;">
 			<div class="container">
 				
 					   
 					
 				<div class="row">
-					<div class="mv col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3" >
-						{% if messages %}
-							{%if success == 1 %}
-					      <div class="alert alert-success">
-				        	<div class="container-fluid">
-								 		<div class="alert-icon">
-											<i class="material-icons">check</i>
-										</div>
-										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-											<span aria-hidden="true"><i class="material-icons">clear</i></span>
-										</button>
-										<center>
-											{% for message in messages %}
-												{{ message }}
-					              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-					            {% endfor %}
-				            </center>
-
-			            </div>
-				        </div>
-			        {% else %}
-								<div class="alert alert-danger">
-				        	<div class="container-fluid">
-								 		<div class="alert-icon">
-											<i class="material-icons">error_outline</i>
-										</div>
-										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-											<span aria-hidden="true"><i class="material-icons">clear</i></span>
-										</button>
-										<center>
-											{% for message in messages %}
-												{{ message }}
-					              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
-					            {% endfor %}
-					           </center>
-
-			            </div>
-			            {%if error == 1 %}
-						        <div>
-						        	<div class="footer text-center">
-						        		<a href="/nuevos_datos"><input class="btn btn-success" type="button" name="Cambiar Contraseña" value="Cambiar Contraseña"></a>
-						        	</div>			        	
-						        </div>
-					        {% endif %}
-
-				        </div>
-				       
-
-				      {% endif %}
-				    {%endif%}
-			    </div>
 
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3" style="margin-top: 5%;">
+					{% if messages %}
+						<div class="alert alert-danger">
+		        	<div class="container-fluid">
+						 		<div class="alert-icon">
+									<i class="material-icons">error_outline</i>
+								</div>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true"><i class="material-icons">clear</i></span>
+								</button>
+								{% for message in messages %}
+									{{ message }}
+		              <!--b>Error Alert:</b> Damn man! You screwed up the server this time. You should find a good excuse for your Boss...-->
+		            {% endfor %}
 
-						<div class="card card-signup" style="margin: 100px 0 40px;">
+	            </div>
+		        </div>
+		      {% endif %}
+						<div class="card card-signup" style="margin: 31px 0 40px;">
 							<form class="form" method="post" action='{% url "admingo:singup" %}' >
 							{% csrf_token %}
 								<div class="header header-primary text-center">
-									<h4>Iniciar Sesión </h4>
+									<h4>Iniciar Sesión</h4>
 									<!--div class="social-line">
 										<a href="#pablo" class="btn btn-simple btn-just-icon">
 											<i class="fa fa-facebook-square"></i>
@@ -148,6 +113,13 @@
 								</div>
 								
 								<div class="content">
+
+									<!--div class="input-group">
+										<span class="input-group-addon">
+											<i class="material-icons">face</i>
+										</span>
+										<input type="text" class="form-control" placeholder="First Name...">
+									</div-->
 
 									<div class="input-group">
 										<span class="input-group-addon">
@@ -173,37 +145,27 @@
 									</div> -->
 								</div>
 								<div class="footer text-center">
-									<a href='{% url "admingo:recuperar_password" %}' style="color: #9c27b0; text-decoration: none"> <p>¿Olvidaste tu contraseña?</p></a>
-								</div>
-								<div class="footer text-center">
 									<button class="btn btn-success" type="submit">GO!</button>
 									<!--a class="btn btn-simple btn-primary btn-lg" >	</a-->
 								</div>
 							</form>
 						</div>
+						<!--https://secure.mlstatic.com/components/resources/mp/desktop/css/assets/desktop-logo-mercadopago.png-->
+						<input src= "https://secure.mlstatic.com/components/resources/mp/desktop/css/assets/desktop-logo-mercadopago.png" type="image" class="btn btn-simple" border="0" name="mcp-button" id="mcp-button" alt="mercado Pago" onclick="document.getElementById('mcp-button2').click();">
+
+						<a mp-mode="dftl" href="https://www.mercadopago.com/mlv/checkout/start?pref_id=105003949-f1e789da-a247-4503-9849-7db91e5091c5" name="MP-payButton" id="mcp-button2" style="display: none"></a>
+
+						<script type="text/javascript">
+						(function(){function $MPC_load(){window.$MPC_loaded !== true && (function(){var s = document.createElement("script");s.type = "text/javascript";s.async = true;s.src = document.location.protocol+"//secure.mlstatic.com/mptools/render.js";var x = document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);window.$MPC_loaded = true;})();}window.$MPC_loaded !== true ? (window.attachEvent ?window.attachEvent('onload', $MPC_load) : window.addEventListener('load', $MPC_load, false)) : null;})();
+						</script>
+
+
 						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 							<input type="hidden" name="cmd" value="_s-xclick">
-							<input type="hidden" name="hosted_button_id" value="CKEY68YVT9RA8">
-							<table>
-								<tr>
-									<td>
-										<input type="hidden" name="on0" value="Servicios">Servicios
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<select name="os0">
-											<option value="Servicio Normal">Servicio Normal $10,00 USD</option>
-											<option value="Mediano">Mediano $15,00 USD</option>
-											<option value="Premium">Premium $17,00 USD</option>
-											<option value="VIP">VIP $20,00 USD</option>
-										</select>
-									</td>
-								</tr>
-							</table>
-							<input type="hidden" name="currency_code" value="USD">
-							<input type="image" src="https://www.paypalobjects.com/es_ES/ES/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal, la forma rápida y segura de pagar en Internet.">
-							<img alt="" border="0" src="https://www.paypalobjects.com/es_ES/i/scr/pixel.gif" width="1" height="1">
+							<input type="hidden" name="hosted_button_id" value="CVNM6FP7UWAJL">
+							<input src= "https://www.paypalobjects.com/webstatic/icon/pp32.png" type="image" class="btn btn-simple" border="0" name="submit" alt="PayPal">
+							<!--img alt="" border="0" src="https://www.paypalobjects.com/es_XC/i/scr/pixel.gif" width="1" height="1"-->
+
 						</form>
 
 					</div>

@@ -1,15 +1,12 @@
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
-from django.contrib.auth.hashers import *
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
 
 from InstagramAPI import InstagramAPI
 from .models import *
@@ -17,174 +14,67 @@ from decimal import *
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
-from resizeimage import resizeimage
-
 
 import json
 import re
 import os, sys
 import random
-import locale
 
-
-locale.setlocale( locale.LC_ALL, '' )
-
-array_media_id=[]
 
 # Create your views here.
 def getTotalCommentsMedia(api, mediaId):
-	verdad= True
-	next_max_id = ''
-	all_comments = []
-	while verdad:
-			#print("Entre al while")
-			api.getMediaComments(mediaId, next_max_id)
-			tem = api.LastJson
-			for t in tem['comments']:
-					all_comments.append(t)
+  verdad= True
+  next_max_id = ''
+  all_comments = []
+  while verdad:
+      #print("Entre al while")
+      api.getMediaComments(mediaId, next_max_id)
+      tem = api.LastJson
+      for t in tem['comments']:
+          all_comments.append(t)
 
-			if tem['has_more_comments'] is True:
-					#print(str(json.loads(tem['next_max_id'])['server_cursor']))
-					next_max_id = json.loads(tem['next_max_id'])['server_cursor']
-			else:
-					verdad = False
-	return all_comments
+      if tem['has_more_comments'] is True:
+          #print(str(json.loads(tem['next_max_id'])['server_cursor']))
+          next_max_id = json.loads(tem['next_max_id'])['server_cursor']
+      else:
+          verdad = False
+  return all_comments
 
 def get_precio(request):
 	precio = 0
-	if Finanzas.objects.filter(id_usuario_id=request.user.id).exists():
-		ventas = Finanzas.objects.filter(id_usuario_id=request.user.id)
+	if Ventas.objects.filter(id_usuario_id=request.user.id).exists():
+		ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
 		for v in ventas:
 			precio +=  (int(v.precio)*int(v.cantidad))
 
+	
+	return precio
 
-	return locale.currency(precio, grouping=True )
-
-def resize_image(file_name,input_image_path,x,y):
-	fd_img = open(str(input_image_path)+str(file_name), 'r+b')
-	image = Image.open(fd_img)
-	cover = resizeimage.resize_cover(image, [x, y])
-	cover.save(str(input_image_path)+'cover-'+str(file_name), image.format)
-	fd_img.close()
-	return 'cover-'+str(file_name)
-
-def get_save_info(api,user_id, user_insta, pass_insta,nuevo):
-	if (api != None):
-		api.searchUsername(str(user_insta))
-		img_profile = api.LastJson['user']['profile_pic_url']
-		follower = api.LastJson['user']['follower_count']
-		following = api.LastJson['user']['following_count']
-		if (nuevo == 1):
-			
-			Info(id_usuario_id= user_id, username= user_insta, seguidores=follower, seguidos=following, foto_perfil=img_profile).save()
-			info_user = Info.objects.get(id_usuario=user_id)
-		else:
-			info_user = Info.objects.get(id_usuario=user_id)
-			info_user.seguidores = follower
-			info_user.seguidos = following
-			info_user.foto_perfil= img_profile
-			info_user.save()
-	else:
-		info_user = Info.objects.get(id_usuario=user_id)
-	return info_user
-
-def get_producto(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			media_id = request.POST.get('media_id')
-			if (Productos.objects.filter(media_id=media_id).exists()):
-				pro = Productos.objects.get(media_id=media_id)
-				producto = {'encontre': True,'media_id':pro.media_id, 'cantidad': pro.cantidad,  'disponible': pro.disponible, 'descripcion_producto': pro.descripcion_producto, 'res_automatica': pro.res_automatica}
-			else:
-				producto = {'encontre': False}
-
-		
-			context = {
-				'producto':producto
-			}
-			#print ("get_producto Producto cantidad "+ str(pro.cantidad))
-			return JsonResponse(context)
+def resize_image(input_image_path,output_image_path,size):
+	
+	original_image = Image.open(input_image_path)
+	
+	width, height = original_image.size
+	
+	print('The original image size is {wide} wide x {height} ' 'high'.format(wide=width, height=height))
+	
+	resized_image = original_image.resize(size)
+	
+	width, height = resized_image.size
+	
+	print('The resized image size is {wide} wide x {height} ''high'.format(wide=width, height=height))
+	
+	resized_image.show()
+	
+	resized_image.save(output_image_path)
 
 
-''' Para las Tallas y los Modelos
-def save_talla(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			estado = 0
-			media_id = request.POST.get('media_id')
-			talla = request.POST.get('talla')
-
-			producto = Productos.objects.get(media_id=media_id)
-			if(Tallas.objects.filter(nombre=talla, media_id=media_id, id_usuario_id = request.user.id, id_producto=producto.id).exists()):
-				estado = 2
-			else:
-				Tallas(id_usuario_id=request.user.id, id_producto_id=producto.id, media_id=media_id, nombre=talla).save()
-				estado = 1
-		context = {'estado':estado}
-		return JsonResponse(context)
-
-def save_modelo(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			estado = 0
-			media_id = request.POST.get('media_id')
-			modelo = request.POST.get('modelo')
-
-			producto = Productos.objects.get(media_id=media_id)
-			if(Modelos.objects.filter(nombre=modelo, media_id=media_id, id_usuario_id = request.user.id, id_producto=producto.id).exists()):
-				estado = 2
-			else:
-				Modelos(id_usuario_id=request.user.id, id_producto_id=producto.id, media_id=media_id, nombre=modelo).save()
-				estado = 1
-		context = {'estado':estado}
-		return JsonResponse(context)
-
-def show_tallas(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			estado = 0
-			tallas = []
-			media_id = request.POST.get('media_id')
-			pro = Productos.objects.get(media_id=media_id)
-			if(Tallas.objects.filter(id_usuario_id= request.user.id, media_id=media_id).exists()):
-				tall = Tallas.objects.filter(id_usuario_id= request.user.id, media_id=media_id)
-				for t in tall:
-					tallas.append({'id': t.id, 'producto_id': t.id_producto_id, 'media_id': t.media_id, 'nombre': t.nombre})
-					print(str(t.nombre))
-				estado = 1
-				
-
-		context = {'estado': estado, 'tallas':tallas, 'producto_talla': pro.talla}
-		return JsonResponse(context)
-
-def show_modelos(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			estado = 0
-			modelos = []
-			media_id = request.POST.get('media_id')
-			pro = Productos.objects.get(media_id=media_id)
-			if(Modelos.objects.filter(id_usuario_id= request.user.id, media_id=media_id).exists()):
-				model = Modelos.objects.filter(id_usuario_id= request.user.id, media_id=media_id)
-				for m in model:
-					modelos.append({'id': m.id, 'producto_id': m.id_producto_id, 'media_id': m.media_id, 'nombre': m.nombre})
-					print(str(m.nombre))
-				estado = 1
-				
-
-		context = {'estado': estado, 'modelos':modelos, 'producto_modelo': pro.modelo}
-		return JsonResponse(context)
-'''
-				
 
 @login_required
 def index(request):
 	# IMPORTANTE: comprobar conexion a internet
-	
-
-	request.session['array_media_id']=[]
 	user_r= Usuarios.objects.get(email=request.user.email)
-	#username_insta = ""+user_r.user_insta+""
+	username_insta = ""+user_r.user_insta+""
 
 	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 	api.login()
@@ -197,125 +87,96 @@ def index(request):
 	minTimestamp=None
 	guardo=True
 
-	## Eliminar de la tabla los concursos que no terminaron de publicar
-	concursos_delete = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=0)
-	### cargar informacion actualizada de usuario
+	######  CAMBIAR ESTO  ######
+	'''
+	if not Info.objects.filter(id_usuario_id=request.user.id).exists():
+		print("entre si no existe el perfil de usuario")
+		api.searchUsername(str(username_insta))
+		img_profile = api.LastJson['user']['profile_pic_url']
+		media_count = api.LastJson['user']['media_count']
+		follower = api.LastJson['user']['follower_count']
+		following = api.LastJson['user']['following_count']
+		tags = api.LastJson['user']['usertags_count']
+		
+		Info(id_usuario_id=request.user.id, username=username_insta, seguidores=follower, seguidos=following, fotos=media_count, foto_perfil= img_profile , hastags=tags).save()
 
-	info_user=get_save_info(api, request.user.id, user_r.user_insta, user_r.pass_insta, 0)
+		usuario_info = Info.objects.get(id_usuario_id=request.user.id)
+	else:
+	'''
+	api.searchUsername(str(username_insta))
+	img_profile = api.LastJson['user']['profile_pic_url']
+	media_count = api.LastJson['user']['media_count']
+	follower = api.LastJson['user']['follower_count']
+	following = api.LastJson['user']['following_count']
+	tags = api.LastJson['user']['usertags_count']
+
+	#usuario_info = Info.objects.get(id_usuario_id=request.user.id)
+	#for u in usuario_info:
+	usuario_info = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags , 'username': username_insta}
+	'''
+	usuario_info['foto_perfil']= img_profile
+	usuario_info['fotos']=media_count
+	usuario_info['seguidos']= following
+	usuario_info['seguidores']= follower
+	usuario_info['hastags'] = tags
+	'''
+	#usuario_info.save()
+
+
+		#usuario = Info.objects.filter(id_usuario_id=request.user.id)
+		
+
+		
 	
-	concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
-	concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
 
-	usuario_info = {'foto_perfil': info_user.foto_perfil,'concursos_abiertos': concursos_abiertos, 'concursos_cerrados':concursos_cerrados ,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
-	
-	
-	for con_d in concursos_delete:
-		con_d.delete()
-	## fiin de eliminar los que no terminaron de cargar
-
-	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id, fin_carga=1)
-	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
-	productos = Productos.objects.filter(id_usuario_id=request.user.id)
-
+	#api.getTotalUserFeed(api.username_id)
+	#todos_concursos = []
+	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
 
 	if (todos_concursos.exists()):		
 
 		while has_more_feed:
 
-			api.getUserFeed(usernameId, next_max_id, minTimestamp)
-			temp = api.LastJson
+		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
+		  temp = api.LastJson
 
-			for item in temp["items"]:
-				if (item["caption"] != None):
-					if pausas.exists():
-						for p in pausas:
-							if(str(item['caption']['media_id']) == str(p.media_id)):
-								item['caption']['pausado'] = True
-							else:
-								item['caption']['pausado'] = False
-					
-						item['caption']['cant_pro'] = -1
+		  for item in temp["items"]:
+		  	for con in todos_concursos:
+		  		if(str(item['caption']['media_id']) == str(con.media_id)):
+		  			guardo = False
+		  			break
+		  	if (guardo):
+		  		feed.append(item)
+		  	guardo = True
+		  if temp["more_available"] is False:
 
-					if (productos.exists()):
-						for pro in productos:
-							if(str(item['caption']['media_id']) == str(pro.media_id)):
-								item['caption']['producto'] = pro
-								break
-							else:
-								item['caption']['producto'] = False
-						
-					else:
-						item['caption']['producto'] = False		  		
-
-					for con in todos_concursos:
-						if(str(item['caption']['media_id']) == str(con.media_id)):
-							guardo = False
-							break
-
-
-					if (guardo):
-						request.session['array_media_id'].append(item['caption']['media_id'])
-						feed.append(item)
-					guardo = True
-			#end for
-			if temp["more_available"] is False:
-
-				has_more_feed = False
-			
-			else:
-				guardo = True
-				next_max_id = temp["next_max_id"]
-		#end while
-	
+		    has_more_feed = False
+		  
+		  else:
+		  	guardo = True
+		  	next_max_id = temp["next_max_id"]
+	#print(str(feed))
 	else:
-		
 		while has_more_feed:
 
-			api.getUserFeed(usernameId, next_max_id, minTimestamp)
-			temp = api.LastJson
+		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
+		  temp = api.LastJson
 
-			for item in temp["items"]:
-				if (item['caption'] != None):
-					if pausas.exists():
-						for p in pausas:
-							if(str(item['caption']['media_id']) == str(p.media_id)):
-								item['caption']['pausado'] = True
-							else:
-								item['caption']['pausado'] = False
-						
-						item['caption']['cant_pro'] = -1
-					
-					if (productos.exists()):
-						for pro in productos:
-							if(str(item['caption']['media_id']) == str(pro.media_id)):
-								item['caption']['producto'] = pro
-								break
-							else:
-								item['caption']['producto'] = False
-						
-					else:
-						item['caption']['producto'] = False
-					request.session['array_media_id'].append(item['caption']['media_id'])
-					feed.append(item)
-					
-			#termino el for
+		  for item in temp["items"]:
+		  	feed.append(item)
 
-			
-			if temp["more_available"] is False:
-				
-				print("entre si es falso")
+		  if temp["more_available"] is False:
+		    
+		    print("entre si es falso")
 
-				has_more_feed = False
-			
-			else:
+		    has_more_feed = False
+		  
+		  else:
+		  	next_max_id = temp["next_max_id"]
 
-				next_max_id = temp["next_max_id"]
-			#sigo el while	
-	print("-------- INDEX: "+str(request.session['array_media_id']))
 	context = {
 		'usuario' : usuario_info,
 		'feed' : feed,
-		'pausas': pausas,
 		'monto_total' : get_precio(request)
 
 	}
@@ -327,57 +188,40 @@ def singup(request):
 	#if request.user is not None:
 	#	return redirect("admingo:index")
 	#global api
-	print ("---- request:"+str(request))
-	cerrar_sesion(request)
+	print (str(request))
 	if request.method == "POST":
 		email = request.POST['email']
 		password = request.POST['password']
-		context2={'error': 0}
 
 		try:
-
 			user_u = Usuarios.objects.get(email=email)
 			user_name=user_u.username
 
 			if user_u.user_insta is not None:
 				if user_name is not False:
+					#print (user_name)
+					#print (password)
 					user = authenticate(request, username=user_name, password=password)
-
 					#print(user)
 					if user is not None:
 						if user.is_active:
 							
 
 							api = InstagramAPI(user_u.user_insta, user_u.pass_insta)
-
 							if api.login():
-								login(request, user)
-								# Guardo en info
 								
-								if Info.objects.filter(id_usuario_id=request.user.id).exists():
-									get_save_info(api,request.user.id, user_u.user_insta, user_u.pass_insta,0)
-								else:
-									get_save_info(api,request.user.id, user_u.user_insta, user_u.pass_insta,1)
-
-
-								messages.success(request, 'Bienvenido ' + user_u.nombre + ' '+user_u.apellido)
+								login(request, user)
+								messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
 								api.logout()
 								return redirect('admingo:index')
-							else:
-								if (api.LastJson['error_type']== 'bad_password'):
-									messages.error(request, 'Hemos detectado cambios en la contraseña de instagram')
-									context2 = {'error': 1}
-									return render(request, 'singup.html', context2)
 						else:
-							
-							messages.error(request, 'Datos Incorrectos 3, Intente de Nuevo')
-						return render(request, 'singup.html', context2)		
+							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+						return render(request, 'singup.html')		
 					else:
-						messages.error(request, 'Datos Incorrectos 2, Intente de Nuevo')
-						return render(request, 'singup.html', context2)	
+						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
+						return render(request, 'singup.html')	
 			else:
-				user = authenticate(request, username=user_name, password=password)
-				login(request, user)
+				#request.method= "GET"
 				context = {
 					'username': user_name,
 					'password' : password
@@ -387,13 +231,12 @@ def singup(request):
 
 
 		except ObjectDoesNotExist:
-			messages.error(request, 'Datos Incorrectos 1, Intente de Nuevo.')
+			messages.error(request, 'Datos Incorrectos, Intente de Nuevo.')
 			return render(request, 'singup.html')
 	return render(request, 'singup.html')
 
 def registro(request):
-	
-	cerrar_sesion(request)
+	#print (request.method)
 	if request.method == "POST":
 		nombre = request.POST['nombre']
 		apellido = request.POST['apellido']
@@ -408,25 +251,7 @@ def registro(request):
 		else:
 		'''
 		if Usuarios.objects.filter(email=email).exists():
-			user = Usuarios.objects.get(email=email)
-			if user.fin_registro == 1:
-				messages.error(request ,'Email ya se encuentra registrado')
-			else:
-
-				if user.fin_registro == 0:
-					if user.password == password:
-						messages.success(request, 'Finaliza tu registro.')
-						user = authenticate(request, username=username, password=password)
-						login(request, user)
-						context = {
-							'username': username,
-							'password' : password,
-							'success':1
-						}
-						return render(request, 'registroinsta.html', context)
-					else:
-						messages.success(request, 'Puedes finalizar tu resgistro.')
-						return render(request, 'singup.html',{'success':1})
+			messages.error(request ,'Email ya se encuentra registrado')
 		else:
 			user = User.objects.create_user(username, email, password)
 			user.first_name = nombre
@@ -435,9 +260,6 @@ def registro(request):
 
 			u = Usuarios(nombre=nombre, apellido=apellido, email=email,password=password,username=username)
 			u.save()
-			user = authenticate(request, username=username, password=password)
-			login(request, user)
-
 			context = {
 				'username': username,
 				'password' : password
@@ -459,227 +281,25 @@ def registroinsta(request):
 		username = request.POST['username']
 		password = request.POST['password']
 
-		if (Usuarios.objects.filter(user_insta=cuenta).exists()):
-			messages.error(request, "Usuario de instagram ya se encuentra registrado.")
+		
+
+		api = InstagramAPI(cuenta, password_i)
+
+
+		if api.login():
+			Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i)
+			user = authenticate(request, username=username, password=password)
+
+			login(request, user)
+
+			messages.success(request, 'Bienvenido ' + request.user.first_name + ' ' + request.user.first_name)
+			api.logout()
+			return redirect("admingo:index")
 		else:
-
-			user_u = Usuarios.objects.get(username=username)
-			
-
-			api = InstagramAPI(cuenta, password_i)
-			#password_i = make_password(str(password_i))
-
-
-			if api.login():
-				
-
-
-				Usuarios.objects.filter(username=username).update(user_insta=cuenta, pass_insta=password_i, fin_registro = 1)
-				#user = authenticate(request, username=username, password=password)
-
-
-				#login(request, user)
-				# Guardo en info
-				#api.searchUsername(str(cuenta))
-				#img_profile = api.LastJson['user']['profile_pic_url']
-				get_save_info(api,request.user.id, cuenta, password_i,1)
-				#Info(id_usuario=user_u, username=username, foto_perfil= img_profile).save()
-
-				messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-				api.logout()
-				return redirect("admingo:index")
-			else:
-				#api.logout()
-				messages.error(request, "Usuario no existe o Contraseñana invalida")
+			#api.logout()
+			messages.error(request, "Usuario no existe o Contraseñana invalida")
 
 	return render(request, 'registroinsta.html')
-
-def nuevos_datos(request):
-	
-	#global api 
-	cerrar_sesion(request)
-	if request.method == "POST":
-		
-		cuenta = request.POST['cuenta']		
-		password_i = request.POST['password_i']		
-		email = request.POST['email']
-		password = request.POST['password']
-
-		if Usuarios.objects.filter(email=email).exists():
-			
-			user_u = Usuarios.objects.get(email=email)
-			
-			if (user_u.user_insta == cuenta):
-				user = authenticate(request, username=user_u.username, password=password)
-				if user is not None:
-					if user.is_active:
-						
-						api = InstagramAPI(cuenta, password_i)
-						login(request, user)
-						if api.login():
-							Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i)
-
-
-							
-							# Guardo en info
-							
-							if Info.objects.filter(id_usuario_id=request.user.id).exists():
-								get_save_info(api,request.user.id, cuenta, password_i,0)
-							else:
-								get_save_info(api,request.user.id, cuenta, password_i,1)
-
-							messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-							api.logout()
-							return redirect("admingo:index")						
-						else:
-							if (api.LastJson['error_type']== 'bad_password'):
-								messages.error(request, 'Los datos de instagram, no son correctos')
-								context2 = {'error': 1}
-								return render(request, 'nuevos_datos.html', context2)
-					else:
-						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-
-					
-				else:
-					messages.error(request, "La contraseña no coincide con el correo electronico")	
-			else:
-				messages.error(request, "La cuenta de instagram no pertece al usuario registrado")	
-		else:
-			messages.error(request, "El correo electronico no se encuentra registrado")
-
-	return render(request, 'nuevos_datos.html')
-
-
-@login_required
-def cambiar_cuenta(request):
-
-	if request.method == "POST":
-		
-		cuenta = request.POST['cuenta']		
-		password_i = request.POST['password_i']		
-		email = request.POST['email']
-		password = request.POST['password']
-
-		if Usuarios.objects.filter(email=email).exists():
-			
-			user_u = Usuarios.objects.get(email=email)
-			if Usuarios.objects.filter(user_insta=cuenta).exists():
-				if Usuarios.objects.get(user_insta=cuenta).cambiar_pass_insta == 1:
-					user = authenticate(request, username=user_u.username, password=password)
-
-					if user is not None:
-						if user.is_active:
-							
-							api = InstagramAPI(cuenta, password_i)
-							login(request, user)
-							if api.login():
-								Usuarios.objects.filter(username=user_u.username).update(pass_insta=password_i, cambiar_pass_insta= 0)
-
-
-								info_user=get_save_info(api,user_u.id, cuenta, password_i,1)
-
-								messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-								api.logout()
-								return redirect("admingo:index")						
-							else:
-								if (api.LastJson['error_type']== 'bad_password'):
-									messages.error(request, 'Los datos de instagram, no son correctos')
-									context2 = {'error': 1}
-									return render(request, 'cambiar_cuenta.html', context2)
-						else:
-							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-
-						
-					else:
-						messages.error(request, "La contraseña no coincide con el correo electronico")
-				else:
-					messages.error(request, "La cuenta de Instagram ya se encuentra registrada")
-			else:
-				user = authenticate(request, username=user_u.username, password=password)
-
-				if user is not None:
-					if user.is_active:
-						
-						api = InstagramAPI(cuenta, password_i)
-						login(request, user)
-						if api.login():
-							Usuarios.objects.filter(username=user_u.username).update(user_insta=cuenta, pass_insta=password_i, cambiar_pass_insta=0)
-
-							info_user=get_save_info(api,user_u.id, cuenta, password_i,1)
-							messages.success(request, 'Bienvenido ' + user_u.nombre + ' ' + user_u.apellido)
-							api.logout()
-							return redirect("admingo:index")						
-						else:
-							if (api.LastJson['error_type']== 'bad_password'):
-								messages.error(request, 'Los datos de instagram, no son correctos')
-								context2 = {'error': 1}
-								return render(request, 'cambiar_cuenta.html', context2)
-					else:
-						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-
-					
-				else:
-					messages.error(request, "La contraseña no coincide con el correo electronico")
-		else:
-			messages.error(request, "El correo electronico no se encuentra registrado")
-
-	else:
-		user = Usuarios.objects.get(id=request.user.id)
-		user.cambiar_pass_insta=1
-		user.save()
-		todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
-		todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
-		todos_productos = Productos.objects.filter(id_usuario_id=request.user.id)
-		todas_imaganes = Imagenes.objects.filter(id_usuario_id=request.user.id)
-		todas_pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
-		todos_infos = Info.objects.filter(id_usuario_id=request.user.id)
-
-		todos_ganadores = Ganadores.objects.filter(id_usuario_id=request.user.id)
-
-		todas_finanazas = Finanzas.objects.filter(id_usuario_id=request.user.id)
-		
-		# Elimino las ventas
-		if todas_ventas.exists():
-			
-			for v in todas_ventas:
-				v.delete()
-
-		# Elimino los concursos
-		if todos_concursos.exists():
-			for c in todos_concursos:
-				c.delete()
-
-		# Elimino los productos
-		if todos_productos.exists():
-			for p in todos_productos:
-				p.delete()
-
-		# Elimino las imagenes
-		if todas_imaganes.exists():
-			for i in todas_imaganes:
-				i.delete()
-
-		# Elimino las pausas
-		if todas_pausas.exists():
-			for pa in todas_pausas:
-				pa.delete()
-
-		# Elimino la info
-		if todos_infos.exists():
-			for inf in todos_infos:
-				inf.delete()
-
-		# Elimino los ganadores
-		if todos_ganadores.exists():
-			for win in todos_ganadores:
-				win.delete()
-
-		# Elimino las finanazas
-		if todas_finanazas.exists():
-			for fin in todas_finanazas:
-				fin.delete()
-
-	return render(request, 'cambiar_cuenta.html')
 
 @login_required
 def cerrar_sesion(request):
@@ -691,7 +311,6 @@ def cerrar_sesion(request):
 @login_required
 def vender(request):
 	#print (str(request.user.id))
-	estado = 1
 	if request.method == "POST":
 		if request.is_ajax():
 			varias=0
@@ -711,98 +330,45 @@ def vender(request):
 				varias=1
 
 
-		
+			#Ventas(id_usuario = user_r, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
 			if (Productos.objects.filter(id_usuario_id = request.user.id, media_id = media_id).exists()):
 
 				producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
 
-				#validar la cantidad en stock con la venta
-				print(str("validando cantidad: ----> "+str(int(producto.cantidad) - int(cantidad))))
-				if ((int(producto.cantidad) - int(cantidad)) < 0):
-					estado = 0
-				else:
-					producto.cantidad = int(producto.cantidad) - int(cantidad)
-
-					producto.save()
-						
-					Ventas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
-
-					Finanzas(id_usuario = user_r, id_producto=producto.id, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
-
-					#print("producto.id: "+ str(producto.id))
+				#for pro in producto:
+				#print("producto.cantidad: "+ str(int(producto.cantidad))+" - cantidad: "+str(cantidad)+" = "+str(int(producto.cantidad) - int(cantidad)))
+				producto.cantidad = int(producto.cantidad) - int(cantidad)
+				producto.save()
+					
+				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+				print("producto.id: "+ str(producto.id))
 			else:
 				print("sino")
 				
-				#Productos(id_usuario = user_r, media_id=media_id, texto=texto, descripcion_producto=descripcion_venta).save()
+				Productos(id_usuario = user_r, media_id=media_id, texto=texto, descripcion_producto=descripcion_venta).save()
 
-				#producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
+				producto = Productos.objects.get(id_usuario_id = request.user.id, media_id = media_id)
 
-				Ventas(id_usuario = user_r, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
-
-				Finanzas(id_usuario = user_r, media_id = media_id, cantidad = cantidad,precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_finanza = descripcion_venta).save()
-		
+				Ventas(id_usuario = user_r, id_producto_id=producto.id, media_id = media_id, cantidad = cantidad, varias=varias, precio = precio, nombre_cliente=nombre_cliente, telefono_cliente = telefono_cliente, descripcion_venta = descripcion_venta).save()
+			#for para el array de rult_img#
+			'''
+			ventas = Ventas.objects.all()
+			for ven in ventas:
+				print(ven.id_usuario)
+			'''
+			#print("tamaño: "+ str(len(result_img)))
 			for res in result_img:
-			
-				if (not Imagenes.objects.filter(media_id= media_id).exists()):
+				#print (res.split(',')[1])
+				if not Imagenes.objects.filter(media_id= media_id, imagen=res.split(',')[1]).exists():
 					Imagenes(id_usuario = user_r, media_id= media_id, imagen=res.split(',')[1]).save()
-					print (str("NNNNNNNNNNNNNNN imagen----> "+res.split(',')[1]))
-				else:
-					print (str("IIIIIIIII imagen----> "+res.split(',')[1]))
 
 
-			context = {'estado': estado}
+			context = {'estado': 1}
 	return JsonResponse(context)
 
 @login_required
 def pausar_venta(request):
 	if request.method == "POST":
-		print ("entre a pausar Venta POST")
-		
-		user_r= Usuarios.objects.get(email=request.user.email)
-
-		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
-		api.login()
-
-		estado =0
-
-		if request.is_ajax():
-			desde_pro =request.POST.get('desde_pro')
-			if desde_pro == '0':
-				texto = request.POST.get('texto')
-				media_id = request.POST.get('media_id')
-				if(Productos.objects.filter(media_id=media_id).exists()):
-					pro=Productos.objects.get(media_id=media_id)
-					pro.texto=texto
-					pro.save()
-
-				if(api.editMedia(media_id, ""+texto+"")):
-					estado = 1
-				
-				api.logout()
-				
-				Pausas(id_usuario=user_r, media_id=media_id).save()
-			else:
-				texto = request.POST.get('texto')
-				media_id = request.POST.get('media_id')
-				pro = Productos.objects.get(media_id=media_id)
-				pro.texto = texto
-				pro.save();
-				
-				if(api.editMedia(media_id, ""+texto+"")):
-					estado = 1
-				
-				api.logout()
-				
-				Pausas(id_usuario=user_r, media_id=media_id).save()
-			
-			context = {'estado': estado}
-	return JsonResponse(context)
-
-@login_required
-def play_venta(request):
-
-	if request.method == "POST":
-		
 		print ("entre a pausar Venta POST")
 		user_r= Usuarios.objects.get(email=request.user.email)
 		username_insta = ""+user_r.user_insta+""
@@ -811,114 +377,67 @@ def play_venta(request):
 		api.login()
 
 		if request.is_ajax():
-			estado= 0
 			texto = request.POST.get('texto')
 			media_id = request.POST.get('media_id')
-			if (api.editMedia(media_id, ""+texto+"")):
-				estado =1
-			api.logout()
-			# buscar en productos si esta pausada la venta
-			#product=Productos.objects.filter(media_id=media_id)
-			if (Productos.objects.filter(media_id=media_id).exists()):
-				Productos.objects.get(media_id=media_id)
-				product.texto = texto
-				product.save()
+			api.editMedia(media_id, ""+texto+"")
 
-			pausa = Pausas.objects.get(media_id=media_id)
-			pausa.delete()
-			
-			context = {'estado': estado}
+			api.logout()
+			context = {'estado': 1}
 	return JsonResponse(context)
 
 @login_required
 def ventas (request):
 
-	global array_media_id
-	array_media_id = request.session.get('array_media_id')
-
 	todas_ventas = Ventas.objects.filter(id_usuario_id=request.user.id)
-	ventas_distinc = Ventas.objects.filter(id_usuario_id=request.user.id).values_list('media_id', flat=True).distinct()
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
-	
+	## Esto esta por Hacer ##
+	##usuario = Info.objects.get(id_usuario_id=request.user.id)
+	###
 	user_r= Usuarios.objects.get(email=request.user.email)
+	username_insta = ""+user_r.user_insta+""
 
-	
-	### cargar informacion actualizada de usuario
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)
-
-	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
-
+	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
+	api.login()
+	api.searchUsername(str(username_insta))
+	img_profile = api.LastJson['user']['profile_pic_url']
+	media_count = api.LastJson['user']['media_count']
+	follower = api.LastJson['user']['follower_count']
+	following = api.LastJson['user']['following_count']
+	tags = api.LastJson['user']['usertags_count']
+	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username': username_insta }
 
 	arr_img = []
 	arr_ventas = []
-	into = False
-	
-	for vd in ventas_distinc:
+	for v in todas_ventas:
 		for img in imagenes:
-			if (img.media_id == vd):
-
+			if (img.media_id == v.media_id):
 				arr_img.append(img.imagen)
-		
-		if (int(vd) in array_media_id):
-			arr_ventas.append({'media_id': vd, 'imagen': arr_img, 'cant_img': len(arr_img)})
+
+		arr_ventas.append({'media_id': v.media_id, 'nombre_cliente': v.nombre_cliente, 'telefono_cliente': v.telefono_cliente,'precio': v.precio, 'precio_total':(int(v.cantidad)*v.precio),'descripcion_venta':v.descripcion_venta, 'cantidad': v.cantidad, 'imagen': arr_img, 'cant_img': len(arr_img)})
 
 		arr_img = []
-		
 
 	context = {
-		'usuario' : usuario_info,
+		'usuario' : usuario,
 		'todas_ventas': arr_ventas,
 		'monto_total' : get_precio(request)
 	}
+	api.logout()
 
 	return render (request,'ventas.html', context)
 
-
-def detalles_venta (request):
-	if request.method == "POST":
-		media_id = request.POST.get('media_id')
-		ventas=Ventas.objects.filter(media_id=media_id)
-		arr_ventas = []
-		cont=0
-		for v in ventas:
-			#date=split(v.fecha_venta,'T')
-			#date_bien = date[2]+"/"date[1]+"/"+date[0]
-			print(str(v.fecha_venta.strftime("%d-%m-%Y")))
-			monto_v = (v.precio*v.cantidad)
-			monto_venta = locale.currency(monto_v, grouping=True )
-			precio=locale.currency( v.precio, grouping=True )
-			arr_ventas.append({'cantidad':v.cantidad,'precio': precio,'monto_venta': monto_venta, 'nombre_cliente': v.nombre_cliente, 'telefono_cliente': v.telefono_cliente,'descripcion_venta': v.descripcion_venta, 'fecha_venta': v.fecha_venta.strftime("%d-%m-%Y")})
-			cont+=1
-		context = {
-			'ventas': arr_ventas,
-			'cont' : cont
-		}
-		return JsonResponse(context)
-
-def delete_venta (request):
-	if request.method == "POST":
-		media_id = request.POST.get('media_id')
-		ventas=Ventas.objects.filter(media_id=media_id)
-		
-		estado = 0
-		for v in ventas:
-			if (v.delete()):
-				estado = 1
-			else:
-				estado = 0
-
-		
-		context ={
-			'estado': estado
-		}
-		return JsonResponse(context)
-
 def upload_img(request):
 	ruta_original=os.getcwd()
+	#print ("ruta actual "+ str(os.getcwd()))
+	#os.chdir(os.getcwd()+"/admingo/static/img")
+	#print ("ruta cambio "+ str(os.getcwd()))
+	
+	# Creo carpeta
+	#os.mkdir(os.getcwd()+"/admingo/static/img/usuario-"+str(request.user.id)+"/")
 
 	if request.method == 'POST' and request.FILES['img-ig']:
 		# Creo carpeta de Usuario
-		ruta = ruta_original+"/admingo/static/img/usuario-"+str(request.user.id)+"/"
+		ruta = os.getcwd()+"/admingo/static/img/usuario-"+str(request.user.id)+"/"
 
 		if(os.path.exists(ruta)):
 			
@@ -933,8 +452,7 @@ def upload_img(request):
 			os.chdir(ruta)		
 
 		myfile = request.FILES['img-ig']
-		myfile_resize = request.FILES['img-ig']
-		
+		#print ("myfile: "+ str(myfile))
 
 		if not os.path.isfile(str(myfile)):	
 
@@ -947,26 +465,19 @@ def upload_img(request):
 			
 			#Guardo el archivo
 			uploaded_file_url = fs.url(filename)
-			im = Image.open(ruta+'/'+myfile.name)
-			width, height =im.size
-			im.close()
 
-			if (width and height > 780 ):
-				myfile_resize=resize_image(myfile.name, ruta,780, 780)
 			
-			
-				#me muevo a la ruta del proyecto
-				os.chdir(ruta_original)
-				os.remove(str(ruta_original)+"/admingo/static/img/usuario-"+str(request.user.id)+"/"+myfile.name)
-			else:
-				os.chdir(ruta_original)
+
+		#me muevo a la ruta del proyecto
+		os.chdir(ruta_original)
+		#resize_image(ruta+'/'+myfile.name, ruta+'/'+myfile.name+'-resize',size=(780, 780))
 
 
-			context = {'imagen': str(myfile_resize)}
-		return JsonResponse(context)
+	context = {'imagen': str(myfile)}
+	return JsonResponse(context)
 
 @login_required
-def nuevo_concurso (request, nuevo =None):
+def nuevo_concurso (request):
 	if (request.is_ajax()):
 		print ('entro si request ajax')
 		user_r= Usuarios.objects.get(email=request.user.email)
@@ -984,10 +495,9 @@ def nuevo_concurso (request, nuevo =None):
 		#print("media type:  "+str(media_info["items"][0]["media_type"]))
 		imagen = []
 		hastag= ""
-		existe_img= False
 
 		if (media_info["items"][0]["media_type"] == 1):
-			
+			print("media_info[media_type] == 1")
 			comentario=media_info["items"][0]["caption"]["text"]
 			img_url=media_info["items"][0]["image_versions2"]["candidates"][0]["url"]
 
@@ -998,24 +508,17 @@ def nuevo_concurso (request, nuevo =None):
 				hastag+= " #"+c+" "
 
 			print(str(hastag))
-			if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id).exists()):
-				Imagenes(id_usuario = user_r,media_id=media_id, imagen=img_url).save()
+			
+			Imagenes(id_usuario = user_r,media_id=media_id, imagen=img_url).save()
 
-				Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id,hastags = hastag,  seguir_otros= "",condiciones = comentario, view_otro = 1).save()
+			Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id,hastags = hastag,  seguir_otros= "",condiciones = comentario, view_otro = 1).save()
 		else:
 			
-			
+			print("media_info[media_type] == 8")
 			arra_img=[]
-
 			for img in media_info["items"][0]["carousel_media"]:
-			
-				if (not Imagenes.objects.filter(id_usuario = user_r,media_id=media_id).exists()):
-
-					Imagenes(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).save()
-
-				else:
-					existe_img = True
-					break
+				#arra_img.append(img["image_versions2"]["candidates"][0]['url'])
+				Imagenes(id_usuario = user_r,media_id=media_id, imagen=img["image_versions2"]["candidates"][0]['url']).save()
 
 
 			comentario=media_info["items"][0]["caption"]["text"]
@@ -1024,12 +527,18 @@ def nuevo_concurso (request, nuevo =None):
 			lista_hastag = tag_re.findall(comentario)
 			for c in lista_hastag:
 				hastag+= " #"+c+" "
-			if (not existe_img):
-				Concursos(id_usuario = user_r,img_url="",media_id=media_id,hastags = hastag, seguir_otros= "",condiciones = comentario, view_otro = 1).save()
 
+			Concursos(id_usuario = user_r,img_url="",media_id=media_id,hastags = hastag, seguir_otros= "",condiciones = comentario, view_otro = 1).save()
+
+		#print("imagen : "+str(imagen))
+
+		#print("si es ajax nuevo concurso")
+		#usuario = Info.objects.get(id_usuario_id=request.user.id)
+		#print ("Usuario INFO: "+str(usuario))
 
 		context = {
-		
+			#'usuario' : usuario,		
+			#'monto_total' : get_precio(request),
 			'estado' : request.user.id
 		}
 		api.logout()
@@ -1037,52 +546,43 @@ def nuevo_concurso (request, nuevo =None):
 
 		return JsonResponse(context)
 	else:
-		user_r= Usuarios.objects.get(email=request.user.email)
-
-
-		### cargar informacion actualizada de usuario
-		info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)
-		
-		concursos_abiertos=Concursos.objects.filter(id_usuario=user_r, activo=1).count()
-		concursos_cerrados=Concursos.objects.filter(id_usuario=user_r, activo=0).count()
-
-		usuario_info = {'foto_perfil': info_user.foto_perfil,'concursos_abiertos': concursos_abiertos, 'concursos_cerrados':concursos_cerrados ,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
-
+		concursos = None
+		imagenes_count = "0"
+		imagenes=None
+		if Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1).exists():
+			concursos = Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1)
+			for c in concursos:
+				imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id, media_id = c.media_id)
 			
-		
-		if(nuevo == None):
+			imagenes_count = imagenes.count()
 
-			print("entro si nuevo_concurso request no ajax y nuevo = None")
-			print("User ID: " + str(request.user.id))	
-			concursos = None
-			imagenes_count = "0"
-			imagenes=None
-			if Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1).exists():
-				concursos = Concursos.objects.filter(id_usuario_id=request.user.id, view_otro = 1)
-				for c in concursos:
-					imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id, media_id = c.media_id)
-				
-				imagenes_count = imagenes.count()
+			print("imagenes_count: "+ str(imagenes_count))
+			## Esto esta por hacer ###
+			##usuario = Info.objects.get(id_usuario_id=request.user.id)
+			###
 
-				#print("imagenes_count: "+ str(imagenes_count))
-				## Esto esta por hacer ###
-				##usuario = Info.objects.get(id_usuario_id=request.user.id)
-				###
-			#print("concursos: "+str(concursos))
-			context = {
-					'usuario' : usuario_info,
-					'concursos': concursos,
-					'imagenes' : imagenes 	,
-					'imagenes_count': str(imagenes_count),
-					'monto_total' : get_precio(request)
-				}
+		user_r= Usuarios.objects.get(email=request.user.email)
+		username_insta = ""+user_r.user_insta+""
 
-		else:
-			context = {
-				'usuario' : usuario_info,
+		api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
+		api.login()
+		api.searchUsername(str(username_insta))
+		img_profile = api.LastJson['user']['profile_pic_url']
+		media_count = api.LastJson['user']['media_count']
+		follower = api.LastJson['user']['follower_count']
+		following = api.LastJson['user']['following_count']
+		tags = api.LastJson['user']['usertags_count']
+		usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags , 'username' : username_insta}
+			
+		context = {
+				'usuario' : usuario,
+				'concursos': concursos,
+				'imagenes' : imagenes 	,
+				'imagenes_count': str(imagenes_count),
 				'monto_total' : get_precio(request)
 			}
-		
+		api.logout()
+		print("concursos: "+str(concursos))
 		return render (request,'nuevo_concurso.html', context)
 
 @login_required
@@ -1113,9 +613,25 @@ def publicar_concurso(request):
 			amigos_seguir_otros = request.POST.get('amigos_seguir_otros')
 			ganadores = request.POST.get('ganadores')
 			media_id = request.POST.get('media_id')
-			print("media_id es: "+ str(media_id))
-			if (media_id == '0'):
-				print("media_id == 0")
+
+			if (media_id != 0):
+				print("media_id != 0")
+				concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
+				for con in concurso:
+					con.seguirnos=seguirme
+					con.like=like
+					con.hastags=hastag
+					con.seguir_otros=seguir_otros
+					con.cant_etiqueta=cant_etiqueta
+					con.like_amigo_otros=amigos_like_otros
+					con.seguirme_amigos=amigos_seguirme
+					con.seguir_amigos_otras=amigos_seguir_otros
+					con.ganadores=ganadores
+					con.activo = 1
+					con.save()
+				context = {'estado': 1}
+			else:			
+
 				## subir foto al Insta
 				api.uploadPhoto(str(img2), ""+comentario+"")
 				subir_foto=api.LastJson
@@ -1135,22 +651,22 @@ def publicar_concurso(request):
 
 				while has_more_feed:
 
-					api.getUserFeed(usernameId, next_max_id, minTimestamp)
-					temp = api.LastJson
+				  api.getUserFeed(usernameId, next_max_id, minTimestamp)
+				  temp = api.LastJson
 
-					for item in temp["items"]:
-						
-						feed.append(item)
+				  for item in temp["items"]:
+				    
+				    feed.append(item)
 
-					if temp["more_available"] is False:
-						
-						#print("entre si es falso")
+				  if temp["more_available"] is False:
+				    
+				    #print("entre si es falso")
 
-						has_more_feed = False
-					
-					else:
-						
-						next_max_id = temp["next_max_id"]
+				    has_more_feed = False
+				  
+				  else:
+				  	
+				    next_max_id = temp["next_max_id"]
 
 				
 				for obj in feed:
@@ -1170,31 +686,11 @@ def publicar_concurso(request):
 					#print(str(comentario))
 					#print("Despues de publicar: " +str(api.LastJson));
 					api.logout()
-					print("Subi la foto")
+						
 					context = {'estado': 1}
 				else:
 					api.logout()
 					context = {'estado': 0}
-				
-			else:
-				print("media_id no es 0")
-				concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
-				for con in concurso:
-					con.seguirnos=seguirme
-					con.like=like
-					con.hastags=hastag
-					con.seguir_otros=seguir_otros
-					con.cant_etiqueta=cant_etiqueta
-					con.like_amigo_otros=amigos_like_otros
-					con.seguirme_amigos=amigos_seguirme
-					con.seguir_amigos_otras=amigos_seguir_otros
-					con.ganadores=ganadores
-					con.activo = 1
-					con.fin_carga = 1
-					con.save()
-				context = {'estado': 1}		
-
-			
 			
 	return JsonResponse(context)
 
@@ -1323,12 +819,10 @@ def validar_comentarios(api,array_comentario, media):
 
 ## Fin validando el comentario para generar ganadores
 
+
+
 @login_required
 def mis_concursos(request):
-
-	global array_media_id
-	array_media_id = request.session.get('array_media_id')
-
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
 	
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
@@ -1340,14 +834,13 @@ def mis_concursos(request):
 	api.login()
 	
 	comentarios=[]
-	tiene = 0
 	i =0 
 	#print(str(api.username_id))
 	#api.getSelfUserFollowers()
 	#print("seguidores: "+str(api.LastJson))
 	imagenes_count = imagenes.count()
 	tam=len(todos_concursos)
-	#print(str(len(todos_concursos)))
+	print(str(len(todos_concursos)))
 	for c in todos_concursos:
 		
 		cont_comentario = 0
@@ -1356,45 +849,48 @@ def mis_concursos(request):
 		imagen2 = []
 
 		if (c.media_id != None):
-			if (int(c.media_id) in array_media_id):
-				todos_comments=getTotalCommentsMedia(api,c.media_id)			
-				cont_comentario = len(todos_comments)
+			todos_comments=getTotalCommentsMedia(api,c.media_id)			
+			cont_comentario = len(todos_comments)
 
-				#api.getMediaComments(c.media_id)
-				#cont_comentario = api.LastJson['comment_count']
-				
-				if (cont_comentario > 0):
-					aux=validar_comentarios(api,todos_comments,c)
-					validos = aux['comentarios_validos']
-					cont_likers=aux['cont_likers']
-					cont_validos = len(validos)
-					#validos.append({'media_id':c.media_id})
-				else:
-					validos=[]
-
-				for img in imagenes:
-					if (c.media_id == img.media_id):
-						imagen2.append(img.imagen)
+			#api.getMediaComments(c.media_id)
+			#cont_comentario = api.LastJson['comment_count']
 			
+			if (cont_comentario > 0):
+				aux=validar_comentarios(api,todos_comments,c)
+				validos = aux['comentarios_validos']
+				cont_likers=aux['cont_likers']
+				cont_validos = len(validos)
+				#validos.append({'media_id':c.media_id})
+			else:
+				validos=[]
 
-				if (imagen2):
-				
-					comentarios.append({'imagen2':imagen2,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
-				else:
-					comentarios.append({'imagen2':None,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
+			for img in imagenes:
+				if (c.media_id == img.media_id):
+					imagen2.append(img.imagen)
+		
+
+		if (imagen2):
+		
+			comentarios.append({'imagen2':imagen2,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
+		else:
+			comentarios.append({'imagen2':None,'ruta_img': c.ruta_img, 'condiciones': c.condiciones, 'media_id': c.media_id,'cont_comentario': cont_comentario, 'cont_validos': cont_validos, 'validos': validos, 'activo': c.activo, 'cont_likers': cont_likers, 'publi_ganadores': c.publi_ganadores})
 		print("comentarios["+str(i)+"]['imagen2']"+str(comentarios[i]['imagen2']))
 		i+=1
 	
 	## Esto esta por hacer ##
 	#usuario = Info.objects.get(id_usuario_id=request.user.id)
 	####
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)	
-
-	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
+	api.searchUsername(str(username_insta))
+	img_profile = api.LastJson['user']['profile_pic_url']
+	media_count = api.LastJson['user']['media_count']
+	follower = api.LastJson['user']['follower_count']
+	following = api.LastJson['user']['following_count']
+	tags = api.LastJson['user']['usertags_count']
+	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username' : username_insta }
 	#todos_comments=getTotalCommentsMedia(api,str(1660217691590099505))
 	#print(str(todos_comments[0]['text']))
 	context = {
-		'usuario' : usuario_info,
+		'usuario' : usuario,
 		'comentarios': comentarios,
 		'imagenes_count' : imagenes_count,
 		'monto_total' : get_precio(request)
@@ -1402,26 +898,6 @@ def mis_concursos(request):
 	api.logout()
 	return render (request,'mis_concursos.html', context)
 
-
-@login_required
-def delete_concurso(request):
-	estado = 0
-	if request.method == "POST":
-		if request.is_ajax():
-			media_id= request.POST.get('media_id')
-			concurso = Concursos.objects.get(media_id=media_id)
-			imaganes = Imagenes.objects.filter(media_id=media_id)
-			for img in imaganes:
-				img.delete()
-
-			if (concurso.delete()):
-				estado = 1
-
-			context ={
-				'estado':estado
-			}
-			return JsonResponse(context)
-	
 
 @login_required
 def generar_ganadores(request):
@@ -1575,10 +1051,13 @@ def publicar_ganadores(request):
 	return JsonResponse(context)
 
 
-def agregar_producto(request):
+
+def editar_producto(request):
 
 	if request.is_ajax():
 		media_id = request.POST.get('media_id')
+		talla = request.POST.get('talla')
+		modelo = request.POST.get('modelo')
 		cantidad = request.POST.get('cantidad')
 		descripcion = request.POST.get('descripcion')
 		res_auto = request.POST.get('res_automatica')
@@ -1591,13 +1070,15 @@ def agregar_producto(request):
 		else:
 			res_automatica = 0
 
-		#print("respuesta automatica: "+str(res_automatica))
+		print("respuesta automatica: "+str(res_automatica))
 
 		if (Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id).exists()):
 
 			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
 
 			for p in producto:
+				p.talla = talla
+				p.modelo = modelo
 				p.cantidad = cantidad
 				p.descripcion_producto = descripcion
 				p.res_automatica = res_automatica
@@ -1607,17 +1088,13 @@ def agregar_producto(request):
 
 
 		else:
-			
-
-			pro = Productos.objects.create(id_usuario_id= request.user.id, media_id= media_id, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica)
-			pro.save()
-
-			#user_r= Usuarios.objects.get(email=request.user.email)
+			Productos(id_usuario_id= request.user.id, media_id= media_id, talla=talla, modelo=modelo, cantidad=cantidad, texto=texto,descripcion_producto=descripcion, res_automatica=res_automatica).save()
+			user_r= Usuarios.objects.get(email=request.user.email)
 
 			for res in result_img:
 				#print (res.split(',')[1])
 				if not Imagenes.objects.filter(media_id= media_id, imagen=res.split(',')[1]).exists():
-					Imagenes(id_usuario_id= request.user.id, media_id= media_id, imagen=res.split(',')[1]).save()
+					Imagenes(id_usuario = user_r, media_id= media_id, imagen=res.split(',')[1]).save()
 					#print("noe existe")
 					#print(str(res.split(',')[1]))
 
@@ -1625,60 +1102,8 @@ def agregar_producto(request):
 		context= {'estado':estado}
 		return JsonResponse(context)
 
-
-def editar_producto(request):
-	if request.method == "POST":
-		if request.is_ajax():
-			print("entre a editar_ producto")
-			media_id = request.POST.get('media_id')
-			cantidad = request.POST.get('cantidad')
-			descripcion = request.POST.get('descripcion')
-			res_auto = request.POST.get('res_automatica')
-			print("--- GET res_automatica: "+str(res_auto))
-			estado = 0
-			if (res_auto == "si"):
-				res_automatica = 1
-			else:
-				res_automatica = 0
-
-			producto = Productos.objects.filter(id_usuario_id=request.user.id, media_id=media_id)
-
-			for p in producto:
-					
-
-				p.cantidad = cantidad
-				p.descripcion_producto = descripcion
-				p.res_automatica = res_automatica
-				print("save res_automatica: "+str(p.res_automatica))
-				p.save()
-				estado =1
-
-
-			
-		context= {'estado':estado}
-		return JsonResponse(context)
-
-def delete_producto(request):
-
-	if request.is_ajax():
-		estado =0
-		media_id = request.POST.get('media_id')		
-		pro = Productos.objects.get(media_id= media_id)
-		imagenes = Imagenes.objects.filter(media_id=media_id)
-		for img in imagenes:
-			img.delete()
-
-		if (pro.delete()):
-			estado = 1
-
-		context= {'estado':estado}
-		return JsonResponse(context)
-
 @login_required
 def productos(request):
-	global array_media_id
-	array_media_id = request.session.get('array_media_id')
-
 	product = Productos.objects.filter(id_usuario_id= request.user.id)
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
 	### Esto esta por HAcer ####
@@ -1687,91 +1112,32 @@ def productos(request):
 	user_r= Usuarios.objects.get(email=request.user.email)
 	username_insta = ""+user_r.user_insta+""
 	
-	info_user=get_save_info(None,request.user.id,user_r.user_insta, user_r.pass_insta,0)	
-
-	usuario_info = {'foto_perfil': info_user.foto_perfil,'seguidos': info_user.seguidos, 'seguidores': info_user.seguidores,  'username': user_r.user_insta}
+	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
+	api.login()
+	api.searchUsername(str(username_insta))
+	img_profile = api.LastJson['user']['profile_pic_url']
+	media_count = api.LastJson['user']['media_count']
+	follower = api.LastJson['user']['follower_count']
+	following = api.LastJson['user']['following_count']
+	tags = api.LastJson['user']['usertags_count']
+	usuario = {'foto_perfil': img_profile,'fotos': media_count, 'seguidos': following, 'seguidores': follower, 'hastags':tags, 'username' : username_insta }
+	
 	
 	arr_img = []
 	products = []
-	pausas = Pausas.objects.filter(id_usuario_id=request.user.id)
-	play =False
-	
-	
 
-	if product.exists():
-		print("products exist")
-		for pro in product:
-			for p in pausas:
-				if (p.media_id == pro.media_id):
-					play = True
-			for img in imagenes:
-				if (img.media_id == pro.media_id):
-					arr_img.append(img.imagen)
-			
-			if (int(pro.media_id) in array_media_id):
+	for pro in product:
+		for img in imagenes:
+			if (img.media_id == pro.media_id):
+				arr_img.append(img.imagen)
 
-				products.append({'media_id':pro.media_id,'texto':pro.texto,'play':play,'descripcion':pro.descripcion_producto,  'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
-				arr_img = []
-	
+		products.append({'media_id':pro.media_id,'texto':pro.texto,'descripcion':pro.descripcion_producto, 'talla': pro.talla, 'modelo': pro.modelo, 'cantidad': pro.cantidad, 'disponible':pro.disponible, 'res_automatica': pro.res_automatica, 'imagen':arr_img, 'cant_img': len(arr_img)})
+		arr_img = []
 
 	context = {
-		'usuario' : usuario_info,
+		'usuario' : usuario,
 		'products':products,
 		'monto_total' : get_precio(request)
 	}
+	api.logout()
 	return render (request,'productos.html', context)
-
-
-#### ERRORES De servidor
-def error_400_view(request):
-	return render(request,'error_500.html')
-
-def error_403_view(request):
-	return render(request,'error_500.html')
-
-def error_404_view(request):
-  return render(request,'error_404.html')
-
-def error_500_view(request):
-	return render(request,'error_500.html')
-
-def csrf_failure(request,  reason="error_server"):
-	return HttpResponseForbidden('Error en nuestros servidores')
-
-####   Emails
-
-def recuperar_password(request):
-	context ={'user': request.user}
-	return render(request, 'recuperar_password.html', context)
-
-def enviar_pass(request):
-	email = request.POST.get('email')
-
-	user = Usuarios.objects.filter(email=email)
-	if (user.exists()):
-		user = Usuarios.objects.get(email=email)
-		body = render_to_string(
-			'recuperar_pass.html',
-				{
-					'name': user.nombre+' '+user.apellido,
-					'email': email,
-				},
-		)
-		email = EmailMessage(
-			subject='Recuperar Contraseña',
-			body = body,
-			from_email='contactotestgo@testgo.com.ve',
-			to=[email]
-			)
-		email.content_subtype= 'html'
-		email.send()
-		messages.error(request, 'Hemos enviado el correo electronico satisfactoriamente.\n Revisa tu bandeja de entrada')
-		context ={'success': 1}
-		return render(request, 'singup.html', context)
-	else:
-		messages.error(request, 'El correo introducido no existe. Intente de nuevo')
-
-		context ={'user': request.user}
-		return render(request, 'recuperar_password.html', context)
-
-

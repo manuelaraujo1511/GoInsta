@@ -11,8 +11,6 @@ class Usuarios(models.Model):
 	sexo = models.CharField( max_length = 9, blank = True, null = True)
 	user_insta = models.CharField( max_length = 100, blank = True, null = True)
 	pass_insta = models.CharField( max_length = 100, blank = True, null = True)
-	fin_registro = models.IntegerField(default=0)
-	cambiar_pass_insta = models.IntegerField(default=0)
 	fecha_creacion = models.DateTimeField(default=datetime.now)
 	fecha_modificacion = models.DateTimeField(default=datetime.now)
 	#description = models.TextField( max_length = 300 )
@@ -31,6 +29,8 @@ class Usuarios(models.Model):
 class Productos(models.Model):
 	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
 	media_id = models.CharField( max_length = 1000 )
+	talla = models.CharField( max_length = 1000, null=True )
+	modelo = models.CharField( max_length = 1000, null=True )
 	cantidad = models.IntegerField(default=0)
 	disponible = models.IntegerField(default=1)
 	texto = models.TextField(max_length= 1000, default = None)
@@ -41,7 +41,7 @@ class Productos(models.Model):
 
 class Ventas(models.Model):
 	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	id_producto = models.IntegerField(default=0)
+	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE, default = None)
 	media_id = models.CharField( max_length = 1000 )
 	cantidad = models.IntegerField(default=0)
 	varias = models.IntegerField(default=0)
@@ -86,7 +86,6 @@ class Concursos(models.Model):
 	activo = models.IntegerField(default=0)
 	publi_ganadores = models.IntegerField(default=0)
 	view_otro = models.IntegerField(default=0)
-	fin_carga = models.IntegerField(default=0)
 	fecha_creacion = models.DateTimeField(default= datetime.now)
 
 
@@ -95,35 +94,5 @@ class Ganadores(models.Model):
 	id_concurso = models.IntegerField(default=0)
 	media_id = models.CharField( max_length = 1000, null=True )
 	username = models.CharField( max_length = 1000 )
-	fecha_creacion = models.DateTimeField(default= datetime.now)
-
-class Pausas(models.Model):
-	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	media_id = models.CharField( max_length = 1000, null=True )
-	fecha_creacion = models.DateTimeField(default= datetime.now)
-
-class Finanzas(models.Model):
-	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	id_producto = models.IntegerField(default=0)
-	media_id = models.CharField( max_length = 1000 )
-	cantidad = models.IntegerField(default=0)
-	precio = models.DecimalField(max_digits = 19, decimal_places= 10)
-	nombre_cliente = models.CharField(max_length= 100, default = None)
-	telefono_cliente = models.CharField(max_length= 100, default = None)
-	descripcion_finanza = models.TextField(max_length= 1000, default = None)
-	fecha_creacion = models.DateTimeField(default= datetime.now)
-
-class Modelos(models.Model):
-	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE)
-	media_id = models.CharField( max_length = 1000 )
-	nombre = models.CharField( max_length = 1000 )
-	fecha_creacion = models.DateTimeField(default= datetime.now)
-
-class Tallas(models.Model):
-	id_usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-	id_producto = models.ForeignKey(Productos, on_delete=models.CASCADE)
-	media_id = models.CharField( max_length = 1000 )
-	nombre = models.CharField( max_length = 1000 )
 	fecha_creacion = models.DateTimeField(default= datetime.now)
 

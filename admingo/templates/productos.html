@@ -1,426 +1,362 @@
-{% extends "layout/header.html" %}
-{%block titulo %}Productos{%endblock%}
+{% include 'layout/header.html'%}
+<script type="text/javascript">
+	document.getElementById("index-li").classList.remove('active');
+	document.getElementById("ventas-li").classList.remove('active');
+	document.getElementById("mis-concursos-li").classList.remove('active');
+	document.getElementById("nuevo-concurso-li").classList.remove('active');
+	document.getElementById("productos-li").classList.add('active');
+</script>
+{% for message in messages %}
+<!--dir class="alert alert-info" {{message.tags}} alert-dismissible" role="alert" style="width: auto;">
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+	{{message}}
+</dir-->
+<script type="text/javascript">
+	window.onload = function() {
+  	demo.showNotificationSucces('top','center', "{{message}}")
+	};
+	
+</script>
+{% endfor %}
+		<div class="content">
+			<div class="container-fluid">
 
-{%block mensajes %}
-	{% for message in messages %}
-	<!--dir class="alert alert-info" {{message.tags}} alert-dismissible" role="alert" style="width: auto;">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
-		{{message}}
-	</dir-->
-	<script type="text/javascript">
-		window.onload = function() {
-			$(".load").fadeOut();
-	  	demo.showNotificationSucces('top','center', "{{message}}")
-		};
-		
-	</script>
-	{% endfor %}
-{%endblock %}
-
-{%block contenido %}
-
-	<div class="content">
-		<div class="container-fluid">
-		
-			<div class="row">
-				<div class="col-md-12">
-          <div class="card card-plain">
-            <div class="card-header" data-background-color="purple">
-              <h4 class="title">Mis Productos</h4>
-              <p class="category"> Todos estos productos son los que has vendido o has editado desde la sección de publicaciones</p>
-            </div>
-          	{% if products%}  
-            <div class="card-content table-responsive">
-              <table id="tabla" class="table table-hover ">
-                <thead class="text-succes" style="font-weight: bold">
-                	<tr>
-                		
-              			<th style="width: 160px;">Imagen</th>
-              			<th>Descripción</th>	
-              			<th>Detalles</th>	
-              			<th>Cantidad</th>	
-              			
-              			<th style="width: 149px;"> Acciones</th>
-                	</tr>
-                </thead>
-                <tbody>
-               	
-                {% for pro in products %}
-                <tr>
-                	<td>
-                		{% if pro.cant_img == 1 %}
-                		
-                			{% for fotos in pro.imagen%}
-                  		<img class="img" src="{{fotos}}"  />
-                  		<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
-                  		{%endfor%}
+				<div class="row">
+					<div class="col-md-12">
+            <div class="card card-plain">
+              <div class="card-header" data-background-color="purple">
+                <h4 class="title">Mis Productos</h4>
+                <p class="category"> ###### tengo que escribir algo en esta sección  ####</p>
+              </div>
+              <div class="card-content table-responsive">
+                <table id="tabla" class="table table-hover ">
+                  <thead class="text-succes" style="font-weight: bold">
+                  	<tr>
+                  		<center>
+                  			<th style="width: 160px;">Imagen</th>
+                  		</center>
+                  		<center>
+                  			<th>Descripción</th>	
+                  		</center>
+                  		<center>
+                  			<th>Detalles</th>	
+                  		</center>
+                  		<center>
+                  			<th>Talla</th>	
+                  		</center>
+                  		<center>
+                  			<th>Modelo</th>	
+                  		</center>
+                  		<center>
+                  			<th>Cantidad</th>	
+                  		</center>
                   		
+                  		<center>
+                  			<th style="width: 149px;"> Acciones</th>
+                  		</center>
+                  	</tr>
+                  </thead>
+                  <tbody>
+                 
+                  {% for pro in products %}
+                  <tr>
+                  	<td>
+                  		{% if pro.cant_img == 1 %}
+                  		
+                  			{% for fotos in pro.imagen%}
+	                  		<img class="img" src="{{fotos}}"  />
+	                  		<input id="img-publi" name="{{pro.producto.media_id}}"  type="text" value="{{fotos}}" style="display: none" />
+	                  		{%endfor%}
+	                  		
 
-                  	{% else %}
-                  	          		
-	                  	<div class="carousel-inner">
-	              				<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
-			              			<ol class="carousel-indicators">
-			              			{% for orden in pro.imagen%}	
-			              				{% if forloop.first %}
-											      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
-											      
-											      {% else %}
-											      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
-											      {% endif %}
-											    
-											    {% endfor %}
-											    </ol>
-											    
-											    
-											    <div class="carousel-inner">
-											    	{% for fotos in pro.imagen%}
-											    		
-											    		{%if forloop.first %}
-											    			<div class="item active">
-											    				<img src="{{fotos}}" alt="" style="width:100%;" >
-											    			</div>
-											    			
-											    		{% else %}
-											    			<div class="item">
-											    				<img src="{{fotos}}" alt="" style="width:100%;" >
-											    			</div>
-											    		{% endif %}
-											    		
-											    	{% endfor %}
-											    
-											    </div>
-											    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
-											      <!--span class="glyphicon glyphicon-chevron-left"></span>
-											      <span class="sr-only">Previous</span-->
-											      <i class="material-icons">keyboard_arrow_left</i>
-											    </a>
-											    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
-											      <!--span class="glyphicon glyphicon-chevron-right"></span>
-											      <span class="sr-only">Next</span-->
-											      <i class="material-icons">keyboard_arrow_right</i>
-											    </a>
-									  		</div>
-									  	</div>
+	                  	{% else %}
+	                  	          		
+		                  	<div class="carousel-inner">
+		              				<div id="myCarousel{{forloop.counter0}}" class="carousel" data-ride="carousel">
+				              			<ol class="carousel-indicators">
+				              			{% for orden in pro.imagen%}	
+				              				{% if forloop.first %}
+												      <li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}" class="active"></li>
+												      
+												      {% else %}
+												      	<li data-target="#myCarousel{{ forloop.parentloop.counter }}" data-slide-to="{{forloop.counter0}}"></li>
+												      {% endif %}
+												    
+												    {% endfor %}
+												    </ol>
+												    
+												    
+												    <div class="carousel-inner">
+												    	{% for fotos in pro.imagen%}
+												    		
+												    		{%if forloop.first %}
+												    			<div class="item active">
+												    				<img src="{{fotos}}" alt="" style="width:100%;" >
+												    			</div>
+												    			
+												    		{% else %}
+												    			<div class="item">
+												    				<img src="{{fotos}}" alt="" style="width:100%;" >
+												    			</div>
+												    		{% endif %}
+												    		
+												    	{% endfor %}
+												    
+												    </div>
+												    <a class="left carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="prev">
+												      <!--span class="glyphicon glyphicon-chevron-left"></span>
+												      <span class="sr-only">Previous</span-->
+												      <i class="material-icons">keyboard_arrow_left</i>
+												    </a>
+												    <a class="right carousel-control" href="#myCarousel{{forloop.counter0}}" data-slide="next">
+												      <!--span class="glyphicon glyphicon-chevron-right"></span>
+												      <span class="sr-only">Next</span-->
+												      <i class="material-icons">keyboard_arrow_right</i>
+												    </a>
+										  		</div>
+										  	</div>
 
-                  	{% endif %}
-                  </td>
-                  <td> {{pro.texto}}</td>	
-                	<td> {{pro.descripcion}}</td>
-                	<td> {{pro.cantidad}}</td>
-                	<!--td class="td-actions text-right"-->
-                	<td>
-										 <!--div class="clearfix"></div-->
-										<div class="row">
-										 	<div class="col-sm-4">
-										 		{% if pro.play %}
-													<button type="button" class="btn btn-simple ModalPlay" data-media="{{pro.media_id}}" data-texto="{{pro.texto}}" title="Play a Venta" style="padding: 0px 0px !important">
-													
-														<i class="material-icons text-warning" style="font-size: 30px">play_arrow</i>
-
-													</button>
-												{%else%}	
+	                  	{% endif %}
+	                  <td> {{pro.texto}}</td>	
+                  	<td> {{pro.descripcion}}</td>
+                  	<td> {{pro.talla}}</td>
+                  	<td> {{pro.modelo}}</td>
+                  	<td> {{pro.cantidad}}</td>
+                  	<!--td class="td-actions text-right"-->
+                  	<td>
+											 <!--div class="clearfix"></div-->
+											 <div class="row">
+											 	<div class="col-sm-4">
 													<button type="button" class="btn btn-simple Modalcancelar" data-media="{{pro.media_id}}" data-texto="{{pro.texto}}" title="Pausar Venta" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-warning" style="font-size: 30px">pause</i>
 
-													</button>
-												{%endif%}
-										 	</div>
-										 	<div class="col-sm-4">
-										 	{%if pro.cantidad > 0%}
-												<button type="button" class="btn btn-simple pull-right Modalvender"  data-media="{{pro.media_id}}"  data-comentario="{{pro.texto}}" data-cantidad="{{pro.cantidad}}" title="Vender" style="padding: 0px 0px !important">
-												
-													<i class="material-icons text-success" style="font-size: 30px">shop</i>
+													</button> 		
+											 	</div>
+											 	<div class="col-sm-4">
+													<button type="button" class="btn btn-simple Modalvender"  data-media="{{pro.media_id}}"  data-comentario="{{pro.texto}}" title="Vender" style="padding: 0px 0px !important">
+													
+														<i class="material-icons text-success" style="font-size: 30px">shop</i>
 
-												</button> 
-											{%else%}
-												<button type="button" class="btn btn-simple pull-right"  title="No tienes suficientes" style="padding: 0px 0px !important" disabled="True">
-												
-													<i class="material-icons text-default" style="font-size: 30px">shop</i>
+													</button> 		
+											 	</div>
+											 	<div class="col-sm-4">						 	
+											 		<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{pro.media_id}}" data-talla="{{pro.talla}}" data-modelo="{{pro.modelo}}" data-cantidad="{{pro.cantidad}}" data-descripcion="{{pro.descripcion}}" data-resautomatica="{{pro.res_automatica}}" data-comentario = "{{pro.texto}}"  title="Editar Producto" style="padding: 0px 0px !important">
 
-												</button> 
-											{%endif%}	
-										 	</div>
-										</div>
-										<div class="row">
-										 	<div class="col-sm-4">						 	
-										 		<button type="button" id="btn-editar" class="btn btn-simple ModalEditarProducto"  data-media="{{pro.media_id}}" title="Editar Producto" style="padding: 0px 0px !important">
+										 			<i class="material-icons text-primary" style="font-size: 30px">edit</i>
 
-									 			<i class="material-icons text-primary" style="font-size: 30px">edit</i>
+										 			</button>
+											 	</div>
+											 </div>
+											 
+											
+											
+											
+											 <!--div class="clearfix"></div-->
+										</td>
+									</tr>
+                  {% endfor%}
+              		</tbody>
 
-									 			</button>
-										 	</div>
-										 	<div class="col-sm-4">						 	
-										 		<button type="button" id="btn-eliminar-pro-{{forloop.counter}}" class="class-eliminar-pro btn btn-simple pull-right ModalEliminarProducto"  data-mediaid="{{pro.media_id}}" title="Eliminar Producto" style="padding: 0px 0px !important">
-
-									 			<i class="material-icons text-default" style="font-size: 30px">delete</i>
-
-									 			</button>
-										 	</div>
-										</div>								
-										
-										 <!--div class="clearfix"></div-->
-									</td>
-								</tr>
-                {% endfor%}
-            		</tbody>
-
-              </table>
+                </table>
+              </div>
             </div>
-          	{% else%}
-							<center>
-								<h3> Aun no vendes o no agregas tus productos</h3>
-								<a type="button" class="btn btn-success btn-round" href="{% url 'admingo:index' %}"> Ir a Mis Publicaciones </a>
-							</center>
-						{%endif%}
           </div>
-        </div>
+				</div>
+				
 			</div>
-			
 		</div>
+
+		{% include 'layout/footer.html'%}		
 	</div>
-{%endblock%}
-	
+</div>
+<!-- Modal Vender-->
+
+</body>
 
 
+<!-- Modal Editar Producto-->
+<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
+      </div>
+      <div class="modal-body">
+      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
+				{% csrf_token %} 
+		      <div class="row">
+			      
+		      	<div class="col-lg-6">
+	  		      <div id="div-talla" class="form-group label-floating has-error">
+	  						<label class="control-label">Talla</label>
+	  						<input type="text" name="talla-edit-p" id="talla-edit-p" class="form-control" required="">
+	  					</div>	
+		      	</div>
 
-{%block modales%}
-	<!-- Modal para Vender -->
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	        <h4 class="modal-title" id="myModalLabel">Vender</h4>
-	      </div>
-	      <div class="modal-body">
-	      	<form class="form form-vender" method="post" action='{% url "admingo:vender" %}'>
-					{% csrf_token %}
-			      <div class="row">
-				      
-			      	<div class="col-lg-6">
-		  		      <div class="form-group label-floating has-error">
-		  						<label class="control-label">Compadror</label>
-		  						<input type="text" name="nombre" id="nombre" class="form-control" required="">
-		  					</div>	
-			      	</div>
-
-			      	<div class="col-lg-6">
-			      		<div class="form-group label-floating has-error">
-			      			<label class="control-label">Telefono</label>
-			      			<input type="text" name="telefono" id="telefono" class="form-control" >
-			      		</div>	
-			      	</div>	      	
-			      </div>
-			      <div class="row">
-			      	<div class="col-lg-4">
-			      		<div class="div-cantidad-venta form-group label-floating">
-			      			<label class="control-label">Cantidad</label>
-			      			
-			      			<input type="number" name="cantidad_venta" id="cantidad_venta" value="" class="form-control" required="" >
-
-			      			<input type="number" name="cantidad_pro_input" id="cantidad_pro_input" style="display: none">
-
-			      		</div>
-			      		<p id="cant_pro_id" style="display: none; color: #6d0074; font-size: 12px;"></p>
-
-			      		<p id="erro-cantidad-venta" style="display: none; color: #e53935; font-size: 12px;"></p>
-			      	</div>
-			      	<div class="col-lg-4">
-			      		<div class="div-precio form-group label-floating">
-			      			<label class="control-label">Precio</label>
-			      			<input type="number" name="precio" id="precio" class="form-control" required="" >
-			      		</div>
-			      		<p id="erro-precio" style="display: none; color: #e53935; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
-			      	</div>
-			      	<div class="col-lg-12">
-			      		<div class="form-group label-floating">
-			      			<label class="control-label">Detalle de la venta</label>
-			      			<input type="text" name="descripcion" id="descripcion" class="form-control">
-			      		</div>
-			      	</div>
-			      	<div class="form-group label-floating" style="display: none">
-			      	<input  name="media_id" id="media_id" value="" style="display: none" >
-			      	<input  name="comentario-vender" id="comentario-vender" value="" style="display: none" >
-			      	</div>
-			      	
-			      </div>
-			    
-	        	
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		        <button type="submit" class="btn btn-success btn-simple" id="btn-vender">Vender</button>
+		      	<div class="col-lg-6">
+		      		<div id="div-modelo" class="form-group label-floating has-error">
+		      			<label class="control-label">Modelo</label>
+		      			<input type="text" name="modelo-edit-p" id="modelo-edit-p" class="form-control" >
+		      		</div>	
+		      	</div>	      	
 		      </div>
-		      </form>
-		    </div>
-		  </div>
-	  </div>
-	</div>
-	<!-- Modal Pausar Venta-->
-	<div class="modal fade" id="MyPausar" tabindex="-1" role="dialog" aria-labelledby="MyPausarLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	        <h4 class="modal-title" id="MyPausarLabel">Pausar Venta</h4>
-	      </div>
-	      <form class="form form-pausar-venta" method="post" action='{% url "admingo:pausar_venta" %}'>
-	      	<div class="modal-body">
-		     
-		      	{% csrf_token %}
-		      	Al momento de pausar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
-		      	<div class="form-group label-floating has-error">
-		    			<label class="control-label">Titulo</label>
-		    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
-		    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
-		    		</div>
-		    		<input  name="media_id" id="media_id" value="" style="display: none" >
-		      
-	      
-		      	
-		      </div>
-		        	
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		        <button type="submit" class="btn btn-success btn-simple">Pausar</button>
-		      </div>
-	      </form>
-	    </div>
-	  </div>
-	</div>
-
-	<!-- Modal Play Venta-->
-	<div class="modal fade" id="MyPlay" tabindex="-1" role="dialog" aria-labelledby="MyPlayLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	        <h4 class="modal-title" id="MyPlayLabel">Play Venta</h4>
-	      </div>
-	      <form class="form form-play-venta" method="post">
-	      	<div class="modal-body">
-		     
-		      	{% csrf_token %}
-		      	Al momento de republicar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
-		      	<div class="form-group label-floating ">
-		    			<label class="control-label">Titulo</label>
-		    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
-		    			<textarea id="text-publi-play" name="text-publi-play" class="form-control" rows="5" required=""></textarea>
-		    		</div>
-		    		<input  name="media_id" id="media_id" value="" style="display: none" >
-		      
-	      
-		      	
-		      </div>
-		        	
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		        <button type="submit" class="btn btn-success btn-simple">Play</button>
-		      </div>
-	      </form>
-	    </div>
-	  </div>
-	</div>
-
-	<!-- Modal Eliminar Producto-->
-	<div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEliminarProductoLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	      </div>
-	      <div class="modal-body" id="texto-ganadores">
-		      <center>
-		      	<h3> Seguro que quieres eliminar el producto.?</h3>
-		      	<p> Al eliminarlo, no eliminas la publicacion de Instagram</p>
-		      </center>
-	      	<center>
-	        	
-	      		<button type="button" class="btn btn-default" id="btn-no-eliminar-pro">NO</button>
-	      		<button type="button" class="btn btn-success" id="btn-si-eliminar-pro" data-mediaid="">SI</button>	
-	      	</center>
-	      	
-	    	</div>
-	    	<div class="modal-footer">
-	        
-	      </div>
-		  </div>
-		</div>
-	</div>
-
-	<!-- Modal Editar Producto-->
-	<div class="modal fade" id="ModalEditarProducto" tabindex="-1" role="dialog" aria-labelledby="ModalEditarProductoLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	        <h4 class="modal-title" id="ModalEditarProductoLabel">Editar Producto</h4>
-	      </div>
-	      <div class="modal-body">
-	      	<form class="form form-edit-producto" method="post" action='{% url "admingo:editar_producto" %}'>
-					{% csrf_token %} 
-			      <div class="row">
-			      	<div class="col-lg-4">
-			      		<div class="div-cantidad form-group label-floating">
-			      			<label class="control-label">Cantidad</label>
-			      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
-			      		</div>
-			      		<p id="erro-cantidad-editar" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser un valor positivo.</p>   
-			      	</div>
-
-		      		<!--div class="col-md-8">
+		      <div class="row">
+		      	<div class="col-lg-4">
+		      		<div class="div-cantidad form-group label-floating">
+		      			<label class="control-label">Cantidad</label>
+		      			<input type="number" name="cantidad-editar" id="cantidad-editar" class="form-control" required="" >
+		      		</div>
+		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      	</div>
+		      		<div class="col-md-8">
 			      		<div class="togglebutton">
 		            	<label>
-		            		<span id ="res-automatica-edit-no" >No</span> 
+		            		<span id ="res-automatica-no" >No</span> 
 		               	
-		               	<input id="res-automatica-edit" name="res-automatica-edit" type="checkbox" >
+		               	<input id="res-automatica" name="res-automatica" type="checkbox" >
 
-		               	<span id ="res-automatica-edit-si">Si</span> 
+		               	<span id ="res-automatica-si">Si</span> 
 		            	</label>
 		            	<span style="margin-left: 10%">Respuesta automatica?</span>
 		           		
 		            </div>
 		            <p style="font-size: 12px">al recibir un comentario preguntando, precio o disponibilidad, responderemos de forma automatica</p>
-		          </div-->
-			      	
-			      	<div class="col-lg-12">
-			      		<div class="form-group label-floating">
-			      			<label class="control-label">Descripción</label>
-			      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
-			      		</div>
-			      	</div>
-			      	<div class="form-group label-floating" style="display: none">
-			      	<input  name="media_id_edit" id="media_id_edit" style="display: none" >
-			      	<input  name="comentario-edit" id="comentario-edit" value="" style="display: none" >
-			      	<input  name="res-automatica-edit-check" id="res-automatica-edit-check" value="" style="display: none" >
-			      	</div>
-			      	
-			      </div>
-			    
-	        	
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
-		        <button id="btn-guardar-edit-pro" type="submit" class="btn btn-success btn-simple" >Guardar</button>
+		          </div>
+		      	
+		      	<div class="col-lg-12">
+		      		<div class="form-group label-floating">
+		      			<label class="control-label">Descripción</label>
+		      			<input type="text" name="descripcion-edit-p" id="descripcion-edit-p" class="form-control">
+		      		</div>
+		      	</div>
+		      	<div class="form-group label-floating" style="display: none">
+		      	<input  name="media_id_edit" id="media_id_edit" value="" style="display: none" >
+		      	<input  name="comentario-edit" id="comentario-edit" value="" style="display: none" >
+		      	<input  name="res-automatica-check" id="res-automatica-check" value="" style="display: none" >
+		      	</div>
+		      	
 		      </div>
-		      </form>
-		    </div>
-		  </div>
+		    
+        	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+	        <button type="submit" class="btn btn-success btn-simple" id="btn-editar">Guardar</button>
+	      </div>
+	      </form>
+	    </div>
 	  </div>
-	</div>
-{%endblock%}
+  </div>
+</div>
+
+<!-- Modal para Vender-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Vender</h4>
+      </div>
+      <div class="modal-body">
+      	<form class="form form-vender" method="post" action='{% url "admingo:vender" %}'>
+				{% csrf_token %}
+		      <div class="row">
+			      
+		      	<div class="col-lg-6">
+	  		      <div class="form-group label-floating has-error">
+	  						<label class="control-label">Compadror</label>
+	  						<input type="text" name="nombre" id="nombre" class="form-control" required="">
+	  					</div>	
+		      	</div>
+
+		      	<div class="col-lg-6">
+		      		<div class="form-group label-floating has-error">
+		      			<label class="control-label">Telefono</label>
+		      			<input type="text" name="telefono" id="telefono" class="form-control" >
+		      		</div>	
+		      	</div>	      	
+		      </div>
+		      <div class="row">
+		      	<div class="col-lg-4">
+		      		<div class="div-cantidad form-group label-floating">
+		      			<label class="control-label">Cantidad</label>
+		      			<input type="number" name="cantidad" id="cantidad" class="form-control" required="" >
+		      		</div>
+		      		<p id="erro-cantidad" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      	</div>
+		      	<div class="col-lg-4">
+		      		<div class="div-precio form-group label-floating">
+		      			<label class="control-label">Precio</label>
+		      			<input type="number" name="precio" id="precio" class="form-control" required="" >
+		      		</div>
+		      		<p id="erro-precio" style="display: none; color: #6d0074; font-size: 12px;"> - Debe ser mayor a cero(0).</p>
+		      	</div>
+		      	<div class="col-lg-12">
+		      		<div class="form-group label-floating">
+		      			<label class="control-label">Detalle de la venta</label>
+		      			<input type="text" name="descripcion" id="descripcion" class="form-control">
+		      		</div>
+		      	</div>
+		      	<div class="form-group label-floating" style="display: none">
+		      	<input  name="media_id" id="media_id" value="" style="display: none" >
+		      	<input  name="comentario-vender" id="comentario-vender" value="" style="display: none" >
+		      	</div>
+
+		      	
+		      </div>
+		    
+        	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+	        <button type="submit" class="btn btn-success btn-simple" id="btn-vender">Vender</button>
+	      </div>
+	      </form>
+	    </div>
+	  </div>
+  </div>
+</div>
+<!-- Modal Cancelar Venta-->
+<div class="modal fade" id="MyPausar" tabindex="-1" role="dialog" aria-labelledby="MyPausarLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="MyPausarLabel">Pausar Venta</h4>
+      </div>
+      <form class="form form-pausar-venta" method="post" action='{% url "admingo:pausar_venta" %}'>
+      	<div class="modal-body">
+	     
+	      	{% csrf_token %}
+	      	Al momento de cancelar la venta el pie de foto o comentario de su publicacion se actualizara de la siguiente forma:<br>
+	      	<div class="form-group label-floating has-error">
+	    			<label class="control-label">Titulo</label>
+	    			<!--input id="text-publi" type="text" name="text-publi" value= "" class="form-control" required=""-->
+	    			<textarea id="text-publi" name="text-publi" class="form-control" rows="5" required=""></textarea>
+	    		</div>
+	    		<input  name="media_id" id="media_id" value="" style="display: none" >
+	      
+      
+	      	
+	      </div>
+	        	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Cancelar</button>
+	        <button type="submit" class="btn btn-success btn-simple">Pausar</button>
+	      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+	
 
     
-{%block scripts%}
-	<script type="text/javascript">
-		document.getElementById("index-li").classList.remove('active');
-		document.getElementById("ventas-li").classList.remove('active');
-		document.getElementById("mis-concursos-li").classList.remove('active');
-		document.getElementById("nuevo-concurso-li").classList.remove('active');
-		document.getElementById("productos-li").classList.add('active');
-	</script>
+    
+
 	<script type="text/javascript">
   	$(document).ready(function(){
 
@@ -453,92 +389,37 @@
 		    
 			});
 
-			$('#tabla').on('click','.Modalvender',function(){
+			$('.Modalvender').on('click',function(){
 				media_id =$(this).attr('data-media');
 				comentario =$(this).attr('data-comentario');				
-				cant_pro=$(this).attr("data-cantidad")
-				$("#cantidad_pro_input").val(cant_pro);
 				$('#media_id').val(media_id);
 				$('#comentario-vender').val(comentario);
-				$('#cant_pro_id').css("display", "block");
-				$('#cant_pro_id').html("- Disponible: "+cant_pro);
 				
 		    $('#myModal').modal('show');
 
-
 			});
-	  	$("#cantidad_venta").change(function() {
+
+		
 
 
-				cantidad = $('#cantidad_venta').val();
-				//console.log("cambie cantidad: "+ cantidad);
+			
+			$('.Modalcancelar').on('click',function(){
+				media_id =$(this).attr('data-media');
+				text_publi =$(this).attr('data-texto');
 
-				cant_pro = $("#cantidad_pro_input").val();
-				//console.log("cambie cant_pro: "+ cant_pro);
-				if (cantidad <= 0){
-					$("#div-cantidad-venta").addClass("has-error");
-					$("#erro-cantidad-venta").html("- Debe ser mayor a cero(0).");
-					$("#erro-cantidad-venta").css("display", "block");
-					if (cant_pro > 0){
-						
-						//console.log("----- resta: "+ resta)
-						if (cantidad <=-1){
-								$("#cant_pro_id").html("- Disponible: 0");
-						}else{
-							resta = cant_pro-cantidad;
-							if (resta >= 0){
-								$("#cant_pro_id").html("- Disponible: "+(resta));
-
-							}
-						}
-						
-						
-					}
-					
-				}else{
-					$("#div-cantidad-venta").removeClass("has-error");
-					$("#erro-cantidad-venta").css("display", "none");
-					if (cant_pro > 0){
-						resta = cant_pro-cantidad;
-						//console.log("----- resta: "+ resta)
-						if (resta >= 0){
-							$("#cant_pro_id").html("- Disponible: "+(resta));
-
-						}else{
-							$("#div-cantidad-venta").addClass("has-error");
-							$("#erro-cantidad-venta").html("- No dispones suficientes.");
-							$("#erro-cantidad-venta").css("display", "block");
-							$("#cant_pro_id").html("- Disponible: 0 ");	
-							
-						}
-						
-					}
-					
-				}
 				
+				$('#text-publi').val("--- Venta PAUSADA --- "+text_publi);				
+				$('#media_id').val(media_id);
+		    $('#MyPausar').modal('show');
+
 			});
-
-			$("#precio").change(function() {
-
-				precio = $('#precio').val();
-				if (precio <= 0){
-					$("#div-precio").addClass("has-error");
-					$("#erro-precio").css("display", "block");
-				}else{
-					$("#div-precio").removeClass("has-error");
-					$("#erro-precio").css("display", "none");
-				}
-				
-			});
-
 
 			$("#myModal").on("submit", ".form-vender", function (e) {
 				e.preventDefault();
 				var array_img = [];
 				var nombre = $('#nombre').val();
 				var telefono = $('#telefono').val();
-				var cantidad = $('#cantidad_venta').val();
-				var cant_pro = $('#cantidad_pro_input').val();// cantidad guardada
+				var cantidad = $('#cantidad').val();
 				var precio = $('#precio').val();
 				var descripcion = $('#descripcion').val();
 				var media_id = $('#media_id').val();
@@ -556,22 +437,17 @@
 				});
 				//console.table(array_img);
 				//console.log(result_img);
-				if (cant_pro > 0){
-					if( cant_pro-cantidad < 0){
-						demo.showNotificationError('top','center','No dispones sufiencientes Productos');
-						return false;
-					
-					}	
-					
-				}
+
 
 				if (cantidad <= 0){
-					demo.showNotificationError('top','center','La cantidad debe ser positiva');
+					$("#div-cantidad").addClass("has-error");
+					$("#erro-cantidad").css("display", "block");
 					
 					return false;
 				}else{
 					if (precio <= 0){
-						demo.showNotificationError('top','center','El precio debe ser positivo');
+						$("#div-precio").addClass("has-error");
+						$("#erro-precio").css("display", "block");
 						
 						return false;
 					}else{
@@ -597,15 +473,12 @@
 				    	},
 					    success : function(data){
 								//console.log(data);
-								if (data.estado == 0){
-									$(".load").fadeOut();
-									demo.showNotificationError('top','center','No tienes sufientes de este producto');
-								}else{
-									$('#myModal').modal('hide');
-									demo.showNotificationSucces('top','center','Venta almacenada en el sistema')	
-									$(".load").fadeIn();
-									location.reload();	
-								}
+								$(".load").fadeOut();
+								$('#myModal').modal('hide');
+								demo.showNotificationSucces('top','center','Venta almacenada en el sistema');
+								setTimeout(function(){// wait for 5 secs(2)
+		           			location.reload(); // then reload the page.(3)
+	      					}, 2000);
 							
 					        
 					    },
@@ -620,17 +493,6 @@
 				}
 					
 			});
-		
-			$('#tabla').on('click','.Modalcancelar',function(){
-				media_id =$(this).attr('data-media');
-				text_publi =$(this).attr('data-texto');
-
-				
-				$('#text-publi').val("--- Venta PAUSADA --- "+text_publi);				
-				$('#media_id').val(media_id);
-		    $('#MyPausar').modal('show');
-
-			});
 
 			$("#MyPausar").on("submit", ".form-pausar-venta", function (e) {
 				e.preventDefault();
@@ -639,91 +501,26 @@
 				var csrftoken = getCookie('csrftoken');
 				//var array_img = $('#array_img').serializeArray()
 				$.ajax({
-			    url : "{% url 'admingo:pausar_venta'%}",
+			    url : '{% url "admingo:pausar_venta" %}',
 			    type : 'POST',
 			    data : 
 			    	{	'csrfmiddlewaretoken' : csrftoken,
 			    		'texto': texto,		    		
 			    		'media_id' : media_id,
-			    		'desde_pro': 1
 			    	},
 					beforeSend: function() {
 		        // setting a timeout
-		        $(".load").fadeIn();
-		        $('#MyPausar').modal('hide');
+		        //$(".load").fadeIn();
 		        //console.log("Before Send");
 	  				//$.ajaxSettings.beforeSend(xhr, settings);
 		    	},
 			    success : function(data){
 						//console.log(data);
-						
-						if (data.estado == 1){
+						$('#MyPausar').modal('hide');
 							demo.showNotificationSucces('top','center','Venta Pausada satisfactoriamente');
-							location.reload();	
-						}else{
-							demo.showNotificationError('top','center','No pudimos Pausada la publicación. Intentalo nuevamente.');
-							location.reload();
-						}
-							
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-					 console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-					 }              
-			
-				});
-					
-
-	  	});
-
-	  	$('#tabla').on('click','.ModalPlay',function(){
-				media_id =$(this).attr('data-media');
-				text_publi =$(this).attr('data-texto');
-
-				
-				$('#text-publi-play').val(text_publi);				
-				$('#media_id').val(media_id);
-		    $('#MyPlay').modal('show');
-
-			});
-
-			$("#MyPlay").on("submit", ".form-play-venta", function (e) {
-				e.preventDefault();
-				var texto = $('#text-publi-play').val();
-				var media_id = $('#media_id').val();
-				var csrftoken = getCookie('csrftoken');
-				//var array_img = $('#array_img').serializeArray()
-				$.ajax({
-			    url : '{% url "admingo:play_venta" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'texto': texto,		    		
-			    		'media_id' : media_id,
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $(".load").fadeIn();
-		        $('#MyPlay').modal('hide');
-		        //console.log("Before Send");
-	  				//$.ajaxSettings.beforeSend(xhr, settings);
-		    	},
-			    success : function(data){
-						//console.log(data);
-						if(data.estado == 1){
-							demo.showNotificationSucces('top','center','Venta Republicada satisfactoriamente');
-							$(".load").fadeIn();
-							location.reload();
-
-						}else{
-							demo.showNotificationError('top','center', "No pudimos republicar. Intentalo de nuvo");
-							$(".load").fadeIn();
-							location.reload();
-						}
-							
-							/*setTimeout(function(){// wait for 5 secs(2)
+							setTimeout(function(){// wait for 5 secs(2)
            			location.reload(); // then reload the page.(3)
-      				}, 2000); **/
+      				}, 2000); 
 					//$(".load").fadeOut();
 			        
 			    },
@@ -735,164 +532,77 @@
 					
 
 	  	});
-	  	for (i =0;  i <= $('.class-eliminar-pro').length ; i++){
-    		$('#btn-eliminar-pro-'+i).on('click',function(){
-					media_id =$(this).attr('data-mediaid');
-					$("#btn-si-eliminar-pro").attr('data-mediaid',media_id);
-					$('#ModalEliminarProducto').modal('show');
 
-				});	
-    	}
-
-			$("#btn-no-eliminar-pro").on('click',function(){
-					
-				$('#ModalEliminarProducto').modal('hide');
-
-			});
-
-			$("#btn-si-eliminar-pro").on('click',function(){
-				
-				media_id = $(this).attr('data-mediaid');
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-			    url : '{% url "admingo:delete_producto" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id': media_id,
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $('#ModalEliminarProducto').modal('hide');
-		        $(".load").fadeIn();
-		        //console.log("Before Send");
-    				//$.ajaxSettings.beforeSend(xhr, settings);
-		    	},
-			    success : function(data){						
-						
-						if (data.estado == 1){
-							demo.showNotificationSucces('top','center','El producto fue Eliminado con Exito!');
-							location.reload();
-						}else{
-							demo.showNotificationError('top','center','Hubo un problema al eliminar el producto. Intentalo nuevamente.');
-							location.reload();	
-						}
-			        
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-						$(".load").fadeOut();
-					}              
-			
-				});
-				
-			});	
-	  	
-
-			if($('#res-automatica-edit').is(':checked')){
-				$("#res-automatica-edit-si").css("color", "black");
-		    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
-		    $("#res-automatica-edit-check").val("si")
+			if($('#btn-editar').attr('data-resautomatica') == 1){
+				$("#res-automatica-si").css("color", "black");
+		    $("#res-automatica-no").css("color", "rgba(0,0,0, 0.26)");
+		    $("#res-automatica-td").css("display", "block");
+		    $("#res-automatica-check").val("si")
 
 			}else{
-				$("#res-automatica-edit-no").css("color", "black");
-		   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
-		   	$("#res-automatica-edit-check").val("no")
+				$("#res-automatica-no").css("color", "black");
+		   	$("#res-automatica-si").css("color", "rgba(0,0,0, 0.26)");
+		   	$("#res-automatica-td").css("display", "none");
+		   	$("#res-automatica-check").val("no")
 			}
 
-			$("#res-automatica-edit").change(function() {
+			$("#res-automatica").change(function() {
 		    if(this.checked) {
-		      $("#res-automatica-edit-si").css("color", "black");
-		      $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
-		      $("#res-automatica-edit-check").val("si")
+		      $("#res-automatica-si").css("color", "black");
+		      $("#res-automatica-no").css("color", "rgba(0,0,0, 0.26)");
+		      $("#res-automatica-td").css("display", "block");
+		      $("#res-automatica-check").val("si")
 		    }else{
-		    	$("#res-automatica-edit-no").css("color", "black");
-		    	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
-		    	$("#res-automatica-edit-check").val("no")
+		    	$("#res-automatica-no").css("color", "black");
+		    	$("#res-automatica-si").css("color", "rgba(0,0,0, 0.26)");
+		    	$("#res-automatica-td").css("display", "none");
+		    	$("#res-automatica-check").val("no")
 		    	
 		    }
-		  });
+		   });
 
-		  $("#cantidad-editar").change(function() {
-
-
-				cantidad = $('#cantidad-editar').val();
-				if (cantidad < 0){
-					$("#erro-cantidad-editar").addClass("has-error");
-					$("#erro-cantidad-editar").html("- Debe ser un valor positivo.");
-					$("#erro-cantidad-editar").css("display", "block");
-					
-					
-				}else{
-					$("#erro-cantidad-editar").removeClass("has-error");
-					$("#erro-cantidad-editar").css("display", "none");
-				}
-				
-			});
-
-			
-			$('#tabla').on('click','.ModalEditarProducto',function(){
-
+			$('.ModalEditarProducto').on('click',function(){
 				media_id =$(this).attr('data-media');
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-			    url : '{% url "admingo:get_producto" %}',
-			    type : 'POST',
-			    data : 
-			    	{	'csrfmiddlewaretoken' : csrftoken,
-			    		'media_id' : media_id,
-			    	},
-					beforeSend: function() {
-		        // setting a timeout
-		        $(".load").fadeIn();
-		    	},
-			    success : function(data){
-						console.table(data.producto);
-						if (data.producto.encontre == true){
-							$("#cantidad-editar").val(data.producto.cantidad);
-							$("#descripcion-edit-p").val(data.producto.descripcion_producto);
-							$('#media_id_edit').val(data.producto.media_id);
-					  	
-					  	if(data.producto.res_automatica == 1){
-					  		$('#res-automatica-edit').prop('checked', true);
-								$("#res-automatica-edit-si").css("color", "black");
-						    $("#res-automatica-edit-no").css("color", "rgba(0,0,0, 0.26)");
-						    $("#res-automatica-edit-check").val("si")
+				talla = $(this).attr('data-talla');
+				modelo = $(this).attr('data-modelo');
+				cantidad = $(this).attr('data-cantidad');
+				descripcion = $(this).attr('data-descripcion');
+				texto = $(this).attr('data-comentario');
 
-							}else{
-								$('#res-automatica-edit').prop('checked', false);
-								$("#res-automatica-edit-no").css("color", "black");
-						   	$("#res-automatica-edit-si").css("color", "rgba(0,0,0, 0.26)");
-						   	$("#res-automatica-edit-check").val("no")
-							}
+				$("#talla-edit-p").val(talla);
+				$("#modelo-edit-p").val(modelo);
+				$("#cantidad-editar").val(cantidad);
+				$("#descripcion-edit-p").val(descripcion);
+				$("#comentario-edit").val(texto);
+				$('#media_id_edit').val(media_id);
+				$("#div-modelo").removeClass("has-error")
+				$("#div-talla").removeClass("has-error")
 
-							$(".load").fadeOut();
-							
-															
-					    $('#ModalEditarProducto').modal('show');
-							
-						}
-			    },
-	        error : function(xhr,errmsg,err) {
-						console.log(xhr.status + ": " + xhr.responseText);
-					 	$(".load").fadeOut();
-					 }              
-			
-				});
+		    $('#ModalEditarProducto').modal('show');
+
 			});
 
-	  	$("#btn-guardar-edit-pro").on("click", function (e) {
+	  	$("#ModalEditarProducto").on("submit", ".form-edit-producto", function (e) {
 				
 				e.preventDefault();
-
+				var array_img= []
+				var talla = $('#talla-edit-p').val();
+				var modelo = $('#modelo-edit-p').val();
 				var cantidad = $('#cantidad-editar').val();
 				var descripcion = $('#descripcion-edit-p').val();
-				var res_automatica = $('#res-automatica-edit-check').val();
+				var res_automatica = $('#res-automatica-check').val();
 				var media_id = $('#media_id_edit').val();
 				var csrftoken = getCookie('csrftoken');
 				var texto = $('#comentario-edit').val();
-			
-				if (cantidad < 0){
+				$('input[id^="img-publi"]').each(function() {
+				  array_img.push([this.name, this.value]);
+
+				});
+
+				var result_img = array_img.filter(function(v,i) {
+				  return v[0] === media_id;
+				});
+				if (cantidad <= 0){
 					$("#div-cantidad").addClass("has-error");
 					$("#erro-cantidad").css("display", "block");
 					
@@ -904,9 +614,13 @@
 				    data : 
 				    	{	'csrfmiddlewaretoken' : csrftoken,
 				    		'media_id' : media_id,
+				    		'talla' : talla,
+				    		'modelo' : modelo,
 				    		'cantidad' : cantidad,
 				    		'descripcion' : descripcion,
-				    		'res_automatica' : res_automatica,
+				    		'result_img[]' : result_img,
+				    		'texto': texto,
+				    		'res_automatica' : res_automatica
 				    	},
 						beforeSend: function() {
 			        // setting a timeout
@@ -916,16 +630,22 @@
 		  				//$.ajaxSettings.beforeSend(xhr, settings);
 			    	},
 				    success : function(data){
-							console.log(data);
-							//$(".load").fadeOut();
+							//console.log(data);
+							$(".load").fadeOut();
+							$('#ModalEditarProducto').modal('hide');
 							if (data.estado == 1){
-								demo.showNotificationSucces('top','center','Producto editado con exito.');
-								location.reload();
-							
+								demo.showNotificationSucces('top','center','Producto editado con exito. Ahora lo puedes ver con mas detalle en la sección de Mis Productos');
 							}else{
-								demo.showNotificationError('top','center','Hubo un problema al editar el producto. Intentalo nuevamente.')
-								location.reload();
+								demo.showNotificationSucces('top','center','Producto editado con exito.');
+									setTimeout(function(){// wait for 5 secs(2)
+		           			location.reload(); // then reload the page.(3)
+	      					}, 2000);
 							}
+							
+								
+								/* */
+						//$(".load").fadeOut();
+				        
 				    },
 		        error : function(xhr,errmsg,err) {
 		        	$(".load").fadeOut();
@@ -940,13 +660,11 @@
 
 	  	});
 
-	  	
-
-		
-		}); // end document Ready
+	
+	}); // end document Ready
 	</script>
 
-{%endblock%}
+</html>
 
 
 

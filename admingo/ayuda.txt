@@ -1,0 +1,48 @@
+#### ACCIONES POR DESARROLLAR ####
+
+	- Validar la conexion a internet antes de conectar al api
+
+##################################
+
+len caption->text: 57
+caption->text.split(' '): ['Encabezado', 'de', 'la', 'pagina\n-', 'Debes', 'seguirnos\n-', 'Debes', 'darle', 'like', 'a', 'esta', 'foto\n-', 'Debes', 'usar', 'los', 'hastags:', '#hastag1', '#hastag2\n-', 'Debes', 'seguir', 'estas', 'cuentas:', '@cuenta1', '@cuenta2\n-', 'Etiquetar', 'a', '3', 'amigos\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'hacer', 'like', 'a', 'esta', 'publicación\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'seguir', 'a', 'nuestra', 'cuenta\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'seguir', 'a', 'las', 'cuentas', 'nombradas\npie', 'de', 'la', 'pagina']
+
+
+len comentario: 58
+comentario.split(' '): ['Encabezado', 'de', 'la', 'pagina\n-', 'Debes', 'seguirnos\n-', 'Debes', 'darle', 'like', 'a', 'esta', 'foto\n-', 'Debes', 'usar', 'los', 'hastags:', '#hastag1', '#hastag2\n-', 'Debes', 'seguir', 'estas', 'cuentas:', '@cuenta1', '@cuenta2', '\n-', 'Etiquetar', 'a', '3', 'amigos\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'hacer', 'like', 'a', 'esta', 'publicación\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'seguir', 'a', 'nuestra', 'cuenta\n-', 'Tus', 'amigos', 'etiquetados', 'deben', 'seguir', 'a', 'las', 'cuentas', 'nombradas\npie', 'de', 'la', 'pagina']
+
+
+Este es el primer encabezado que hago para las publicaciones nuevas
+
+Este es el primer pie de pagina que hago para las publicaciones nuevas
+
+
+## pruba con intervalos de confianza
+confiaza_coment = int((len(arr_comentario) * 0.95)/10)
+varianza= abs(len(arr_comentario) - len(arr_obj))
+varianza_arr = 0
+				if (varianza <= confiaza_coment):
+					print(">>>> Entra si la varianaza esta dentro de la confianza  ")
+					print("#---> entre si los dos len son iguales")
+
+					for x in range(0,len(arr_obj)):					
+						if (arr_obj[x] != arr_comentario[x]):
+							iguales = False
+							print("XXXX no se parecen: "+str(x))
+							if (varianza_arr <= confiaza_coment):
+								print(">>>> Entra si la varianaza esta dentro de la confianza en arr ")
+								iguales=True
+								break
+						else:
+							varianza_arr += 1
+					if (iguales):
+						media_id = obj['caption']['media_id']
+						img_url = obj['image_versions2']['candidates'][0]['url']
+						print("todo es igual")
+						break
+				else:
+					iguales = False
+
+
+
+

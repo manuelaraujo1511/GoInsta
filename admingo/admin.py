@@ -10,10 +10,3 @@ admin.site.register(Imagenes)
 admin.site.register(Concursos)
 admin.site.register(Ganadores)
 admin.site.register(Productos)
-admin.site.register(Pausas)
-admin.site.register(Finanzas)
-''' PAra las tallas y modelos
-admin.site.register(Tallas)
-admin.site.register(Modelos)
-'''
-
