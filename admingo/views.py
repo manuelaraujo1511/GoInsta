@@ -28,6 +28,7 @@ def getTotalCommentsMedia(api, mediaId):
   all_comments = []
   while verdad:
       #print("Entre al while")
+      # FUNCIONA
       api.getMediaComments(mediaId, next_max_id)
       tem = api.LastJson
       for t in tem['comments']:
@@ -138,7 +139,7 @@ def index(request):
 	if (todos_concursos.exists()):		
 
 		while has_more_feed:
-
+      # FUNCIONA
 		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
 		  temp = api.LastJson
 
@@ -160,7 +161,7 @@ def index(request):
 	#print(str(feed))
 	else:
 		while has_more_feed:
-
+      # FUNCIONA
 		  api.getUserFeed(usernameId, next_max_id, minTimestamp)
 		  temp = api.LastJson
 
@@ -640,6 +641,7 @@ def publicar_concurso(request):
 			else:			
 
 				## subir foto al Insta
+        # FUNCIONA
 				api.uploadPhoto(str(img2), ""+comentario+"")
 				subir_foto=api.LastJson
 				#print("subir foto: "+str(subir_foto))
@@ -657,7 +659,7 @@ def publicar_concurso(request):
 				########
 
 				while has_more_feed:
-
+          # FUNCIONA
 				  api.getUserFeed(usernameId, next_max_id, minTimestamp)
 				  temp = api.LastJson
 
@@ -887,6 +889,7 @@ def mis_concursos(request):
 	## Esto esta por hacer ##
 	#usuario = Info.objects.get(id_usuario_id=request.user.id)
 	####
+  # FUNCIONA
 	api.searchUsername(str(username_insta))
 	img_profile = api.LastJson['user']['profile_pic_url']
 	media_count = api.LastJson['user']['media_count']
@@ -1044,7 +1047,7 @@ def publicar_ganadores(request):
 
 		concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
 		
-
+    # FUNCIONA
 		con = api.comment(media_id, comentario)
 		if (con):
 
@@ -1121,6 +1124,7 @@ def productos(request):
 	
 	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 	api.login()
+  # FUNCIONA
 	api.searchUsername(str(username_insta))
 	img_profile = api.LastJson['user']['profile_pic_url']
 	media_count = api.LastJson['user']['media_count']
