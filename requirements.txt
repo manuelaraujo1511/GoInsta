@@ -16,3 +16,5 @@ static3==0.7.0
 urllib3==1.22
 InstagramAPI
 django_heroku
+# import imageio
+# imageio.plugins.ffmpeg.download()
