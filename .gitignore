@@ -3,18 +3,20 @@
 # Edit at https://www.gitignore.io/?templates=django
 
 ### Django ###
-GoInsta/__pycache__/__init__.cpython-34.pyc
-GoInsta/__pycache__/settings.cpython-34.pyc
-GoInsta/__pycache__/urls.cpython-34.pyc
-GoInsta/__pycache__/wsgi.cpython-34.pyc
-admingo/__pycache__/__init__.cpython-34.pyc
-admingo/__pycache__/admin.cpython-34.pyc
-admingo/__pycache__/apps.cpython-34.pyc
-admingo/__pycache__/models.cpython-34.pyc
-admingo/__pycache__/urls.cpython-34.pyc
-admingo/__pycache__/views.cpython-34.pyc
-admingo/migrations/__pycache__/0001_initial.cpython-34.pyc
-admingo/migrations/__pycache__/__init__.cpython-34.pyc
+*/__pycache__
+# GoInsta/__pycache__/settings.cpython-34.pyc
+# GoInsta/__pycache__/urls.cpython-34.pyc
+# GoInsta/__pycache__/wsgi.cpython-34.pyc
+# admingo/__pycache__/*
+# admingo/__pycache__/admin.cpython-34.pyc
+# admingo/__pycache__/apps.cpython-34.pyc
+# admingo/__pycache__/models.cpython-34.pyc
+# admingo/__pycache__/urls.cpython-34.pyc
+# admingo/__pycache__/views.cpython-34.pyc
+*/*/__pycache__
+*/*/*/__pycache__
+# admingo/migrations/__pycache__/0001_initial.cpython-34.pyc
+# admingo/migrations/__pycache__/__init__.cpython-34.pyc
 db.sqlite3
 
 *.sqlite3

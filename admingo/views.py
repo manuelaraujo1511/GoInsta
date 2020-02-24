@@ -203,15 +203,15 @@ def singup(request):
 					#print (password)
 					user = authenticate(request, username=user_name, password=password)
 					#print(user)
-					if user is not None:
-						if user.is_active:
+					if user is None:
+						if user is None:
 							
 
 							api = InstagramAPI(user_u.user_insta, user_u.pass_insta)
 							if api.login():
 								
-								login(request, user)
-								messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
+								#login(request, user)
+								#messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
 								api.logout()
 								return redirect('admingo:index')
 						else:
