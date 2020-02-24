@@ -14,6 +14,8 @@ class Usuarios(models.Model):
 	fecha_creacion = models.DateTimeField(default=datetime.now)
 	fecha_modificacion = models.DateTimeField(default=datetime.now)
 	#description = models.TextField( max_length = 300 )
+	fin_registro = models.IntegerField(null = True)
+	cambiar_pass_insta = models.IntegerField(null = True)
 	
 	def __unicode__(self ):
 		return self.email
