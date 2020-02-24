@@ -70,9 +70,11 @@ def resize_image(input_image_path,output_image_path,size):
 
 
 
-@login_required
+#@login_required
 def index(request):
 	# IMPORTANTE: comprobar conexion a internet
+	print("----------")	
+	print(request.user)	
 	user_r= Usuarios.objects.get(email=request.user.email)
 	username_insta = ""+user_r.user_insta+""
 
@@ -180,6 +182,7 @@ def index(request):
 		'monto_total' : get_precio(request)
 
 	}
+	print(feed)
 	
 	api.logout()
 	return render(request, 'index.html', context)
@@ -189,10 +192,13 @@ def singup(request):
 	#	return redirect("admingo:index")
 	#global api
 	print (str(request))
+	
 	if request.method == "POST":
 		email = request.POST['email']
 		password = request.POST['password']
-
+		#print (email, password)
+		user_u = Usuarios.objects.get(email=email)
+		#print(user_u.user_insta)
 		try:
 			user_u = Usuarios.objects.get(email=email)
 			user_name=user_u.username
@@ -202,21 +208,20 @@ def singup(request):
 					#print (user_name)
 					#print (password)
 					user = authenticate(request, username=user_name, password=password)
+					login(request, user)
 					#print(user)
-					if user is None:
-						if user is None:
+					if user is not None:
+						
 							
 
-							api = InstagramAPI(user_u.user_insta, user_u.pass_insta)
-							if api.login():
-								
-								#login(request, user)
-								#messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
-								api.logout()
-								return redirect('admingo:index')
-						else:
-							messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
-						return render(request, 'singup.html')		
+						# api = InstagramAPI(user_u.user_insta, user_u.pass_insta)
+						# if api.login():
+							
+						# 	#login(request, user)
+						# 	#messages.success(request, 'Bienvenido ' + request.user.first_name + ' '+request.user.last_name)
+						# 	api.logout()
+						print("REDIRECT")
+						return redirect('admingo:index')
 					else:
 						messages.error(request, 'Datos Incorrectos, Intente de Nuevo')
 						return render(request, 'singup.html')	
@@ -258,7 +263,7 @@ def registro(request):
 			user.last_name = apellido
 			user.save()
 
-			u = Usuarios(nombre=nombre, apellido=apellido, email=email,password=password,username=username)
+			u = Usuarios(nombre=nombre, apellido=apellido, email=email,password=password,username=username,fin_registro=0,cambiar_pass_insta=0)
 			u.save()
 			context = {
 				'username': username,
@@ -291,7 +296,7 @@ def registroinsta(request):
 			user = authenticate(request, username=username, password=password)
 
 			login(request, user)
-
+			print(request.user)
 			messages.success(request, 'Bienvenido ' + request.user.first_name + ' ' + request.user.first_name)
 			api.logout()
 			return redirect("admingo:index")
@@ -495,6 +500,8 @@ def nuevo_concurso (request):
 		#print("media type:  "+str(media_info["items"][0]["media_type"]))
 		imagen = []
 		hastag= ""
+		print("---"*20)
+		print(media_info)
 
 		if (media_info["items"][0]["media_type"] == 1):
 			print("media_info[media_type] == 1")

@@ -115,7 +115,7 @@
 
                   	{% if obj.image_versions2 is not Null %}
                   		<img class="img" src="{{obj.image_versions2.candidates.0.url}}"  />
-                  		<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{obj.image_versions2.candidates.0.url}}" style="display: none" />
+                  		<input id="img-publi" name="{{obj.code}}"  type="text" value="{{obj.image_versions2.candidates.0.url}}" style="display: none" />
                   		
 
                   	{% else %}
@@ -141,13 +141,13 @@
 										    		{%if forloop.first %}
 										    			<div class="item active">
 										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" >
-										    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
+										    				<input id="img-publi" name="{{obj.code}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
 										    			</div>
 										    			
 										    		{% else %}
 										    			<div class="item">
 										    				<img src="{{fotos.image_versions2.candidates.0.url}}" alt="" style="width:100%;" ">
-										    				<input id="img-publi" name="{{obj.caption.media_id}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
+										    				<input id="img-publi" name="{{obj.code}}"  type="text" value="{{fotos.image_versions2.candidates.0.url}}" style="display: none" />
 										    			</div>
 										    		{% endif %}
 										    		
@@ -175,14 +175,14 @@
 											 <!--div class="clearfix"></div-->
 											 <div class="row">
 											 	<div class="col-sm-4">
-													<button type="button" class="btn btn-simple Modalcancelar" data-media="{{obj.caption.media_id}}" data-texto="{{obj.caption.text}}" title="Pausar Venta" style="padding: 0px 0px !important">
+													<button type="button" class="btn btn-simple Modalcancelar" data-media="{{obj.code}}" data-texto="{{obj.caption.text}}" title="Pausar Venta" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-warning" style="font-size: 30px">pause</i>
 
 													</button> 		
 											 	</div>
 											 	<div class="col-sm-4">
-													<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.caption.media_id}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
+													<button type="button" id="btn-vender" class="btn btn-simple Modalvender"  data-media="{{obj.code}}"  data-comentario = "{{obj.caption.text}}" title="Vender" style="padding: 0px 0px !important">
 													
 														<i class="material-icons text-success" style="font-size: 30px">shop</i>
 
@@ -191,14 +191,14 @@
 											 </div>
 											 <div class="row">
 											 	<div class="col-sm-4">
-											 		<button type="button" class="btn btn-simple ModalAgregarConcurso"  data-media="{{obj.caption.media_id}}" title="Agregar como un Concurso" style="padding: 0px 0px !important">
+											 		<button type="button" class="btn btn-simple ModalAgregarConcurso"  data-media="{{obj.code}}" title="Agregar como un Concurso" style="padding: 0px 0px !important">
 
 											 			<i class="material-icons text-info" style="font-size: 30px">card_giftcard</i>
 
 											 		</button>
 											 	</div>
 										 		<div class="col-sm-4">						 	
-											 		<button type="button" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.caption.media_id}}" data-comentario = "{{obj.caption.text}}" title="Editar Producto" style="padding: 0px 0px !important">
+											 		<button type="button" class="btn btn-simple ModalEditarProducto"  data-media="{{obj.code}}" data-comentario = "{{obj.caption.text}}" title="Editar Producto" style="padding: 0px 0px !important">
 
 										 			<i class="material-icons text-primary" style="font-size: 30px">edit</i>
 
