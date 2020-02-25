@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8" />
 	{% load static %}
@@ -10,28 +11,29 @@
 	<title>GOInsta</title>
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
-    <meta name="viewport" content="width=device-width" />
+	<meta name="viewport" content="width=device-width" />
 
-    <!-- Bootstrap core CSS     -->
-    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"-->
+	<!-- Bootstrap core CSS     -->
+	<!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"-->
 
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="/static/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!--  Material Dashboard CSS    -->
-    <link href="/static/css/material-dashboard.css" rel="stylesheet"/>
+	<!--  Material Dashboard CSS    -->
+	<link href="/static/css/material-dashboard.css" rel="stylesheet" />
 
-    <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" />
 
 
-    
 
-    <!--  CSS for Demo Purpose, don't include it in your project     -->
-    <link href="/static/css/demo.css" rel="stylesheet" />
 
-    <!--     Fonts and icons     -->
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
-    
+	<!--  CSS for Demo Purpose, don't include it in your project     -->
+	<link href="/static/css/demo.css" rel="stylesheet" />
+
+	<!--     Fonts and icons     -->
+	<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet'
+		type='text/css'>
+
 </head>
 
 <body>
@@ -40,8 +42,8 @@
 	</div>
 	<div class="wrapper">
 
-    <div class="sidebar" data-color="purple" data-image="/static/img/sidebar-1.jpg">
-	
+		<div class="sidebar" data-color="purple" data-image="/static/img/sidebar-1.jpg">
+
 
 			<div class="logo">
 				<!--a href="#" class="simple-text">
@@ -49,52 +51,52 @@
 				</a-->
 				<div class="profile-avatar">
 					<a href="#">
-						<img class="img" src="{{usuario.foto_perfil}}" height="60" width= "60"/>
+						<img class="img" src="{{usuario.foto_perfil}}" height="60" width="60" />
 					</a>
 				</div>
 				<center>
-					<h5>{{usuario.username}}</h5>	
+					<h5>{{usuario.username}}</h5>
 				</center>
-				
+
 			</div>
 
-    	<div class="sidebar-wrapper">
-        <ul class="nav">
-          <li id="index-li" class="active">
-              <a href="{% url 'admingo:index' %}">
-                  <i class="material-icons">dashboard</i>
-                  <p>Publicaciones</p>
-              </a>
-          </li>
-           <li id="productos-li">
-              <a href="{% url 'admingo:productos' %}">
-                  <i class="material-icons">shop</i>
-                  <p>Mis Productos</p>
-              </a>
-          </li>
-          <li id="ventas-li">
-              <a href="{% url 'admingo:ventas' %}">
-                  <i class="material-icons">assessment</i>
-                  <p>Ventas</p>
-              </a>
-          </li>
-          <li id="nuevo-concurso-li">
-              <a href="{% url 'admingo:nuevo_concurso' %}">
-                  <i class="material-icons">card_giftcard</i>
-                  <p>Iniciar Concurso</p>
-              </a>
-          </li>
-          <li id="mis-concursos-li">
-              <a href="{% url 'admingo:mis_concursos' %}">
-                  <i class="material-icons">card_membership</i>
-                  <p>Mis Concursos</p>
-              </a>
-          </li>
-        </ul>
-    	</div>
-    </div>
+			<div class="sidebar-wrapper">
+				<ul class="nav">
+					<li id="index-li" class="active">
+						<a href="{% url 'admingo:index' %}">
+							<i class="material-icons">dashboard</i>
+							<p>Publicaciones</p>
+						</a>
+					</li>
+					<!-- <li id="productos-li">
+						<a href="{% url 'admingo:productos' %}">
+							<i class="material-icons">shop</i>
+							<p>Mis Productos</p>
+						</a>
+					</li>
+					<li id="ventas-li">
+						<a href="{% url 'admingo:ventas' %}">
+							<i class="material-icons">assessment</i>
+							<p>Ventas</p>
+						</a>
+					</li> -->
+					<li id="nuevo-concurso-li">
+						<a href="{% url 'admingo:nuevo_concurso' %}">
+							<i class="material-icons">card_giftcard</i>
+							<p>Iniciar Concurso</p>
+						</a>
+					</li>
+					<li id="mis-concursos-li">
+						<a href="{% url 'admingo:mis_concursos' %}">
+							<i class="material-icons">card_membership</i>
+							<p>Mis Concursos</p>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
 
-    <div class="main-panel">
+		<div class="main-panel">
 			<nav class="navbar navbar-transparent navbar-absolute">
 				<div class="container-fluid">
 					<div class="navbar-header">
@@ -104,7 +106,8 @@
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="#">Monto Vendido {{monto_total | floatformat:2}} <i class="material-icons">account_balance_wallet</i></a>
+						<!-- <a class="navbar-brand" href="#">Monto Vendido {{monto_total | floatformat:2}} <i
+								class="material-icons">account_balance_wallet</i></a> -->
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav navbar-right">
@@ -129,12 +132,12 @@
 								</ul>
 							</li>
 							<li>
-								
-								<a href='{% url "admingo:cerrar_sesion" %}' placeholder ="Cerrar Sesión">
+
+								<a href='{% url "admingo:cerrar_sesion" %}' placeholder="Cerrar Sesión">
 									<i class="material-icons">power_settings_new</i>
 									<p class="hidden-lg hidden-md">Cerrar Sesión</p>
 								</a>
-							
+
 							</li>
 						</ul>
 
@@ -150,4 +153,3 @@
 					</div>
 				</div>
 			</nav>
-

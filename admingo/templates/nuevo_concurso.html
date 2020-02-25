@@ -270,7 +270,7 @@
 								<div class="col-md-2">
 									<div id="etiqueta-td">
 										<div class="form-group label-floating" style="padding-bottom: 0px;margin: 0 0 0 0;">
-											<label class="control-label">¿Qué cantidad?</label>
+											<label class="control-label">¿Cuantos?</label>
 											<input type="number" name="cantidad-etiqueta" id="cantidad-etiqueta" class="form-control">
 										</div>
 										
@@ -590,6 +590,7 @@ $('#btn-publicar').click(function(){
 		}else{
 			var csrftoken = getCookie('csrftoken');
 			var img = $("#img-text").val();
+			console.log(img)
 			var comentario = mensaje_final;
 			var seguirme = ajax_seguirnos;
 			var like = ajax_like;

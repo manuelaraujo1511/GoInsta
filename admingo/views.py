@@ -599,7 +599,7 @@ def publicar_concurso(request):
 
 
 		ruta_original=os.getcwd()
-		#print ("ruta original: "+str(ruta_original))
+		print ("ruta original: "+str(ruta_original))
 		#print ("entre a Publicar Concurso POST")
 		user_r= Usuarios.objects.get(email=request.user.email)
 		username_insta = ""+user_r.user_insta+""
@@ -622,6 +622,8 @@ def publicar_concurso(request):
 			ganadores = request.POST.get('ganadores')
 			media_id = request.POST.get('media_id')
 
+			media_id = int(media_id)
+
 			if (media_id != 0):
 				print("media_id != 0")
 				concurso = Concursos.objects.filter(id_usuario_id=request.user.id, media_id = media_id)
@@ -642,9 +644,9 @@ def publicar_concurso(request):
 
 				## subir foto al Insta
         # FUNCIONA
-				api.uploadPhoto(str(img2), ""+comentario+"")
+				print(api.uploadPhoto(str(img2), ""+comentario+""))
 				subir_foto=api.LastJson
-				#print("subir foto: "+str(subir_foto))
+				# print("subir foto: "+str(subir_foto))
 				#####
 
 				## para buscar la ultima publicacion
@@ -679,7 +681,8 @@ def publicar_concurso(request):
 
 				
 				for obj in feed:
-					media_id = obj['caption']['media_id']
+					#media_id = obj['caption']['media_id']
+					media_id = obj['id']
 					img_url = obj['image_versions2']['candidates'][0]['url']
 					break
 
@@ -689,7 +692,7 @@ def publicar_concurso(request):
 
 				#print("esta es la imagen: "+str(img2))
 				#print(str(comentario))
-				if (subir_foto['status']== 'ok'):
+				if (subir_foto):
 					Concursos(id_usuario = user_r,img_url=img_url,media_id=media_id, ruta_img = img, seguirnos =seguirme, like=like, hastags = hastag, seguir_otros=seguir_otros, cant_etiqueta = cant_etiqueta, like_amigo_otros = amigos_like_otros, seguirme_amigos=amigos_seguirme, seguir_amigos_otras = amigos_seguir_otros,condiciones = comentario, ganadores= ganadores, activo = 1).save()
 					#print("esta es la imagen: "+str(img2))
 					#print(str(comentario))
@@ -832,12 +835,16 @@ def validar_comentarios(api,array_comentario, media):
 
 @login_required
 def mis_concursos(request):
+	user_r= Usuarios.objects.get(email=request.user.email)
+	username_insta = ""+user_r.user_insta+""
+
 	todos_concursos = Concursos.objects.filter(id_usuario_id=request.user.id)
+	print(todos_concursos)
+	todos_concursos_2 = Concursos.objects.filter(id_usuario=user_r)
+	print(todos_concursos_2)
 	
 	imagenes = Imagenes.objects.filter(id_usuario_id=request.user.id)
 
-	user_r= Usuarios.objects.get(email=request.user.email)
-	username_insta = ""+user_r.user_insta+""
 	
 	api= InstagramAPI(user_r.user_insta, user_r.pass_insta)
 	api.login()
@@ -849,8 +856,10 @@ def mis_concursos(request):
 	#print("seguidores: "+str(api.LastJson))
 	imagenes_count = imagenes.count()
 	tam=len(todos_concursos)
+	print("str(len(todos_concursos))")
 	print(str(len(todos_concursos)))
-	for c in todos_concursos:
+	for c in todos_concursos_2:
+		print(c)
 		
 		cont_comentario = 0
 		cont_validos = 0
