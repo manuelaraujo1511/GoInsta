@@ -21,3 +21,5 @@ Password: "jgrc*2020"
 
 - El UpoadPhoto tiene problemas , revisar en views.py
 
+- Hay notas (**MODIFICAR**) dentro de views.py
+

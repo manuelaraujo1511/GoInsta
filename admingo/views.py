@@ -663,61 +663,70 @@ def publicar_concurso(request):
                 # FUNCIONA
                 photo = str(ruta_original)+"/"+str(img2)
                 print(str(ruta_original)+"/"+str(img2))
-                try:
-                    op = open(photo, 'rb')
-                    print(op)
-                except:
-                    print("No abrio")
-                subir_foto = api.uploadPhoto(str(ruta_original)+"/"+str(img2), caption = str(comentario))
+                # try:
+                #     op = open(photo, 'rb')
+                #     print(op)
+                # except:
+                #     print("No abrio")
+
+                subir_foto = api.uploadPhoto(
+                    str(ruta_original)+"/"+str(img2), caption=str(comentario))
                 print(subir_foto)
                 # subir_foto = api.LastJson
                 # print("subir foto: "+str(subir_foto))
                 #####
 
-                # para buscar la ultima publicacion
-                next_max_id = ''
-                has_more_feed = True
-                minTimestamp = 100
-                feed = []
-                usernameId = api.username_id
-                media_id = ''
-                img_url = ''
-                iguales = True
-                ########
+                # MODIFICAR la codicion y e unificar
+                if (not subir_foto):
+                    # para buscar la ultima publicacion
+                    next_max_id = ''
+                    has_more_feed = True
+                    minTimestamp = 100
+                    feed = []
+                    usernameId = api.username_id
+                    media_id = ''
+                    img_url = ''
+                    iguales = True
+                    ########
 
-                while has_more_feed:
-                    # FUNCIONA
-                    api.getUserFeed(usernameId, next_max_id, minTimestamp)
-                    temp = api.LastJson
+                    while has_more_feed:
+                        # FUNCIONA
+                        api.getUserFeed(
+                            usernameId, next_max_id, minTimestamp)
+                        temp = api.LastJson
 
-                    for item in temp["items"]:
+                        for item in temp["items"]:
 
-                        feed.append(item)
+                            feed.append(item)
 
-                    if temp["more_available"] is False:
+                        if temp["more_available"] is False:
 
-                        #print("entre si es falso")
+                            #print("entre si es falso")
 
-                        has_more_feed = False
+                            has_more_feed = False
 
-                    else:
+                        else:
 
-                        next_max_id = temp["next_max_id"]
+                            next_max_id = temp["next_max_id"]
+                    try:
 
-                for obj in feed:
-                    #media_id = obj['caption']['media_id']
-                    media_id = obj['id']
-                    img_url = obj['image_versions2']['candidates'][0]['url']
-                    break
+                        for obj in feed:
+                            #media_id = obj['caption']['media_id']
+                            print(obj)
+                            media_id = obj['id']
+                            img_url = obj['image_versions2']['candidates'][0]['url']
+                            break
+                    except:
+                        img_url = ""
 
-                #print("media_id: "+str(media_id))
-                #print("img_url: "+str(img_url))
+                    #print("media_id: "+str(media_id))
+                    #print("img_url: "+str(img_url))
 
-                #print("esta es la imagen: "+str(img2))
-                # print(str(comentario))
-                if (subir_foto):
+                    #print("esta es la imagen: "+str(img2))
+                    # print(str(comentario))
+                if (not subir_foto):
                     Concursos(id_usuario=user_r, img_url=img_url, media_id=media_id, ruta_img=img, seguirnos=seguirme, like=like, hastags=hastag, seguir_otros=seguir_otros, cant_etiqueta=cant_etiqueta,
-                    like_amigo_otros=amigos_like_otros, seguirme_amigos=amigos_seguirme, seguir_amigos_otras=amigos_seguir_otros, condiciones=comentario, ganadores=ganadores, activo=1).save()
+                              like_amigo_otros=amigos_like_otros, seguirme_amigos=amigos_seguirme, seguir_amigos_otras=amigos_seguir_otros, condiciones=comentario, ganadores=ganadores, activo=1).save()
                     #print("esta es la imagen: "+str(img2))
                     # print(str(comentario))
                     #print("Despues de publicar: " +str(api.LastJson));
@@ -726,7 +735,7 @@ def publicar_concurso(request):
                     context = {'estado': 1}
                 else:
                     api.logout()
-                    context = {'estado': 0}
+                    context = {'estado': 2}
 
     return JsonResponse(context)
 
