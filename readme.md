@@ -26,10 +26,12 @@ Password: "jgrc*2020"
 
 # Nuevos Paso
 
--   publicar para IG
+-   publicar para IG.
 -   Concursos para Facebook.
 -   Reglas de publicar una foto en el perfil de usuario para validar las nuevas reglas.
 -   Validar los histories para el concurso.
 -   Manipular diferentes cuentas desde la SW.
+-   Competencia del SW.
+
 
 
